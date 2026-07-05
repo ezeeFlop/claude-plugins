@@ -26,17 +26,21 @@ Either way, the bundled `.mcp.json` launches the MCP server via
 published `audigeo-mcp` package from PyPI and caches an isolated environment
 on first launch — no manual `pip install`.
 
-## Configure
+## Configure your key (one command, once)
 
-Set your API key (generate at https://audigeo.ai → Settings → API Keys,
-requires plan Pro or Agency) in your shell environment before starting Claude
-Code:
+Generate an API key at https://audigeo.ai → Settings → API Keys (plan Pro or
+Agency), then run:
 
-```bash
-export AUDIGEO_API_KEY=agk_...
+```
+/audigeo-login agk_...
 ```
 
-Restart Claude Code. Try `/audigeo-status` to verify.
+That's it — no env var, no config file to edit. The key is stored in
+`~/.config/audigeo/api_key` (chmod 600) and used across all your Claude Code
+sessions. Try `/audigeo-status` to verify.
+
+*(Alternatives if you prefer: set `AUDIGEO_API_KEY` in your shell, or in the
+`env` block of `~/.claude/settings.json`. Any of the three works.)*
 
 ## What's included
 
@@ -45,7 +49,7 @@ Restart Claude Code. Try `/audigeo-status` to verify.
 - **7 skills**: contextual guidance the agent loads on demand (audit,
   monitoring, hallucination triage, brand profile, content generation, bot
   analytics, product overview).
-- **4 slash commands**: `/audigeo-status`, `/audigeo-audit`,
+- **5 slash commands**: `/audigeo-login`, `/audigeo-status`, `/audigeo-audit`,
   `/audigeo-monitor`, `/audigeo-content`.
 - **Subagent `audigeo-strategist`**: an in-house GEO expert agent with the
   full toolkit at its disposal.
