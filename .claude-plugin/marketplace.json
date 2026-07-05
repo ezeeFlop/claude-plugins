@@ -27,6 +27,28 @@
       ],
       "source": "./plugins/audigeo",
       "homepage": "https://audigeo.ai"
+    },
+    {
+      "name": "spongram",
+      "displayName": "Spongram",
+      "description": "Cerveau persistant cross-session pour Claude Code — mémoire continue, knowledge graph temporel et code-map, via votre instance Spongram (cloud) ou l'app Desktop locale.",
+      "author": {
+        "name": "Sponge Theory",
+        "email": "support@sponge-theory.io",
+        "url": "https://sponge-theory.io"
+      },
+      "category": "productivity",
+      "version": "0.1.0",
+      "keywords": [
+        "memory",
+        "knowledge-graph",
+        "mcp",
+        "second-brain",
+        "spongram",
+        "sponge-theory"
+      ],
+      "source": "./plugins/spongram",
+      "homepage": "https://spongram.sponge-theory.dev"
     }
   ]
 }

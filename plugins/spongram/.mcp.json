@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "spongram": {
+      "type": "http",
+      "url": "${user_config.instance_url}/mcp",
+      "headers": {
+        "Authorization": "Bearer ${user_config.brain_key}"
+      }
+    }
+  }
+}

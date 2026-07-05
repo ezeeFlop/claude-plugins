@@ -1,0 +1,29 @@
+{
+  "name": "spongram",
+  "version": "0.1.0",
+  "description": "Spongram by Sponge Theory — cerveau persistant cross-session pour Claude Code (mémoire + knowledge graph + code-map), via votre instance Spongram distante.",
+  "author": {
+    "name": "Sponge Theory",
+    "email": "support@sponge-theory.io",
+    "url": "https://sponge-theory.io"
+  },
+  "homepage": "https://spongram.sponge-theory.dev",
+  "license": "Sponge Theory Proprietary",
+  "keywords": ["memory", "knowledge-graph", "mcp", "second-brain", "spongram", "sponge-theory"],
+  "userConfig": {
+    "instance_url": {
+      "type": "string",
+      "title": "Spongram instance URL",
+      "description": "URL de votre instance Spongram (cloud hébergé ou self-host), sans /mcp — ex. https://spongram.sponge-theory.dev",
+      "default": "https://spongram.sponge-theory.dev",
+      "required": true
+    },
+    "brain_key": {
+      "type": "string",
+      "title": "Brain key (spt_brain_…)",
+      "description": "La clé de votre cerveau, affichée une seule fois dans l'admin Spongram à sa création.",
+      "sensitive": true,
+      "required": true
+    }
+  }
+}
