@@ -1,6 +1,6 @@
 {
   "name": "audigeo",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "AudiGEO.ai — audit GEO, monitoring IA, hallucinations, génération de contenu, depuis Claude Code.",
   "author": {
     "name": "Sponge Theory",
@@ -9,5 +9,26 @@
   },
   "homepage": "https://audigeo.ai",
   "license": "Sponge Theory Proprietary",
-  "keywords": ["geo", "seo", "ai-monitoring", "audigeo", "sponge-theory"]
+  "keywords": ["geo", "seo", "ai-monitoring", "audigeo", "sponge-theory"],
+  "userConfig": {
+    "api_key": {
+      "type": "string",
+      "title": "Clé API AudiGEO",
+      "description": "Générée sur audigeo.ai → Settings → API Keys (plan Pro ou Agency). Format agk_…",
+      "sensitive": true,
+      "required": true
+    },
+    "api_url": {
+      "type": "string",
+      "title": "URL de l'API",
+      "description": "Laisser par défaut sauf instance self-hosted.",
+      "default": "https://audigeo.ai/api/v1"
+    },
+    "read_only": {
+      "type": "boolean",
+      "title": "Mode lecture seule",
+      "description": "Désactive les outils d'écriture (lancer un audit, générer du contenu…).",
+      "default": false
+    }
+  }
 }

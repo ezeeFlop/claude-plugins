@@ -2,7 +2,12 @@
   "mcpServers": {
     "audigeo": {
       "command": "uvx",
-      "args": ["audigeo-mcp"]
+      "args": ["audigeo-mcp"],
+      "env": {
+        "AUDIGEO_API_KEY": "${user_config.api_key}",
+        "AUDIGEO_API_URL": "${user_config.api_url}",
+        "AUDIGEO_READ_ONLY": "${user_config.read_only}"
+      }
     }
   }
 }

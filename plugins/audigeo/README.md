@@ -26,21 +26,18 @@ Either way, the bundled `.mcp.json` launches the MCP server via
 published `audigeo-mcp` package from PyPI and caches an isolated environment
 on first launch — no manual `pip install`.
 
-## Configure your key (one command, once)
+## Configure your key
 
-Generate an API key at https://audigeo.ai → Settings → API Keys (plan Pro or
-Agency), then run:
+When you enable the plugin, **Claude Code prompts you with a form** for your
+AudiGEO API key (masked, stored in your system keychain) and, optionally, the
+API URL. Generate a key at https://audigeo.ai → Settings → API Keys (plan Pro
+or Agency). That's the whole setup — no env var, no file to edit. Try
+`/audigeo-status` to verify.
 
-```
-/audigeo-login agk_...
-```
-
-That's it — no env var, no config file to edit. The key is stored in
-`~/.config/audigeo/api_key` (chmod 600) and used across all your Claude Code
-sessions. Try `/audigeo-status` to verify.
-
-*(Alternatives if you prefer: set `AUDIGEO_API_KEY` in your shell, or in the
-`env` block of `~/.claude/settings.json`. Any of the three works.)*
+*Alternatives if the form doesn't appear (older Claude Code) or to change the
+key later:* run `/audigeo-login agk_...` (stores it in
+`~/.config/audigeo/api_key`), or set `AUDIGEO_API_KEY` in your shell / the
+`env` block of `~/.claude/settings.json`. Any of these works.
 
 ## What's included
 
