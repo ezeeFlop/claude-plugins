@@ -95,6 +95,30 @@
       ],
       "source": "./plugins/neokanban",
       "homepage": "https://kanban.sponge-theory.dev"
+    },
+    {
+      "name": "spt-models",
+      "displayName": "SPT Models",
+      "description": "Inference + model catalogue for the SPT Models GPU stack — chat, completion, embeddings, image / video / audio / music generation, transcription, rerank, plus per-model prompting guides — directly in Claude Code.",
+      "author": {
+        "name": "Sponge Theory",
+        "email": "support@sponge-theory.io",
+        "url": "https://sponge-theory.io"
+      },
+      "category": "productivity",
+      "version": "1.4.0",
+      "keywords": [
+        "mcp",
+        "inference",
+        "gpu",
+        "openai-compatible",
+        "spt",
+        "vllm",
+        "diffusers",
+        "sponge-theory"
+      ],
+      "source": "./plugins/spt-models",
+      "homepage": "https://models.sponge-theory.dev"
     }
   ]
 }

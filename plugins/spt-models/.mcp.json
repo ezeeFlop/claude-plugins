@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "spt-models": {
+      "command": "uv",
+      "args": ["run", "--directory", "${CLAUDE_PLUGIN_ROOT}", "server/main.py"],
+      "env": {
+        "SPT_BASE_URL": "${user_config.spt_base_url}",
+        "SPT_API_KEY": "${user_config.spt_api_key}",
+        "SPT_ADMIN_TOKEN": "${user_config.spt_admin_token}",
+        "SPT_REQUEST_TIMEOUT": "${user_config.spt_request_timeout}",
+        "SPT_VERIFY_TLS": "${user_config.spt_verify_tls}"
+      }
+    }
+  }
+}

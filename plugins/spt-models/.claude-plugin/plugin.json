@@ -1,0 +1,50 @@
+{
+  "name": "spt-models",
+  "version": "1.4.0",
+  "description": "Inference + model catalogue for the SPT Models GPU stack — chat, completion, embeddings, image / video / audio / music generation, transcription, rerank, plus per-model prompting guides — directly in Claude Code.",
+  "author": {
+    "name": "Sponge Theory",
+    "email": "support@sponge-theory.io",
+    "url": "https://sponge-theory.io"
+  },
+  "homepage": "https://models.sponge-theory.dev",
+  "license": "MIT",
+  "keywords": ["mcp", "inference", "gpu", "openai-compatible", "spt", "vllm", "diffusers", "sponge-theory"],
+  "userConfig": {
+    "spt_base_url": {
+      "type": "string",
+      "title": "SPT Gateway URL",
+      "description": "Base URL of your SPT Models Gateway. The MCP server appends /v1/* and /admin/api/* itself — do NOT include a trailing path.",
+      "default": "https://models.sponge-theory.dev",
+      "required": true
+    },
+    "spt_api_key": {
+      "type": "string",
+      "title": "SPT API Key",
+      "description": "Bearer token for /v1/* inference endpoints. Create one in the SPT admin UI (Keys page).",
+      "sensitive": true,
+      "required": true
+    },
+    "spt_admin_token": {
+      "type": "string",
+      "title": "SPT Admin Token (optional)",
+      "description": "Admin token used for load_model / unload_model / refresh_prompting_guide. Leave empty to disable those ops-only tools.",
+      "sensitive": true,
+      "required": false
+    },
+    "spt_request_timeout": {
+      "type": "string",
+      "title": "Request timeout (seconds)",
+      "description": "HTTP timeout for inference calls. Image / video generation can be slow — raise to 600+ for large diffusion models.",
+      "default": "300",
+      "required": false
+    },
+    "spt_verify_tls": {
+      "type": "string",
+      "title": "Verify TLS certificate",
+      "description": "Set to 'false' to skip TLS verification (self-signed certs only — never in production).",
+      "default": "true",
+      "required": false
+    }
+  }
+}
