@@ -1,20 +1,24 @@
 # Sponge Theory — Claude Code plugins
 
 Marketplace of [Claude Code](https://docs.claude.com/en/docs/claude-code)
-plugins published by [Sponge Theory](https://audigeo.ai).
+plugins published by [Sponge Theory](https://sponge-theory.ai).
 
 ## Install
 
 ```
 /plugin marketplace add ezeeFlop/claude-plugins
-/plugin install audigeo@sponge-theory
+/plugin install <plugin>@sponge-theory
 ```
+
+Each plugin prompts for its configuration (API keys, instance URL) when
+enabled — secrets are stored in your system keychain, never in files.
 
 ## Available plugins
 
 | Plugin | Description |
 |---|---|
-| **audigeo** | GEO audits, AI-platform monitoring, hallucination detection, and content generation for [AudiGEO.ai](https://audigeo.ai). Requires plan Pro or Agency. Set `AUDIGEO_API_KEY` (an `agk_…` key from Settings → API Keys) in your environment. Needs [`uv`](https://docs.astral.sh/uv/) installed — the plugin runs its MCP server via `uvx audigeo-mcp`. |
+| **spongram** | Persistent cross-session brain for Claude Code — temporal knowledge graph memory, code map, 3D cortex — backed by your [Spongram](https://spongram.sponge-theory.dev) instance (hosted or self-host). On enable, enter your instance URL and your `spt_brain_…` key (shown once in the Spongram admin). |
+| **audigeo** | GEO audits, AI-platform monitoring, hallucination detection, and content generation for [AudiGEO.ai](https://audigeo.ai). Requires plan Pro or Agency. On enable, enter your `agk_…` API key (Settings → API Keys). Needs [`uv`](https://docs.astral.sh/uv/) installed — the plugin runs its MCP server via `uvx audigeo-mcp`. |
 
 ## Layout
 
