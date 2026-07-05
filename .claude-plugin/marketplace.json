@@ -1,0 +1,25 @@
+{
+  "name": "sponge-theory",
+  "description": "Plugins Claude Code publiés par Sponge Theory.",
+  "owner": {
+    "name": "Sponge Theory",
+    "email": "support@audigeo.ai"
+  },
+  "plugins": [
+    {
+      "name": "audigeo",
+      "displayName": "AudiGEO",
+      "description": "Audit GEO, monitoring IA multi-plateformes, détection d'hallucinations et génération de contenu — directement dans Claude Code.",
+      "author": {
+        "name": "Sponge Theory",
+        "email": "support@audigeo.ai",
+        "url": "https://audigeo.ai"
+      },
+      "category": "productivity",
+      "version": "0.1.2",
+      "keywords": ["geo", "seo", "ai-monitoring", "audigeo", "hallucinations", "content-generation"],
+      "source": "./plugins/audigeo",
+      "homepage": "https://audigeo.ai"
+    }
+  ]
+}

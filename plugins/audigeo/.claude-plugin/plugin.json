@@ -1,0 +1,13 @@
+{
+  "name": "audigeo",
+  "version": "0.1.2",
+  "description": "AudiGEO.ai — audit GEO, monitoring IA, hallucinations, génération de contenu, depuis Claude Code.",
+  "author": {
+    "name": "Sponge Theory",
+    "email": "support@audigeo.ai",
+    "url": "https://audigeo.ai"
+  },
+  "homepage": "https://audigeo.ai",
+  "license": "Sponge Theory Proprietary",
+  "keywords": ["geo", "seo", "ai-monitoring", "audigeo", "sponge-theory"]
+}

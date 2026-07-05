@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "audigeo": {
+      "command": "uvx",
+      "args": ["audigeo-mcp"],
+      "env": {
+        "AUDIGEO_API_KEY": "${AUDIGEO_API_KEY}"
+      }
+    }
+  }
+}
