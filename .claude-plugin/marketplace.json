@@ -16,8 +16,15 @@
         "url": "https://audigeo.ai"
       },
       "category": "productivity",
-      "version": "0.1.2",
-      "keywords": ["geo", "seo", "ai-monitoring", "audigeo", "hallucinations", "content-generation"],
+      "version": "0.1.3",
+      "keywords": [
+        "geo",
+        "seo",
+        "ai-monitoring",
+        "audigeo",
+        "hallucinations",
+        "content-generation"
+      ],
       "source": "./plugins/audigeo",
       "homepage": "https://audigeo.ai"
     }
