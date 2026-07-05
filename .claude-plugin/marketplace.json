@@ -72,6 +72,29 @@
       ],
       "source": "./plugins/neorag",
       "homepage": "https://rag.sponge-theory.dev"
+    },
+    {
+      "name": "neokanban",
+      "displayName": "NeoKanban",
+      "description": "Gérez tâches, projets et boards, et lancez des transcriptions audio avec diarisation, directement dans Claude Code — via votre instance NeoKanban.",
+      "author": {
+        "name": "Sponge Theory",
+        "email": "support@sponge-theory.io",
+        "url": "https://sponge-theory.io"
+      },
+      "category": "productivity",
+      "version": "0.1.0",
+      "keywords": [
+        "kanban",
+        "task-management",
+        "project-management",
+        "transcription",
+        "mcp",
+        "neokanban",
+        "sponge-theory"
+      ],
+      "source": "./plugins/neokanban",
+      "homepage": "https://kanban.sponge-theory.dev"
     }
   ]
 }

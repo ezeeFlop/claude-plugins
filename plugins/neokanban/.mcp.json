@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "neokanban": {
+      "type": "http",
+      "url": "${user_config.api_url}/api/v1/mcp/messages",
+      "headers": {
+        "Authorization": "Bearer ${user_config.token}"
+      }
+    }
+  }
+}

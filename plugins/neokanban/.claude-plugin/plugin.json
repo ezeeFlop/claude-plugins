@@ -1,0 +1,29 @@
+{
+  "name": "neokanban",
+  "version": "0.1.0",
+  "description": "NeoKanban by Sponge Theory — manage tasks, projects and boards, and run audio transcription with speaker diarization, directly from Claude Code.",
+  "author": {
+    "name": "Sponge Theory",
+    "email": "support@sponge-theory.io",
+    "url": "https://sponge-theory.io"
+  },
+  "homepage": "https://kanban.sponge-theory.dev",
+  "license": "Sponge Theory Proprietary",
+  "keywords": ["kanban", "task-management", "project-management", "transcription", "mcp", "neokanban", "sponge-theory"],
+  "userConfig": {
+    "api_url": {
+      "type": "string",
+      "title": "NeoKanban API URL",
+      "description": "URL of your NeoKanban instance, without a path — e.g. https://kanban.sponge-theory.dev. Leave the default unless you self-host.",
+      "default": "https://kanban.sponge-theory.dev",
+      "required": true
+    },
+    "token": {
+      "type": "string",
+      "title": "MCP token (nk_mcp_…)",
+      "description": "Generate this token in the NeoKanban web UI under Settings → Integrations → MCP. Shown once at creation.",
+      "sensitive": true,
+      "required": true
+    }
+  }
+}
