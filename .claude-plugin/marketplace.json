@@ -49,6 +49,29 @@
       ],
       "source": "./plugins/spongram",
       "homepage": "https://spongram.sponge-theory.dev"
+    },
+    {
+      "name": "neorag",
+      "displayName": "SPT NeoRAG",
+      "description": "RAG entreprise dans Claude Code — bases de connaissances, ingestion de documents, retrieval sémantique / hybride / knowledge-graph, via votre instance NeoRAG (cloud ou self-host).",
+      "author": {
+        "name": "Sponge Theory",
+        "email": "support@sponge-theory.io",
+        "url": "https://sponge-theory.io"
+      },
+      "category": "productivity",
+      "version": "0.1.0",
+      "keywords": [
+        "rag",
+        "retrieval",
+        "knowledge-base",
+        "knowledge-graph",
+        "mcp",
+        "neorag",
+        "sponge-theory"
+      ],
+      "source": "./plugins/neorag",
+      "homepage": "https://rag.sponge-theory.dev"
     }
   ]
 }

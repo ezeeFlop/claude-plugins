@@ -1,0 +1,29 @@
+{
+  "name": "neorag",
+  "version": "0.1.0",
+  "description": "SPT NeoRAG by Sponge Theory — enterprise RAG (knowledge bases, document ingestion, semantic + knowledge-graph retrieval) directly in Claude Code, via your NeoRAG instance.",
+  "author": {
+    "name": "Sponge Theory",
+    "email": "support@sponge-theory.io",
+    "url": "https://sponge-theory.io"
+  },
+  "homepage": "https://rag.sponge-theory.dev",
+  "license": "Sponge Theory Proprietary",
+  "keywords": ["rag", "retrieval", "knowledge-base", "knowledge-graph", "mcp", "neorag", "sponge-theory"],
+  "userConfig": {
+    "base_url": {
+      "type": "string",
+      "title": "NeoRAG instance URL",
+      "description": "Base URL of your NeoRAG instance (cloud or self-host), without /mcp — e.g. https://rag.sponge-theory.dev",
+      "default": "https://rag.sponge-theory.dev",
+      "required": true
+    },
+    "api_key": {
+      "type": "string",
+      "title": "NeoRAG API key",
+      "description": "A NeoRAG API key, created in the API Keys section of your NeoRAG instance. Shown once at creation.",
+      "sensitive": true,
+      "required": true
+    }
+  }
+}
