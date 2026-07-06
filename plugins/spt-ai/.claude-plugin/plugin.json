@@ -1,0 +1,29 @@
+{
+  "name": "spt-ai",
+  "version": "0.1.0",
+  "description": "Sponge-Theory.ai content admin by Sponge Theory — create and manage blog posts, products, external-SaaS entries, tiers, digital products, media and site config on your Sponge-Theory.ai site, directly from Claude Code, via your site's MCP endpoint.",
+  "author": {
+    "name": "Sponge Theory",
+    "email": "support@sponge-theory.io",
+    "url": "https://sponge-theory.io"
+  },
+  "homepage": "https://sponge-theory.ai",
+  "license": "Sponge Theory Proprietary",
+  "keywords": ["cms", "content", "blog", "products", "mcp", "spt", "sponge-theory"],
+  "userConfig": {
+    "base_url": {
+      "type": "string",
+      "title": "Sponge-Theory.ai API base URL",
+      "description": "Base URL of your Sponge-Theory.ai backend, without /mcp — e.g. https://apisaas.sponge-theory.ai",
+      "default": "https://apisaas.sponge-theory.ai",
+      "required": true
+    },
+    "api_key": {
+      "type": "string",
+      "title": "Service API key (spt_…)",
+      "description": "A service API key, created in your site admin under Settings → API keys. Shown once at creation.",
+      "sensitive": true,
+      "required": true
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "spt-ai": {
+      "type": "http",
+      "url": "${user_config.base_url}/mcp",
+      "headers": {
+        "X-API-Key": "${user_config.api_key}"
+      }
+    }
+  }
+}

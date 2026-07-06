@@ -119,6 +119,29 @@
       ],
       "source": "./plugins/spt-models",
       "homepage": "https://models.sponge-theory.dev"
+    },
+    {
+      "name": "spt-ai",
+      "displayName": "Sponge-Theory.ai Content Admin",
+      "description": "Manage the content of your Sponge-Theory.ai site from Claude Code — create/edit/translate/share blog posts, products, external-SaaS entries, tiers and digital products, upload media and update site config, via your site's MCP endpoint.",
+      "author": {
+        "name": "Sponge Theory",
+        "email": "support@sponge-theory.io",
+        "url": "https://sponge-theory.io"
+      },
+      "category": "productivity",
+      "version": "0.1.0",
+      "keywords": [
+        "cms",
+        "content",
+        "blog",
+        "products",
+        "mcp",
+        "spt",
+        "sponge-theory"
+      ],
+      "source": "./plugins/spt-ai",
+      "homepage": "https://sponge-theory.ai"
     }
   ]
 }
