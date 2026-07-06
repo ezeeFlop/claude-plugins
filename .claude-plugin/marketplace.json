@@ -123,14 +123,14 @@
     {
       "name": "spt-ai",
       "displayName": "Sponge-Theory.ai Content Admin",
-      "description": "Manage the content of your Sponge-Theory.ai site from Claude Code — create/edit/translate/share blog posts, products, external-SaaS entries, tiers and digital products, upload media and update site config, via your site's MCP endpoint.",
+      "description": "Pilot your Sponge-Theory.ai corporate site from Claude Code — list/read AND create/edit/translate/share blog posts, products, external-SaaS entries, tiers and digital products, upload media, and manage CMS pages (home, FAQ, terms, privacy) and site config, via your site's MCP endpoint.",
       "author": {
         "name": "Sponge Theory",
         "email": "support@sponge-theory.io",
         "url": "https://sponge-theory.io"
       },
       "category": "productivity",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "keywords": [
         "cms",
         "content",

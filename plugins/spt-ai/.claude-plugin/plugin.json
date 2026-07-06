@@ -1,7 +1,7 @@
 {
   "name": "spt-ai",
-  "version": "0.1.0",
-  "description": "Sponge-Theory.ai content admin by Sponge Theory — create and manage blog posts, products, external-SaaS entries, tiers, digital products, media and site config on your Sponge-Theory.ai site, directly from Claude Code, via your site's MCP endpoint.",
+  "version": "0.1.1",
+  "description": "Sponge-Theory.ai corporate site content admin by Sponge Theory — list, read AND create/update/delete/translate/share blog posts, products, external-SaaS entries, tiers and digital products, upload media, and manage CMS pages (home, FAQ, terms, privacy) and site config on your Sponge-Theory.ai site, directly from Claude Code, via your site's MCP endpoint.",
   "author": {
     "name": "Sponge Theory",
     "email": "support@sponge-theory.io",
