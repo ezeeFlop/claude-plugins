@@ -142,6 +142,30 @@
       ],
       "source": "./plugins/spt-ai",
       "homepage": "https://sponge-theory.ai"
+    },
+    {
+      "name": "oriflux",
+      "displayName": "Oriflux",
+      "description": "Analytics web + produit + API, sans cookie, dans Claude Code — trafic, sessions, géographie et santé des API — en lecture seule via le registre de métriques typé d'Oriflux, depuis votre instance Oriflux (cloud ou self-host).",
+      "author": {
+        "name": "Sponge Theory",
+        "email": "support@sponge-theory.io",
+        "url": "https://sponge-theory.io"
+      },
+      "category": "productivity",
+      "version": "0.1.0",
+      "keywords": [
+        "analytics",
+        "web-analytics",
+        "product-analytics",
+        "api-analytics",
+        "cookieless",
+        "mcp",
+        "oriflux",
+        "sponge-theory"
+      ],
+      "source": "./plugins/oriflux",
+      "homepage": "https://oriflux.sponge-theory.dev"
     }
   ]
 }
