@@ -1,6 +1,6 @@
 {
   "name": "spongram",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Spongram by Sponge Theory — cerveau persistant cross-session pour Claude Code (mémoire + knowledge graph + code-map), via votre instance Spongram distante.",
   "author": {
     "name": "Sponge Theory",
