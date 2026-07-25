@@ -17,7 +17,13 @@ natively, when you enable the plugin.
 - **`spongram` skill** — teaches Claude *when* to read/write memory (preferences,
   decisions, facts) and to tag every memory by project;
 - **SessionStart hooks** — inject project continuity from message 1, and wire a
-  git post-commit code-map refresh for the current repo.
+  git post-commit code-map refresh for the current repo;
+- **Memory-capture nudge** — a throttled reminder fired at the end of a turn, and
+  right after a `git commit`, when nothing durable has been written for a while.
+  Advisory only: it never forces an extra turn, and it makes no network call.
+  Disable with `SPONGRAM_NUDGE_DISABLED=1`; tune with `SPONGRAM_NUDGE_GAP` /
+  `SPONGRAM_NUDGE_COOLDOWN` (Stop) and `SPONGRAM_NUDGE_COMMIT_GAP` /
+  `SPONGRAM_NUDGE_COMMIT_COOLDOWN` (commit).
 
 ## Setup
 
