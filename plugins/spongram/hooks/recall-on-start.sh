@@ -48,6 +48,12 @@ PROXY="${CLAUDE_PLUGIN_OPTION_INSTANCE_URL:-}"
 KEY="${CLAUDE_PLUGIN_OPTION_BRAIN_KEY:-}"
 
 # Build the curl auth argument only when a key exists (local sidecar has none).
+#
+# The expansion below uses the ${arr[@]+"${arr[@]}"} guard rather than a plain
+# quoted "${arr[@]}": bash 3.2 — still the default /bin/bash on macOS — treats an
+# EMPTY array as an unbound variable under `set -u`, which aborted every curl
+# below. That is precisely the keyless local/desktop sidecar path, which used to
+# lose all session continuity and the code-map minimap here, silently.
 auth_args=()
 [ -n "$KEY" ] && auth_args=(-H "Authorization: Bearer $KEY")
 
@@ -56,13 +62,13 @@ fallback_episodes='[]'
 global_episodes='[]'
 codemap_minimap='{}'
 if [ -n "$PROXY" ]; then
-  project_episodes=$(curl -sS --max-time 3 "${auth_args[@]}" \
+  project_episodes=$(curl -sS --max-time 3 ${auth_args[@]+"${auth_args[@]}"} \
     "$PROXY/v1/graph/data/episodes?limit=5&project=$project_slug" 2>/dev/null) || project_episodes='[]'
-  fallback_episodes=$(curl -sS --max-time 3 "${auth_args[@]}" \
+  fallback_episodes=$(curl -sS --max-time 3 ${auth_args[@]+"${auth_args[@]}"} \
     "$PROXY/v1/graph/data/episodes?limit=3" 2>/dev/null) || fallback_episodes='[]'
-  codemap_minimap=$(curl -sS --max-time 3 "${auth_args[@]}" \
+  codemap_minimap=$(curl -sS --max-time 3 ${auth_args[@]+"${auth_args[@]}"} \
     "$PROXY/v1/codemap/data/minimap" 2>/dev/null) || codemap_minimap='{}'
-  global_episodes=$(curl -sS --max-time 3 "${auth_args[@]}" \
+  global_episodes=$(curl -sS --max-time 3 ${auth_args[@]+"${auth_args[@]}"} \
     "$PROXY/v1/graph/data/episodes?limit=5&project=global" 2>/dev/null) || global_episodes='[]'
 fi
 

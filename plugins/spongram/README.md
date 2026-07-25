@@ -23,7 +23,14 @@ natively, when you enable the plugin.
   Advisory only: it never forces an extra turn, and it makes no network call.
   Disable with `SPONGRAM_NUDGE_DISABLED=1`; tune with `SPONGRAM_NUDGE_GAP` /
   `SPONGRAM_NUDGE_COOLDOWN` (Stop) and `SPONGRAM_NUDGE_COMMIT_GAP` /
-  `SPONGRAM_NUDGE_COMMIT_COOLDOWN` (commit).
+  `SPONGRAM_NUDGE_COMMIT_COOLDOWN` (commit);
+- **Out-of-band capture** — on context compaction and at session end, a bounded
+  tail of the transcript is sent to your brain, which distils the durable facts
+  and stores them. Those two moments cannot prompt the assistant at all, so the
+  capture does not rely on it: compaction is exactly when context is discarded.
+  Runs detached — it never delays a compaction or a session exit — and requires
+  `SPONGRAM_DISTILL_ENABLED` on your instance. Disable client-side with
+  `SPONGRAM_CAPTURE_DISABLED=1`. Episodes it writes are tagged `capture=auto`.
 
 ## Setup
 
