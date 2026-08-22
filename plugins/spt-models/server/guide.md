@@ -32,7 +32,15 @@ video / audio / embedding / rerank models.
    you pass any model-specific flag (e.g. ErnieImage's `use_pe`) and non-standard
    params on `chat` / `complete` / `generate_music` (e.g. `top_k`).
 
-4. **Never invent a slug** — only use slugs returned by `list_models`.
+4. **Never invent a model name** — only use names returned by `list_models`.
+   Both kinds of entry are valid: canonical slugs, and *aliases* (entries
+   carrying `alias_of: <slug>` — stable client-facing names such as `gpt-4`
+   or `default-llm` that an admin pointed at a catalogue model). An alias
+   works everywhere a slug does: every inference tool, `get_model_info`,
+   `load_model`, `unload_model`. It is the same model, not a second one —
+   when an alias and its target both match a request, use the canonical slug
+   (unless the user named the alias) and never present the pair to the user
+   as two different models.
 
 ## 1. Discover
 
@@ -51,8 +59,17 @@ intent to a model type:
 | embeddings, vectorise                       | `embedding` |
 | reranke, classe des documents               | `rerank`    |
 
-If the catalogue has exactly one matching model, pick it.  If several, show
-the user a short list (`slug — short description`) and ask which one.
+Before counting candidates, fold aliases into their target: an entry with
+`alias_of` is the same model as the slug it names, so drop it from the list
+(or keep only the slug).  If exactly one model remains, pick it.  If several,
+show the user a short list (`slug — short description`) and ask which one.
+
+Each verbose entry carries a `description` (one line on what the model does)
+and `capabilities` (short functional tags such as `128k context`,
+`tool calling`, `FR/EN`).  Use them to choose between candidates and to write
+that short list — you do not need `get_model_info` just to tell two models
+apart.  Both are empty when nothing is known about the model; that is a
+"no data" signal, not a claim that the model lacks the capability.
 
 ## 2. Read the prompting guide
 
@@ -129,6 +146,7 @@ Resources are fine to read silently for context; prefer them over extra
 - Don't rely on a bare `generate_image(size=…)` and assume the resolution
   stuck — set `extra={"width": …, "height": …}` from the model's supported
   resolutions.
-- Don't invent a model slug.
+- Don't invent a model name — slugs and aliases both come from `list_models`.
+- Don't list an alias and its target (`alias_of`) as two separate choices.
 - Don't drop or paraphrase the user's prompt — reformulate it per the guide,
   preserving the intent.

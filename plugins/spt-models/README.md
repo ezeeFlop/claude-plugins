@@ -70,6 +70,10 @@ The bundled skill teaches the agent the right order:
   `tts`, `transcribe`, `rerank`, plus admin-gated `load_model`, `unload_model`,
   `refresh_prompting_guide` — and 3 resources (`spt://models`,
   `spt://model/{slug}`, `spt://guide`).
+- **Model aliases** (gateway ≥ 1.1.0 with migration 015): `list_models` also
+  returns admin-defined aliases (`gpt-4`, `default-llm`, …) marked with
+  `alias_of: <slug>`; every inference tool accepts either name and the
+  response echoes the one you used.
 - **Skill** `spt-models`: the discover → prompting-guide → infer workflow,
   loaded on demand so a plain "generate me an image" surfaces the catalogue and
   uses the right per-model prompting style.

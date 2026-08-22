@@ -49,7 +49,13 @@ class SPTClient:
             )
         self.api_key = os.environ.get("SPT_API_KEY", "").strip()
         self.admin_token = os.environ.get("SPT_ADMIN_TOKEN", "").strip()
-        self.timeout = _float_env("SPT_REQUEST_TIMEOUT", 300.0)
+        # Server-side inference budget is 3600s end-to-end (orchestrator's
+        # inference_timeout_seconds, gateway's proxy/admin-router timeouts —
+        # video gen can run 28+ min).  Default must clear that budget with
+        # margin, or the client gives up on a call the server is about to
+        # finish successfully — the worst kind of failure, since it looks
+        # like an error when none occurred.
+        self.timeout = _float_env("SPT_REQUEST_TIMEOUT", 3900.0)
         self.verify_tls = _bool_env("SPT_VERIFY_TLS", True)
 
         if not self.api_key:

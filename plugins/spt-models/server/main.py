@@ -86,8 +86,16 @@ async def list_models(verbose: bool = True) -> dict[str, Any]:
     """List all models registered on the SPT stack.
 
     With `verbose=True` (default) each entry includes `name`, `type`,
-    `vram_required_mb`, `loaded` status, and the structured `prompting_guide`.
-    Use `verbose=False` for a stock OpenAI-shape response.
+    `vram_required_mb`, `loaded` status, a one-line `description` of what the
+    model does, its `capabilities` (short functional tags), and the structured
+    `prompting_guide`.  Use `verbose=False` for a stock OpenAI-shape response.
+
+    `description` + `capabilities` are the cheapest way to pick a model: they
+    let you shortlist from this one call instead of fetching every model card.
+
+    Entries with `alias_of` are aliases: `id` is a client-facing name an admin
+    pointed at the slug in `alias_of`.  Same model, usable wherever a slug is —
+    never count the pair as two models.
     """
     return await _get_client().list_models(verbose=verbose)
 
@@ -96,10 +104,18 @@ async def list_models(verbose: bool = True) -> dict[str, Any]:
 async def get_model_info(slug: str) -> dict[str, Any]:
     """Return full info for one model.
 
+    `slug` may also be an alias (see `alias_of` in `list_models`).
+
     Fields:
       - id, name, type, created
+      - alias_of (str | None): set when `slug` was an alias — the canonical
+        slug it resolves to.  The other fields describe that target.
       - vram_required_mb
       - loaded (bool)
+      - description (str): one-line summary of what the model does.  Empty
+        string when nothing is known about it.
+      - capabilities (list[str]): short functional tags, e.g.
+        ["128k context", "tool calling", "FR/EN"].  Empty list when unknown.
       - prompting_guide (dict): keys may include `system_prompt`, `format`,
         `example_prompts`, `recommended_params`, `limitations`, `do_dont`,
         `notes`.  All keys are optional; empty dict means "no guide captured".
