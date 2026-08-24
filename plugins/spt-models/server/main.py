@@ -415,15 +415,28 @@ async def transcribe(
     audio_b64: str,
     content_type: str = "audio/wav",
     language: str | None = None,
+    mode: str | None = None,
+    timestamp_granularities: list[str] | None = None,
 ) -> dict[str, Any]:
     """Speech-to-text transcription.  Pass the audio as base64.  Files larger
-    than ~50 MB should be chunked client-side — the Gateway rejects >100 MB."""
+    than ~50 MB should be chunked client-side — the Gateway rejects >100 MB.
+
+    `mode` selects the transcription policy on models that expose one:
+    "verbatim" keeps every filler, stutter and vocal sound, "intended" returns
+    the clean readable sentence.  Only CrisperWhisper honours it today; other
+    STT backends ignore it.  Omit it to keep the model's own default.
+
+    `timestamp_granularities` mirrors the OpenAI field — ["word"] and/or
+    ["segment"].  Asking for word timings roughly doubles the wall time, so
+    pass ["segment"] when the text alone is enough."""
     audio_bytes = base64.b64decode(audio_b64)
     return await _get_client().transcribe(
         model=model,
         audio_bytes=audio_bytes,
         content_type=content_type,
         language=language,
+        mode=mode,
+        timestamp_granularities=timestamp_granularities,
     )
 
 

@@ -191,12 +191,20 @@ class SPTClient:
         audio_bytes: bytes,
         content_type: str = "audio/wav",
         language: str | None = None,
+        mode: str | None = None,
+        timestamp_granularities: list[str] | None = None,
     ) -> dict[str, Any]:
         client = await self._get_client()
         files = {"file": ("audio", audio_bytes, content_type)}
         data: dict[str, Any] = {"model": model}
         if language:
             data["language"] = language
+        if mode:
+            data["mode"] = mode
+        if timestamp_granularities:
+            # The Gateway declares this field under its OpenAI name, brackets
+            # included; httpx repeats the key once per list entry.
+            data["timestamp_granularities[]"] = timestamp_granularities
         resp = await client.post(
             "/v1/audio/transcriptions",
             files=files,

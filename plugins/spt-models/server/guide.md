@@ -100,8 +100,8 @@ loads automatically on this call** — you never load it yourself.
 | `image_gen` | `generate_image(model, prompt, ...)`                     |
 | `video_gen` | `generate_video(model, prompt, ...)` if available        |
 | `sound_gen` | `generate_music(model, prompt, ...)`                     |
-| `tts`       | `tts(model, text, voice?, ...)`                          |
-| `stt`       | `transcribe(model, audio_base64, ...)`                   |
+| `tts`       | `tts(model, input, voice?, ...)`                         |
+| `stt`       | `transcribe(model, audio_b64, ...)`                      |
 | `embedding` | `embed(model, input, ...)`                               |
 | `rerank`    | `rerank(model, query, documents, ...)`                   |
 
@@ -124,6 +124,36 @@ generate_image(
 The first call triggers the load (tens of seconds for big diffusion models);
 subsequent calls reuse the loaded model and are fast.  Without `extra` width/
 height you get 512×512 — too small/square for most real uses.
+
+### Worked example — transcription
+
+`transcribe` takes two optional knobs beyond `language`:
+
+- `mode` — the transcription policy, on models that expose one. `"verbatim"`
+  keeps every filler, stutter, repetition and vocal sound ("um", "th- the");
+  `"intended"` returns the clean readable sentence. Today only
+  `crisperwhisper-2.0-large` honours it; the other STT backends ignore it
+  silently, so passing it is never an error — it simply has no effect. Omit it
+  to keep the model's own default.
+- `timestamp_granularities` — `["word"]` and/or `["segment"]`, mirroring the
+  OpenAI field. On `crisperwhisper-2.0-large` word timings are returned *by
+  default* and they cost real time — 4.0 s vs 1.8 s on a 15 s clip — so pass
+  `["segment"]` to opt out when the text alone is enough. The timings come back
+  nested per segment as `segments[].words` (`{start, end, word}` each), not in a
+  top-level `words` array.
+
+Choose `verbatim` when the disfluencies *are* the signal — medical or legal
+transcripts, speech therapy, interview analysis, dubbing. Choose `intended`
+when the user wants prose: meeting notes, articles, summaries.
+
+```
+transcribe(
+    model="crisperwhisper-2.0-large",
+    audio_b64="…base64 of the audio file…",
+    mode="verbatim",
+    timestamp_granularities=["word"],
+)
+```
 
 **Always cite which model you used** at the end of your response
 ("Generated with `ernie-image-turbo`" / "Transcribed with `whisperx-large-v3`").

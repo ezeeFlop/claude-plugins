@@ -63,13 +63,27 @@ The bundled skill teaches the agent the right order:
    least-recently-used one under VRAM pressure. **Never call `load_model`
    first** — it is an ops-only tool.
 
+## Transcription — verbatim or intended
+
+`transcribe` takes two optional parameters beyond `language` (plugin 1.6.0+):
+
+| Parameter | Values | Effect |
+|---|---|---|
+| `mode` | `verbatim` \| `intended` | `verbatim` keeps every filler, stutter, repetition and vocal sound; `intended` returns the clean readable sentence. Only `crisperwhisper-2.0-large` honours it today — the other STT backends ignore it silently. Omit it to keep the model's own default. |
+| `timestamp_granularities` | `["word"]` and/or `["segment"]` | Mirrors the OpenAI field. `crisperwhisper-2.0-large` returns word timings by default and they cost real time (4.0 s vs 1.8 s on a 15 s clip) — pass `["segment"]` to opt out. Timings arrive nested as `segments[].words`, not as a top-level `words` array. |
+
+Ask for `verbatim` when the disfluencies *are* the signal — medical or legal
+transcripts, speech therapy, interview analysis, dubbing — and `intended` when
+you want prose. Both come from the same request, so you can run the two and
+diff them.
+
 ## What's included
 
 - **MCP server**: 14 tools — `list_models`, `get_model_info`, `chat`,
   `complete`, `embed`, `generate_image`, `generate_video`, `generate_music`,
   `tts`, `transcribe`, `rerank`, plus admin-gated `load_model`, `unload_model`,
-  `refresh_prompting_guide` — and 3 resources (`spt://models`,
-  `spt://model/{slug}`, `spt://guide`).
+  `refresh_prompting_guide` — plus the `spt://models` and `spt://guide`
+  resources and the `spt://model/{slug}` resource template.
 - **Model aliases** (gateway ≥ 1.1.0 with migration 015): `list_models` also
   returns admin-defined aliases (`gpt-4`, `default-llm`, …) marked with
   `alias_of: <slug>`; every inference tool accepts either name and the
