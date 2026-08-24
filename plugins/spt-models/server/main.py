@@ -23,16 +23,23 @@ _HERE = Path(__file__).resolve().parent
 if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
+# SDK 2.0 renamed FastMCP to MCPServer and moved it; the decorator API is
+# unchanged, so accept either major rather than pinning ourselves to 1.x.
 try:
-    from mcp.server.fastmcp import FastMCP
-except ImportError as exc:
-    print(
-        "ERROR: 'mcp' Python SDK is not installed.  The uv runtime resolves "
-        "dependencies from pyproject.toml automatically.  If you're running "
-        "this server manually: uv run --directory <bundle-dir> server/main.py",
-        file=sys.stderr,
-    )
-    raise SystemExit(1) from exc
+    from mcp.server.mcpserver import MCPServer as _Server  # SDK >= 2
+except ImportError:
+    try:
+        from mcp.server.fastmcp import FastMCP as _Server  # SDK 1.x
+    except ImportError as exc:
+        print(
+            "ERROR: no usable 'mcp' Python SDK found (looked for "
+            "mcp.server.mcpserver, then mcp.server.fastmcp).  The uv runtime "
+            "resolves dependencies from pyproject.toml automatically.  If "
+            "you're running this server manually: "
+            "uv run --directory <bundle-dir> server/main.py",
+            file=sys.stderr,
+        )
+        raise SystemExit(1) from exc
 
 from spt_client import SPTClient
 
@@ -63,7 +70,7 @@ except FileNotFoundError:
     )
 
 
-mcp = FastMCP("spt-models", instructions=_AGENT_GUIDE)
+mcp = _Server("spt-models", instructions=_AGENT_GUIDE)
 
 
 # A single shared client across all tools to keep the connection pool warm.
