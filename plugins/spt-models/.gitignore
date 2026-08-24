@@ -1,0 +1,8 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+# A committed lock would override pyproject's bounds on the user's machine —
+# including the mcp<2 bound the server depends on.
+uv.lock
