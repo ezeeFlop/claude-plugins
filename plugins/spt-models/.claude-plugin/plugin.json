@@ -1,6 +1,6 @@
 {
   "name": "spt-models",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Inference + model catalogue for the SPT Models GPU stack — chat, completion, embeddings, image / video / audio / music generation, transcription, rerank, plus per-model prompting guides — directly in Claude Code.",
   "author": {
     "name": "Sponge Theory",
@@ -9,7 +9,16 @@
   },
   "homepage": "https://models.sponge-theory.dev",
   "license": "MIT",
-  "keywords": ["mcp", "inference", "gpu", "openai-compatible", "spt", "vllm", "diffusers", "sponge-theory"],
+  "keywords": [
+    "mcp",
+    "inference",
+    "gpu",
+    "openai-compatible",
+    "spt",
+    "vllm",
+    "diffusers",
+    "sponge-theory"
+  ],
   "userConfig": {
     "spt_base_url": {
       "type": "string",

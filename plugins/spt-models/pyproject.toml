@@ -1,7 +1,7 @@
 [project]
 name = "spt-models-mcp"
-version = "1.7.0"
-description = "MCP server for the SPT Models GPU inference stack (Claude Code plugin)."
+version = "1.8.0"
+description = "MCP bundle for the SPT Models GPU inference stack."
 requires-python = ">=3.10"
 dependencies = [
     # Works on both majors: SDK 2.0 renamed FastMCP to MCPServer, and main.py

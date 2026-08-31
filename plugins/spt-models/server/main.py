@@ -14,6 +14,7 @@ import base64
 import logging
 import os
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
@@ -302,7 +303,8 @@ async def generate_image(
         payload["seed"] = seed
     if extra:
         payload.update(extra)
-    return await _get_client().generate_image(payload)
+    resp = await _get_client().run_generation_job("/v1/images/generations", payload)
+    return resp.json()
 
 
 @mcp.tool()
@@ -351,7 +353,8 @@ async def generate_video(
         payload["seed"] = seed
     if extra:
         payload.update(extra)
-    return await _get_client().generate_video(payload)
+    resp = await _get_client().run_generation_job("/v1/videos/generations", payload)
+    return resp.json()
 
 
 @mcp.tool()
@@ -397,8 +400,8 @@ async def generate_music(
     the prompting guide first — these models want Stable-Audio-style descriptive
     prompts (genre, instruments, BPM, mood, production), not speech text.
 
-    Returns `{created, model, audio, format}` where `audio` is base64 — decode it
-    and write to a .wav file.
+    Returns `{created, model, audio, format, _compute_time_ms}` where `audio`
+    is base64 — decode it and write to a .wav file.
     """
     payload: dict[str, Any] = {"model": model, "input": prompt}
     if audio_end_in_s is not None:
@@ -413,7 +416,16 @@ async def generate_music(
         payload["seed"] = seed
     if extra:
         payload.update(extra)
-    return await _get_client().generate_music(payload)
+    resp = await _get_client().run_generation_job("/v1/audio/music", payload)
+    ctype = resp.headers.get("content-type", "")
+    if "json" in ctype:
+        return resp.json()                   # vieille gateway (déjà b64)
+    return {
+        "created": int(time.time()),
+        "model": model,
+        "audio": base64.b64encode(resp.content).decode(),
+        "format": "wav",
+    }
 
 
 @mcp.tool()

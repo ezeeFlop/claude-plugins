@@ -11,8 +11,10 @@ when SPT_ADMIN_TOKEN isn't configured.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
+import time
 from typing import Any
 
 import httpx
@@ -174,7 +176,8 @@ class SPTClient:
         """POST /v1/audio/music — sound/music generation.
 
         Unlike tts() (raw bytes for voice models), sound_gen models return JSON
-        ``{created, model, audio: <base64>, format}`` — parse and return it.
+        ``{created, model, audio: <base64>, format, _compute_time_ms}`` — parse
+        and return it.
         """
         client = await self._get_client()
         resp = await client.post(
@@ -234,6 +237,53 @@ class SPTClient:
             )
         resp.raise_for_status()
         return resp.json()
+
+    # -- Mode job (gateway >= 1.4) ------------------------------------------
+
+    async def run_generation_job(
+        self, path: str, payload: dict[str, Any],
+        *, poll_interval: float = 5.0, max_wait: float = 3600.0,
+    ) -> httpx.Response:
+        """Soumet en mode job et polle jusqu'au terme.
+
+        Chaque appel HTTP individuel reste court (<=120 s) — le .plugin
+        Claude Code bake SPT_REQUEST_TIMEOUT=300, une génération vidéo de
+        28 min ne peut PAS traverser en une requête. Retourne la réponse
+        brute de /result (JSON ou binaire). Sur une gateway antérieure au
+        mode job, la soumission revient en réponse synchrone complète:
+        on la retourne telle quelle (fallback transparent).
+        """
+        client = await self._get_client()
+        resp = await client.post(
+            path, json={**payload, "async": True},
+            headers=self._api_headers(), timeout=120.0,
+        )
+        resp.raise_for_status()
+        body = resp.json() if "json" in resp.headers.get("content-type", "") else None
+        if not (isinstance(body, dict) and body.get("job_id")):
+            return resp                      # vieille gateway: réponse synchrone
+        job_id = body["job_id"]
+        deadline = time.monotonic() + max_wait
+        while True:
+            j = await client.get(
+                f"/v1/jobs/{job_id}",
+                headers=self._api_headers(), timeout=60.0,
+            )
+            j.raise_for_status()
+            status = j.json().get("status")
+            if status in ("succeeded", "failed", "interrupted"):
+                break
+            if time.monotonic() >= deadline:
+                raise RuntimeError(
+                    f"Generation job {job_id} still '{status}' after {max_wait}s"
+                )
+            await asyncio.sleep(poll_interval)
+        result = await client.get(
+            f"/v1/jobs/{job_id}/result",
+            headers=self._api_headers(), timeout=120.0,
+        )
+        result.raise_for_status()            # rejoue le code d'origine si failed
+        return result
 
     # --- /admin/api/* ----------------------------------------------------
 

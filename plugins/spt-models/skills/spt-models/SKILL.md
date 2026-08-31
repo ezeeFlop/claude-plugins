@@ -109,12 +109,16 @@ loads automatically on this call** — you never load it yourself.
 | `llm`       | `chat(model, messages, ...)` or `complete(model, prompt, ...)` |
 | `vlm`       | `chat(model, messages with image url or base64, ...)`    |
 | `image_gen` | `generate_image(model, prompt, ...)`                     |
-| `video_gen` | `generate_video(model, prompt, ...)` if available        |
+| `video_gen` | `generate_video(model, prompt, ...)`                     |
 | `sound_gen` | `generate_music(model, prompt, ...)`                     |
 | `tts`       | `tts(model, input, voice?, ...)`                         |
 | `stt`       | `transcribe(model, audio_b64, ...)`                      |
 | `embedding` | `embed(model, input, ...)`                               |
 | `rerank`    | `rerank(model, query, documents, ...)`                   |
+
+Video/image/music generations go through a server-side job that is polled
+automatically — no client timeout to worry about; the first generation on a
+large model can take 20+ minutes.
 
 ### Worked example — image generation
 
