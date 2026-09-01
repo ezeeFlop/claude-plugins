@@ -1,13 +1,13 @@
 {
   "name": "rayonne",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Rayonne — l'autopilote marketing des SaaS : audit marketing de ta page produit, analyse, contenus, vidéos, métriques AARRR, depuis Claude Code.",
   "author": {
     "name": "Sponge Theory",
     "email": "contact@sponge-theory.ai",
-    "url": "https://rayonne.ai"
+    "url": "https://rayonne.sponge-theory.dev"
   },
-  "homepage": "https://rayonne.ai",
+  "homepage": "https://rayonne.sponge-theory.dev",
   "license": "Sponge Theory Proprietary",
   "keywords": ["marketing", "saas", "rayonne", "audit", "sponge-theory"],
   "userConfig": {
@@ -21,8 +21,8 @@
     "api_url": {
       "type": "string",
       "title": "URL de l'API",
-      "description": "Laisser par défaut sauf instance auto-hébergée.",
-      "default": "https://rayonne.ai/api/public/v1"
+      "description": "Laisser par défaut sauf instance auto-hébergée : l'URL exacte de ton déploiement est affichée dans Rayonne → Réglages → Piloter Rayonne depuis Claude.",
+      "default": "https://rayonne.sponge-theory.dev/api/public/v1"
     },
     "read_only": {
       "type": "boolean",

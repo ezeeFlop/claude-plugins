@@ -1,6 +1,6 @@
 # Rayonne — plugin Claude Code
 
-Pilote ton workspace [Rayonne](https://rayonne.ai) depuis Claude Code :
+Pilote ton workspace [Rayonne](https://rayonne.sponge-theory.dev) depuis Claude Code :
 audit marketing de ta page produit, analyse produit, génération de contenus
 et de vidéos, métriques AARRR.
 

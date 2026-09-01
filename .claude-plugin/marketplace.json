@@ -174,10 +174,10 @@
       "author": {
         "name": "Sponge Theory",
         "email": "contact@sponge-theory.ai",
-        "url": "https://rayonne.ai"
+        "url": "https://rayonne.sponge-theory.dev"
       },
       "category": "productivity",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "keywords": [
         "marketing",
         "saas",
@@ -187,7 +187,7 @@
         "sponge-theory"
       ],
       "source": "./plugins/rayonne",
-      "homepage": "https://rayonne.ai"
+      "homepage": "https://rayonne.sponge-theory.dev"
     }
   ]
 }
