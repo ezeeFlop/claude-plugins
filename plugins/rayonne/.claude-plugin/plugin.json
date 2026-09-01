@@ -1,0 +1,34 @@
+{
+  "name": "rayonne",
+  "version": "0.2.0",
+  "description": "Rayonne — l'autopilote marketing des SaaS : audit marketing de ta page produit, analyse, contenus, vidéos, métriques AARRR, depuis Claude Code.",
+  "author": {
+    "name": "Sponge Theory",
+    "email": "contact@sponge-theory.ai",
+    "url": "https://rayonne.ai"
+  },
+  "homepage": "https://rayonne.ai",
+  "license": "Sponge Theory Proprietary",
+  "keywords": ["marketing", "saas", "rayonne", "audit", "sponge-theory"],
+  "userConfig": {
+    "api_key": {
+      "type": "string",
+      "title": "Clé API Rayonne",
+      "description": "Générée dans Rayonne → Réglages → Clés API (format rk_…, plan Business requis).",
+      "sensitive": true,
+      "required": true
+    },
+    "api_url": {
+      "type": "string",
+      "title": "URL de l'API",
+      "description": "Laisser par défaut sauf instance auto-hébergée.",
+      "default": "https://rayonne.ai/api/public/v1"
+    },
+    "read_only": {
+      "type": "boolean",
+      "title": "Mode lecture seule",
+      "description": "Désactive les outils qui déclenchent un travail (analyse, audit, génération vidéo — la vidéo est facturée). À activer pour explorer sans rien consommer.",
+      "default": false
+    }
+  }
+}

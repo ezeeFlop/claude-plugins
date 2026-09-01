@@ -166,6 +166,28 @@
       ],
       "source": "./plugins/oriflux",
       "homepage": "https://oriflux.sponge-theory.dev"
+    },
+    {
+      "name": "rayonne",
+      "displayName": "Rayonne",
+      "description": "Audit marketing de ta page produit, analyse, contenus, vidéos et métriques AARRR — l'autopilote marketing des SaaS, depuis Claude Code.",
+      "author": {
+        "name": "Sponge Theory",
+        "email": "contact@sponge-theory.ai",
+        "url": "https://rayonne.ai"
+      },
+      "category": "productivity",
+      "version": "0.2.0",
+      "keywords": [
+        "marketing",
+        "saas",
+        "rayonne",
+        "audit",
+        "content",
+        "sponge-theory"
+      ],
+      "source": "./plugins/rayonne",
+      "homepage": "https://rayonne.ai"
     }
   ]
 }
