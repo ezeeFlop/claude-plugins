@@ -170,14 +170,14 @@
     {
       "name": "rayonne",
       "displayName": "Rayonne",
-      "description": "Audit marketing de ta page produit, analyse, contenus, vidéos et métriques AARRR — l'autopilote marketing des SaaS, depuis Claude Code.",
+      "description": "Pilote tout Rayonne depuis Claude Code : audit marketing de ta page produit, brief, stratégie Bullseye, contenus, soumissions, vidéos et métriques AARRR — 46 outils, 7 commandes.",
       "author": {
         "name": "Sponge Theory",
         "email": "contact@sponge-theory.ai",
         "url": "https://rayonne.sponge-theory.dev"
       },
       "category": "productivity",
-      "version": "0.2.1",
+      "version": "0.3.0",
       "keywords": [
         "marketing",
         "saas",
