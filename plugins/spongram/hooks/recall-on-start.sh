@@ -61,6 +61,7 @@ project_episodes='[]'
 fallback_episodes='[]'
 global_episodes='[]'
 codemap_minimap='{}'
+persona_json='{}'
 if [ -n "$PROXY" ]; then
   project_episodes=$(curl -sS --max-time 3 ${auth_args[@]+"${auth_args[@]}"} \
     "$PROXY/v1/graph/data/episodes?limit=5&project=$project_slug" 2>/dev/null) || project_episodes='[]'
@@ -70,6 +71,8 @@ if [ -n "$PROXY" ]; then
     "$PROXY/v1/codemap/data/minimap" 2>/dev/null) || codemap_minimap='{}'
   global_episodes=$(curl -sS --max-time 3 ${auth_args[@]+"${auth_args[@]}"} \
     "$PROXY/v1/graph/data/episodes?limit=5&project=global" 2>/dev/null) || global_episodes='[]'
+  persona_json=$(curl -sS --max-time 3 ${auth_args[@]+"${auth_args[@]}"} \
+    "$PROXY/v1/personas/data/active?variant=code" 2>/dev/null) || persona_json='{}'
 fi
 
 # Locale for the injected strings: FR when the shell locale is French, else EN.
@@ -79,9 +82,14 @@ case "${LANG:-}${LC_ALL:-}" in fr*|FR*) lang="fr" ;; esac
 # Emit additionalContext. Even if episode fetches failed, we still emit the
 # project context block — that's the most important part for proper tagging.
 python3 - "$project_slug" "$repo_owner_name" "$branch" "$cwd" \
-  "$project_episodes" "$fallback_episodes" "$global_episodes" "$codemap_minimap" "$lang" <<'PY' 2>/dev/null || exit 0
+  "$project_episodes" "$fallback_episodes" "$global_episodes" "$codemap_minimap" "$lang" "$persona_json" <<'PY' 2>/dev/null || exit 0
 import json, sys
 slug, repo, branch, cwd, proj_raw, fallback_raw, global_raw, minimap_raw, lang = sys.argv[1:10]
+persona_raw = sys.argv[10] if len(sys.argv) > 10 else "{}"
+try:
+    persona_block = (json.loads(persona_raw) or {}).get("block") or ""
+except Exception:
+    persona_block = ""
 
 LOCALES = {
     "fr": {
@@ -92,7 +100,7 @@ LOCALES = {
         "section_rules": "## Règles strictes — taggage et scoping de la mémoire",
         "rule_tag": "À CHAQUE appel `add_memory`, incluez ces tags dans le champ `source_description`, dans cet ordre, séparés par des espaces :",
         "rule_tag_footer": "Cela permet de filtrer la mémoire par projet et d'éviter le bruit cross-projet.",
-        "rule_scope": "À CHAQUE `search_nodes` / `search_memory_facts`, gardez PAR DÉFAUT les résultats du projet courant (`project={slug}`) ET les faits transverses (`project=global`) ; n'écartez que les AUTRES projets. Cross-projet complet UNIQUEMENT si demandé.",
+        "rule_scope": "Si l'outil accepte `scope`, à CHAQUE `search_nodes` / `search_memory_facts`, passe `scope.project={slug}` : le serveur garde ce projet, `project=global`, la persona active et les souvenirs non tagués, et écarte les autres projets. `scope.all=true` UNIQUEMENT si l'utilisateur demande une recherche cross-projet. Si `_spongram.filtered` > 0 sans résultat utile, propose-la. Sinon, garde par défaut le projet courant et `global`.",
         "rule_global": "Pour `add_memory` : un fait spécifique à CE projet → `project={slug}` (+ repo/branch) ; un fait personnel/transverse → `project=global` (rappelé depuis TOUS vos projets, y compris Claude Desktop).",
         "continuity_for": "## Continuité mémoire — derniers épisodes pour `{slug}`",
         "continuity_fallback": "## Continuité mémoire — pas d'épisode pour `{slug}` encore, voici les {n} plus récents",
@@ -108,7 +116,7 @@ LOCALES = {
         "section_rules": "## Strict rules — memory tagging and scoping",
         "rule_tag": "On EVERY `add_memory` call, include these tags in the `source_description` field, in this order, space-separated:",
         "rule_tag_footer": "This makes it possible to filter memory by project and avoid cross-project noise.",
-        "rule_scope": "On EVERY `search_nodes` / `search_memory_facts`, BY DEFAULT keep results from the current project (`project={slug}`) AND cross-cutting facts (`project=global`); discard only OTHER projects. Full cross-project search ONLY when asked.",
+        "rule_scope": "If the tool accepts `scope`, on EVERY `search_nodes` / `search_memory_facts`, pass `scope.project={slug}`: the server keeps this project, `project=global`, the active persona and untagged memories, and drops other projects. Use `scope.all=true` ONLY when the user explicitly asks for a cross-project search. If `_spongram.filtered` > 0 and nothing useful came back, offer one. Otherwise, default to the current project and `global`.",
         "rule_global": "For `add_memory`: a fact specific to THIS project → `project={slug}` (+ repo/branch); a personal/cross-cutting fact → `project=global` (recalled from ALL your projects, including Claude Desktop).",
         "continuity_for": "## Memory continuity — latest episodes for `{slug}`",
         "continuity_fallback": "## Memory continuity — no episode for `{slug}` yet, here are the {n} most recent",
@@ -138,6 +146,11 @@ lines = [
     s["title"], "",
     s["section_override"], "",
     s["override_body"], "",
+]
+if persona_block:
+    lines.append(persona_block.strip())
+    lines.append("")
+lines += [
     s["section_context"], "",
     f"- **project_slug**: `{slug}`",
 ]

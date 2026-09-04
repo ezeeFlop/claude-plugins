@@ -31,21 +31,23 @@
     {
       "name": "spongram",
       "displayName": "Spongram",
-      "description": "Cerveau persistant cross-session pour Claude Code — mémoire continue, knowledge graph temporel et code-map, via votre instance Spongram (cloud) ou l'app Desktop locale.",
+      "description": "Cerveau persistant cross-session pour Claude Code — mémoire continue, knowledge graph temporel, code-map et personas (identité, voix, règles et compétences Agent Skills, portables entre Claude Code et Claude Desktop), via votre instance Spongram (cloud) ou l'app Desktop locale.",
       "author": {
         "name": "Sponge Theory",
         "email": "support@sponge-theory.io",
         "url": "https://sponge-theory.io"
       },
       "category": "productivity",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "keywords": [
         "memory",
         "knowledge-graph",
         "mcp",
         "second-brain",
         "spongram",
-        "sponge-theory"
+        "sponge-theory",
+        "personas",
+        "agent-skills"
       ],
       "source": "./plugins/spongram",
       "homepage": "https://spongram.sponge-theory.dev"

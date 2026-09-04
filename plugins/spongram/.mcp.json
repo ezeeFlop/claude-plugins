@@ -4,7 +4,8 @@
       "type": "http",
       "url": "${user_config.instance_url}/mcp",
       "headers": {
-        "Authorization": "Bearer ${user_config.brain_key}"
+        "Authorization": "Bearer ${user_config.brain_key}",
+        "X-Spongram-Client": "claude-code"
       }
     }
   }

@@ -68,6 +68,20 @@ No secret ships in this plugin. Your `spt_brain_…` key is entered via Claude
 Code's native `userConfig` (marked `sensitive`, stored in the system keychain)
 and is sent only to your own Spongram instance over HTTPS.
 
+## Personas
+
+Une **persona** est une identité que Claude adopte à la demande : un rôle, une
+voix (ton, tutoiement, langue), des règles, des compétences au standard
+[Agent Skills](https://agentskills.io) (`SKILL.md`) et une mémoire propre qui
+la suit d'un projet à l'autre et de Claude Code à Claude Desktop.
+
+- `/spongram:persona` — liste vos personas ; `/spongram:persona <slug>` en active une.
+- Création et édition sur `https://<votre-instance>/v1/personas` (clé `spt_brain_…`).
+- **Claude Code n'est jamais dégradé** : par défaut il n'hérite que du ton et de
+  la langue, précédés de la règle que les conventions du projet et les
+  instructions de développement priment sur la persona. Aucun output style,
+  aucune modification de `CLAUDE.md`, des permissions ou de la liste d'outils.
+
 ## Support
 
 - Documentation: <https://spongram.sponge-theory.dev>
