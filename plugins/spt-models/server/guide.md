@@ -109,6 +109,11 @@ Video/image/music generations go through a server-side job that is polled
 automatically — no client timeout to worry about; the first generation on a
 large model can take 20+ minutes.
 
+Text-to-speech through this MCP `tts` tool is always a complete file. The HTTP
+API (`POST /v1/audio/speech` with `"stream": true`) streams audio as it is
+generated on capable models (`capabilities` contains `"streaming"`) — use it
+from an application, not from here.
+
 ### Worked example — image generation
 
 ```

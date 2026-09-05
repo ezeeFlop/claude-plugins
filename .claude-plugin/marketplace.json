@@ -101,14 +101,14 @@
     {
       "name": "spt-models",
       "displayName": "SPT Models",
-      "description": "Inference + model catalogue for the SPT Models GPU stack — chat, completion, embeddings, image / video / audio / music generation, transcription, rerank, plus per-model prompting guides — directly in Claude Code.",
+      "description": "Inference + model catalogue for the SPT Models GPU stack — chat, completion, embeddings, image / video / audio / music generation (long jobs polled server-side), transcription, rerank, plus per-model prompting guides and streaming-TTS API notes — directly in Claude Code.",
       "author": {
         "name": "Sponge Theory",
         "email": "support@sponge-theory.io",
         "url": "https://sponge-theory.io"
       },
       "category": "productivity",
-      "version": "1.8.0",
+      "version": "1.9.0",
       "keywords": [
         "mcp",
         "inference",
