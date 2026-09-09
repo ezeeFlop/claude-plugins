@@ -1,7 +1,7 @@
 {
   "name": "rayonne",
-  "version": "0.4.0",
-  "description": "Rayonne — l'autopilote marketing des SaaS : audit marketing de ta page produit, analyse, contenus, vidéos, métriques AARRR, depuis Claude Code.",
+  "version": "0.6.0",
+  "description": "Rayonne — l'autopilote marketing des SaaS : audit marketing de ta page produit, analyse, contenus, vidéos, métriques AARRR, tous les espaces de l'organisation, depuis Claude Code.",
   "author": {
     "name": "Sponge Theory",
     "email": "contact@sponge-theory.ai",
