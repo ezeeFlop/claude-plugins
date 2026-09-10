@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "spongram": {
+      "url": "https://spongram.sponge-theory.dev/mcp",
+      "bearer_token_env_var": "SPONGRAM_BRAIN_KEY",
+      "http_headers": {
+        "X-Spongram-Client": "codex"
+      }
+    }
+  }
+}

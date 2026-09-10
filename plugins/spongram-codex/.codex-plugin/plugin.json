@@ -1,0 +1,28 @@
+{
+  "name": "spongram-codex",
+  "version": "0.5.0",
+  "description": "Shared Spongram memory and structural code map for Codex",
+  "author": {
+    "name": "Sponge Theory",
+    "email": "support@sponge-theory.io"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Spongram for Codex",
+    "shortDescription": "Shared project memory and code map",
+    "longDescription": "Recall and record durable knowledge in the same Spongram brain as Claude Code.",
+    "developerName": "Sponge Theory",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Recall my project decisions with Spongram."
+    ]
+  },
+  "mcpServers": "./.mcp.json",
+  "homepage": "https://spongram.sponge-theory.dev",
+  "repository": "https://github.com/ezeeFlop/claude-plugins",
+  "license": "Sponge Theory Proprietary"
+}

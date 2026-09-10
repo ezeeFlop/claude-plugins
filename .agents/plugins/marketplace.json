@@ -1,0 +1,20 @@
+{
+  "name": "sponge-theory-codex",
+  "interface": {
+    "displayName": "Sponge Theory Codex"
+  },
+  "plugins": [
+    {
+      "name": "spongram-codex",
+      "source": {
+        "source": "local",
+        "path": "./plugins/spongram-codex"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -5,20 +5,27 @@ description: Use Spongram to remember durable decisions and preferences, recall 
 
 # Spongram
 
-## Claude Code adapter
+## Codex adapter
 
-Use `client=claude-code`. Read the project context injected by SessionStart.
-If missing, run `python3 <plugin-root>/lib/project_context.py --client claude-code
---cwd <session-working-directory>` and use its tags.
-Connection uses the existing Claude `userConfig` (`instance_url`, `brain_key`).
-The SessionStart, Stop, PostToolUse, PreCompact and SessionEnd hooks remain
-Claude-specific; do not run them in Codex.
+Use `client=codex`. At the start of a Spongram task, run
+`python3 <plugin-root>/lib/project_context.py --client codex --cwd <session-working-directory>`.
+Use the same session working directory and any `SPONGRAM_PROJECT` override as
+Claude Code. Read the shared memory rules below before tool calls.
 
-SessionStart installs the existing git post-commit map refresh and seeds missing
-maps. `SPONGRAM_CODEMAP_DISABLE=1` disables setup; see README for existing hooks.
-The `/spongram:recall`, `/spongram:brain-stats`, `/spongram:brain-graph` and
-`/spongram:persona` commands remain available. Persona tone must respect project
-and client instructions. See README for automatic capture and its off switch.
+Connect via the bundled HTTP MCP server, with `SPONGRAM_BRAIN_KEY` in the Codex
+process environment. See README to select an instance. Do not read Claude's
+settings, keychain or `~/.spongram/codemap/connection.env` to obtain credentials.
+Respect AGENTS.md, Codex instructions, sandbox and tool approvals.
+
+This adapter has no automatic hooks or transcript capture. For a task worth
+remembering, write a concise durable summary through `add_memory` when authorized.
+Recall and statistics use MCP tools; the Claude slash commands are not installed.
+
+For an authorized map upload, run `python3 <plugin-root>/scripts/codemap.py build
+<repository-root>` (or `update`). It uses the shared extractor and reads the key
+from the environment without persisting it. Install graphifyy==0.8.35 in a dedicated
+Python >=3.10 environment first; it is not installed automatically. Querying an
+existing map over MCP needs no local extractor. No git hook is installed by Codex.
 
 ## Shared memory contract / Contrat mémoire commun
 

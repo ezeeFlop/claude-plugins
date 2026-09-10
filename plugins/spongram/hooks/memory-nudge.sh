@@ -236,8 +236,8 @@ if lang == "fr":
         "code, historique git, CLAUDE.md).\n\n"
         "Taggage obligatoire — `source_description` doit porter le `project=` du "
         "bloc de contexte injecté au SessionStart (ou `project=global` pour un "
-        "fait transverse). N'écris rien via `Write` sur disque : la source de "
-        "vérité est Spongram." % body
+        "fait transverse). Respecte les consignes du client ; la mémoire partagée "
+        "utilise Spongram." % body
     )
 else:
     if kind == "commit":
@@ -264,8 +264,8 @@ else:
         "history, CLAUDE.md).\n\n"
         "Tagging is mandatory — `source_description` must carry the `project=` "
         "from the context block injected at SessionStart (or `project=global` for "
-        "a cross-cutting fact). Never write memory to disk with `Write`: the "
-        "source of truth is Spongram." % body
+        "a cross-cutting fact). Respect client instructions; shared memory uses "
+        "Spongram." % body
     )
 
 print(json.dumps({

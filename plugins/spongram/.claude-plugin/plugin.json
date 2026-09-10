@@ -1,6 +1,6 @@
 {
   "name": "spongram",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Spongram by Sponge Theory — cerveau persistant cross-session pour Claude Code (mémoire + knowledge graph + code-map + personas), via votre instance Spongram distante.",
   "author": {
     "name": "Sponge Theory",
@@ -9,7 +9,14 @@
   },
   "homepage": "https://spongram.sponge-theory.dev",
   "license": "Sponge Theory Proprietary",
-  "keywords": ["memory", "knowledge-graph", "mcp", "second-brain", "spongram", "sponge-theory"],
+  "keywords": [
+    "memory",
+    "knowledge-graph",
+    "mcp",
+    "second-brain",
+    "spongram",
+    "sponge-theory"
+  ],
   "userConfig": {
     "instance_url": {
       "type": "string",

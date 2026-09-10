@@ -38,24 +38,8 @@ KEY="${CLAUDE_PLUGIN_OPTION_BRAIN_KEY:-}"
 # Everything below runs detached: a compaction or a session exit must never wait
 # on an LLM round trip.
 (
-  # Same tagging contract as recall-on-start.sh: an episode captured here must
-  # be filterable exactly like one written by hand (project + repo + branch).
-  hook_cwd=$(printf '%s' "$input" | python3 -c \
-    "import json,sys;print(json.load(sys.stdin).get('cwd','') or '')" 2>/dev/null || echo "")
-  [ -n "$hook_cwd" ] && [ -d "$hook_cwd" ] || hook_cwd="$PWD"
-  SPONGRAM_CAPTURE_REPO=""
-  SPONGRAM_CAPTURE_BRANCH=""
-  if (cd "$hook_cwd" && git rev-parse --git-dir >/dev/null 2>&1); then
-    repo_url=$(cd "$hook_cwd" && git remote get-url origin 2>/dev/null || echo "")
-    SPONGRAM_CAPTURE_BRANCH=$(cd "$hook_cwd" && git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
-    if [ -n "$repo_url" ]; then
-      SPONGRAM_CAPTURE_REPO=$(printf '%s' "$repo_url" \
-        | sed -E 's#.*[:/]([^/]+/[^/]+)(\.git)?$#\1#; s#\.git$##')
-    fi
-  fi
-  export SPONGRAM_CAPTURE_REPO SPONGRAM_CAPTURE_BRANCH
-
-  payload=$(python3 - "$input" <<'PY' 2>/dev/null
+  SELF_DIR=$(cd "$(dirname "$0")" && pwd) || exit 0
+  payload=$(python3 - "$input" "$SELF_DIR/../lib" <<'PY' 2>/dev/null
 import json, os, sys
 
 raw = sys.argv[1] if len(sys.argv) > 1 else "{}"
@@ -129,21 +113,14 @@ except Exception:
 if len(turns) < env_int("SPONGRAM_CAPTURE_MIN_TURNS", 6):
     sys.exit(1)  # too thin to hold anything durable
 
-cwd = inp.get("cwd") or os.getcwd()
-slug = os.path.basename(cwd).lower()
-slug = "".join(c if c.isalnum() or c in "-_" else "-" for c in slug).strip("-") or "unknown"
-
-out = {
-    "source": source,
-    "project": slug,
-    "turns": turns[-MAX_TURNS:],
-}
-repo = os.environ.get("SPONGRAM_CAPTURE_REPO") or ""
-branch = os.environ.get("SPONGRAM_CAPTURE_BRANCH") or ""
-if repo:
-    out["repo"] = repo
-if branch:
-    out["branch"] = branch
+sys.path.insert(0, sys.argv[2])
+from project_context import context
+project = context(inp.get("cwd") or os.getcwd(), "claude-code")
+out = {"source": source, "project": project["project_slug"], "turns": turns[-MAX_TURNS:]}
+if project["repo"]:
+    out["repo"] = project["repo"]
+if project["branch"]:
+    out["branch"] = project["branch"]
 print(json.dumps(out))
 PY
   ) || exit 0

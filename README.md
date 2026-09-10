@@ -10,8 +10,10 @@ plugins published by [Sponge Theory](https://sponge-theory.ai).
 /plugin install <plugin>@sponge-theory
 ```
 
-Each plugin prompts for its configuration (API keys, instance URL) when
-enabled — secrets are stored in your system keychain, never in files.
+Claude plugins declare their connection settings (API keys, instance URL).
+Secret storage depends on the client and plugin: see each plugin README.
+Spongram’s Claude code-map hook keeps a private plaintext connection file;
+the Codex adapter uses a process environment variable.
 
 ## Available plugins
 
@@ -31,3 +33,22 @@ enabled — secrets are stored in your system keychain, never in files.
 .claude-plugin/marketplace.json   # marketplace manifest
 plugins/<name>/                    # each plugin (self-contained)
 ```
+
+## Spongram : Claude Code et Codex
+
+Le plugin Claude Code conserve son chemin `plugins/spongram`. L'intégration
+Codex est dans [`plugins/spongram-codex`](plugins/spongram-codex/README.md), avec
+sa marketplace `.agents/plugins/marketplace.json`. Elles utilisent le cœur
+`shared/spongram` : règles mémoire, contexte projet et extracteur de code-map.
+
+Après une modification du cœur : `python3 scripts/build_spongram.py`, puis
+`python3 scripts/build_spongram.py --check` et
+`python3 -m unittest discover -s tests -p 'test_spongram*.py'`.
+Les copies générées dans chaque plugin rendent les archives autonomes ; aucune
+référence à un fichier situé hors du plugin n'est nécessaire à l'exécution.
+L'extracteur partagé est une copie versionnée de `spongram_codemap` du dépôt
+serveur ; mettre à jour cette copie puis régénérer les deux plugins ensemble.
+
+Publication de Spongram : voir [SPONGRAM_RELEASE.md](SPONGRAM_RELEASE.md).
+Le contrôle `python3 scripts/check_spongram_release.py` valide les deux adaptateurs
+et vérifie les fichiers indexés avant publication ; il ne pousse rien lui-même.
