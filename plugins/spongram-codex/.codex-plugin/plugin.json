@@ -1,6 +1,6 @@
 {
   "name": "spongram-codex",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Shared Spongram memory and structural code map for Codex",
   "author": {
     "name": "Sponge Theory",
@@ -18,10 +18,10 @@
       "Write"
     ],
     "defaultPrompt": [
+      "Configure Spongram.",
       "Recall my project decisions with Spongram."
     ]
   },
-  "mcpServers": "./.mcp.json",
   "homepage": "https://spongram.sponge-theory.dev",
   "repository": "https://github.com/ezeeFlop/claude-plugins",
   "license": "Sponge Theory Proprietary"

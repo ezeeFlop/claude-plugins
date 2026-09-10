@@ -2,11 +2,10 @@
 """Read-only MCP handshake and tools/list probe; never reads memories or writes them."""
 
 import json
-import os
 import sys
 import urllib.error
 import urllib.request
-from pathlib import Path
+from connection import credentials, SetupError
 
 
 def decode(data, content_type):
@@ -24,7 +23,14 @@ def decode(data, content_type):
     return json.loads(text)
 
 
-def probe(url, key, open_url=urllib.request.urlopen):
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def probe(url, key, open_url=None):
+    # Never forward a brain key to a redirected endpoint.
+    open_url = open_url or urllib.request.build_opener(NoRedirect).open
     session = None
     protocol = "2025-03-26"
 
@@ -63,7 +69,7 @@ def probe(url, key, open_url=urllib.request.urlopen):
         {
             "protocolVersion": protocol,
             "capabilities": {},
-            "clientInfo": {"name": "spongram-codex-check", "version": "0.5.0"},
+            "clientInfo": {"name": "spongram-codex-check", "version": "0.5.1"},
         },
     )
     protocol = initialized["protocolVersion"]
@@ -85,13 +91,11 @@ def probe(url, key, open_url=urllib.request.urlopen):
 
 
 def main():
-    key = os.environ.get("SPONGRAM_BRAIN_KEY")
-    if not key:
-        sys.exit("SPONGRAM_BRAIN_KEY is required in the process environment")
-    config = json.loads((Path(__file__).resolve().parents[1] / ".mcp.json").read_text())
-    url = config["mcpServers"]["spongram"]["url"]
     try:
+        url, key = credentials()
         names = probe(url, key)
+    except SetupError as error:
+        sys.exit(str(error))
     except urllib.error.HTTPError as error:
         sys.exit(f"MCP HTTP error {error.code}; check endpoint and brain key")
     except (OSError, ValueError, KeyError):

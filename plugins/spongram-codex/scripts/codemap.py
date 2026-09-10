@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""Explicit Codex map upload, using the shared extractor and environment secret."""
+"""Explicit Codex map upload, using the shared extractor and macOS Keychain."""
 
 import argparse
-import json
-import os
 import subprocess
 import sys
 from pathlib import Path
+from connection import credentials, SetupError
 
 PLUGIN = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PLUGIN / "lib"))
@@ -17,9 +16,10 @@ def main():
     parser.add_argument("action", choices=["build", "update"])
     parser.add_argument("path", type=Path)
     args = parser.parse_args()
-    key = os.environ.get("SPONGRAM_BRAIN_KEY")
-    if not key:
-        parser.error("SPONGRAM_BRAIN_KEY is required in the process environment")
+    try:
+        endpoint, key = credentials()
+    except SetupError as error:
+        parser.error(str(error))
     path = args.path.resolve()
     try:
         root = Path(
@@ -34,8 +34,6 @@ def main():
         )
     except subprocess.CalledProcessError:
         parser.error("Path must be in a Git repository")
-    config = json.loads((PLUGIN / ".mcp.json").read_text())["mcpServers"]["spongram"]
-    endpoint = config["url"]
     if not endpoint.endswith("/mcp"):
         parser.error("Configured endpoint must end in /mcp")
     # Shared map identity with Claude; separate local state avoids races between clients.

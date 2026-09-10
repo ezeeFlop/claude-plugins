@@ -6,7 +6,8 @@ from the server repository. The release source is now this repository:
 an older Claude-only tree over these files or regenerate the Codex marketplace
 from the Claude manifest.
 
-Spongram is a static remote-HTTP MCP plugin. Publishing it means committing and
+Spongram uses remote HTTP MCP. The Codex adapter bundles guided local setup
+scripts, which register a user-level HTTP MCP server with a Keychain header helper. Publishing it means committing and
 pushing this repository; no PyPI package or product/server deployment is involved.
 The server's Codex persona adaptation is a separate server release.
 
@@ -23,7 +24,7 @@ The server's Codex persona adaptation is a separate server release.
    the release files:
 
    ```bash
-   git add .claude-plugin/marketplace.json .agents/plugins/marketplace.json .gitignore README.md SPONGRAM_RELEASE.md plugins/spongram plugins/spongram-codex shared/spongram scripts/build_spongram.py scripts/check_spongram_release.py tests/test_spongram.py
+   git add .claude-plugin/marketplace.json .agents/plugins/marketplace.json .gitignore README.md SPONGRAM_RELEASE.md plugins/spongram plugins/spongram-codex shared/spongram scripts/build_spongram.py scripts/check_spongram_release.py tests/test_spongram*.py scripts/smoke_spongram_*.py
    python3 scripts/check_spongram_release.py
    git diff --cached --check
    git diff --cached --stat
@@ -45,12 +46,12 @@ Create the directories before invoking the CLIs.
 - Claude: `claude plugin marketplace add <checkout>` then
   `claude plugin install spongram@sponge-theory`.
 
-Both should install version 0.5.0 for this release. Claude should report missing
+Both should install version 0.5.1 for this release. Claude should report missing
 required connection settings in the empty profile. Do not configure a real key
 for this packaging test. No session hooks need to run.
 
-An install proof is not a live MCP connection proof. When an authorized test
-brain key is available through the process environment, run
+An install proof is not a live MCP connection proof. When an authorized brain
+is configured through the Keychain setup, run
 `plugins/spongram-codex/scripts/check_connection.py` and verify recall inside both
 clients. Record separately whether the live check ran; never report an untested
 connection as working. Do not create or delete memories without authorization.
@@ -62,7 +63,7 @@ again, rebase onto `origin/main`, rerun preflight on any changed release files a
 push normally. Never force-push or overwrite another plugin's release.
 
 ```bash
-git commit -m "feat(spongram): release shared Claude Code and Codex adapters 0.5.0"
+git commit -m "feat(spongram): release shared Claude Code and Codex adapters 0.5.1"
 git fetch origin
 git rebase origin/main
 git push origin HEAD:main
@@ -93,11 +94,21 @@ codex plugin marketplace upgrade sponge-theory-codex
 codex plugin add spongram-codex@sponge-theory-codex
 ```
 
-Provide `SPONGRAM_BRAIN_KEY` to the Codex process, using the same brain as Claude.
-For a custom instance and GUI secret setup, follow the Codex adapter README.
+After installing, ask Codex **Configure Spongram**. The setup asks for an instance
+URL, offers to reuse a matching Keychain key (including Claude Code), or collects
+a new key through masked macOS input. Follow the Codex adapter README.
 Start a new session after installing/updating.
 
 Claude, refresh the marketplace with
 `claude plugin marketplace update sponge-theory`, then update Spongram from
 `/plugin`. First-time users install `spongram@sponge-theory` and configure their
 existing instance URL and brain key.
+
+## Native setup checks
+
+Run `python3 scripts/smoke_spongram_keychain.py` and
+`python3 scripts/smoke_spongram_dialogs.py` on macOS. Also run
+`python3 scripts/smoke_spongram_mcp.py` to verify actual Codex HTTP/header-helper
+startup against a synthetic loopback MCP server, in isolated profiles. These are explicit tests:
+the first creates and removes a synthetic Keychain item; the second shows an
+auto-closing masked test dialog. Neither reads production credentials.

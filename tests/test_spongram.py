@@ -22,7 +22,9 @@ def module(name, path):
 
 
 context = module("project_context", ROOT / "shared/spongram/lib/project_context.py")
+sys.path.insert(0, str(CODEX / "scripts"))
 config = module("configure", CODEX / "scripts/configure.py")
+from connection import account, normalize_instance, SetupError
 check = module("check_connection", CODEX / "scripts/check_connection.py")
 
 
@@ -145,23 +147,18 @@ class SharedCore(unittest.TestCase):
         self.assertEqual([p["name"] for p in market["plugins"]], ["spongram-codex"])
 
     def test_secret_free_config_and_custom_instance(self):
-        server = config.server_config("https://example.test/spongram/")
+        instance = normalize_instance("https://example.test/spongram/")
+        server = config.server_config(instance, account(instance))
         self.assertEqual(server["url"], "https://example.test/spongram/mcp")
-        self.assertEqual(server["bearer_token_env_var"], "SPONGRAM_BRAIN_KEY")
+        self.assertNotIn("bearer_token_env_var", server)
+        self.assertIn("auth_headers.py", server["http_headers_helper"])
         self.assertEqual(server["http_headers"]["X-Spongram-Client"], "codex")
-        for invalid in [
-            "http://remote.test",
-            "https://user:pass@example.test",
-            "https://example.test?key=secret",
-        ]:
-            with self.assertRaises(ValueError):
-                config.server_config(invalid)
-        bundled = json.loads((CODEX / ".mcp.json").read_text())
-        self.assertEqual(
-            bundled["mcpServers"]["spongram"],
-            config.server_config("https://spongram.sponge-theory.dev"),
-        )
-        self.assertNotIn("CLAUDE_PLUGIN_OPTION", (CODEX / "scripts/codemap.py").read_text())
+        for invalid in ["http://remote.test", "https://user:pass@example.test",
+                        "https://example.test?key=secret"]:
+            with self.assertRaises(SetupError):
+                normalize_instance(invalid)
+        self.assertFalse((CODEX / ".mcp.json").exists())
+        self.assertNotIn("mcpServers", json.loads((CODEX / ".codex-plugin/plugin.json").read_text()))
 
     def test_codemap_secret_stays_in_process_and_map_identity_matches_claude(self):
         from types import SimpleNamespace
@@ -178,7 +175,7 @@ class SharedCore(unittest.TestCase):
                 return 0
 
             with (
-                patch.dict(os.environ, {"SPONGRAM_BRAIN_KEY": "test-only-secret"}),
+                patch.object(runner, "credentials", return_value=("https://example.test/mcp", "test-only-secret")),
                 patch.dict(sys.modules, {"spongram_codemap.cli": SimpleNamespace(main=fake_run)}),
                 patch.object(sys, "argv", ["codemap.py", "build", str(repo)]),
                 patch.object(subprocess, "check_output", wraps=subprocess.check_output) as git,

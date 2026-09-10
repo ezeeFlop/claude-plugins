@@ -13,7 +13,7 @@ plugins published by [Sponge Theory](https://sponge-theory.ai).
 Claude plugins declare their connection settings (API keys, instance URL).
 Secret storage depends on the client and plugin: see each plugin README.
 Spongram’s Claude code-map hook keeps a private plaintext connection file;
-the Codex adapter uses a process environment variable.
+the Codex adapter provides guided macOS setup with Keychain storage.
 
 ## Available plugins
 
