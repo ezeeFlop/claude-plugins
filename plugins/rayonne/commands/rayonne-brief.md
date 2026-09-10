@@ -22,3 +22,8 @@ Montre le brief produit courant et propose de le corriger.
 Rappelle-lui pourquoi ça compte : tout ce que la plateforme générera
 ensuite hérite de ce brief. Corriger ici coûte une phrase ; corriger en
 aval coûte chaque contenu, un par un.
+
+`rayonne_patch_brief` fusionne les objets imbriqués. Omettre un champ le
+conserve ; fournir un tableau le remplace entièrement (`[]` le vide), et
+`null` enregistre une valeur nulle sans supprimer la clé. Un objet vide ne
+vide pas un objet existant. Envoie seulement les corrections souhaitées.

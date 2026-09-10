@@ -29,7 +29,7 @@ Après configuration, vérifie depuis la même copie installée :
 uv run --locked scripts/check_connection.py
 ```
 
-Ce contrôle initialise MCP, vérifie les 81 outils puis appelle uniquement
+Ce contrôle initialise MCP, vérifie les 82 outils puis appelle uniquement
 `rayonne_overview`. Il affiche un statut, aucun contenu de l'espace ni secret.
 Indique le résultat réel, puis demande d'ouvrir un nouveau fil Codex pour
 charger les outils. Ne présente pas la connexion comme validée en cas d'échec.

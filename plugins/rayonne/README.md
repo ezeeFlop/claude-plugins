@@ -36,7 +36,7 @@ format `rk_…`, plan Business).
 
 ## Outils
 
-81 outils, un par verbe de l'API publique — table complète groupée par
+82 outils, un par verbe de l'API publique — table complète groupée par
 module (M1 brief, M2 stratégie, M3 contenu, M3 kit de vente et médias, M4
 soumission et pièces jointes du kit, M5 analytics, M9 vidéo et storyboard,
 avatars vidéo, galerie produit, audit, espaces de l'organisation,
@@ -83,3 +83,6 @@ médias d'un post sans quitter Claude : `rayonne_content_media`,
 Chaque outil d'écriture (générer, éditer, publier, planifier…) consomme du
 quota du workspace ; la génération vidéo est en plus **facturée**. Coche
 **Mode lecture seule** à l'installation pour les désactiver.
+
+Version 0.7.0 : finalisation via `rayonne_onboard_workspace`, sans nouvelle
+analyse ; patch du brief par fusion récursive, champs absents conservés.

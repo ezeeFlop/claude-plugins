@@ -1,7 +1,7 @@
 # Rayonne pour Codex
 
-Adaptateur Codex du plugin Claude Code Rayonne 0.6.0 : les **81 mêmes
-outils**, le même serveur PyPI `rayonne-mcp==0.6.0` et son guide métier.
+Adaptateur Codex du plugin Claude Code Rayonne 0.7.0 : les **82 mêmes
+outils**, le même serveur PyPI `rayonne-mcp==0.7.0` et son guide métier.
 Aucun code serveur propriétaire n'est embarqué dans cet adaptateur.
 
 ## Installation et configuration
@@ -10,7 +10,7 @@ Prérequis : Codex avec plugins, `uv`, Python ≥ 3.10 et une clé API Rayonne
 `rk_…` (Réglages → Clés API, plan Business). Le formulaire sécurisé utilise
 le trousseau macOS. Une première exécution télécharge les dépendances PyPI.
 
-Installe depuis ce dépôt public :
+Installation depuis la marketplace publique :
 
 ```sh
 codex plugin marketplace add https://github.com/ezeeFlop/claude-plugins.git
@@ -32,7 +32,7 @@ seule, ou stocke une nouvelle clé dans le trousseau sous
 `ai.sponge-theory.rayonne.codex`. L'URL, la référence du credential et le
 choix lecture seule sont enregistrés dans `~/.rayonne/codex/connection.json`
 (mode 0600) ; ce fichier ne contient pas de clé. La vérification ne publie
-rien : elle initialise MCP, contrôle 81 outils et lit l'aperçu de l'espace.
+rien : elle initialise MCP, contrôle 82 outils et lit l'aperçu de l'espace.
 Ouvre ensuite un **nouveau fil Codex** pour charger skills et outils.
 
 Un déploiement sans trousseau peut fournir ensemble `RAYONNE_API_URL` et
@@ -62,7 +62,7 @@ python3 mcp/build/build_codex_plugin.py
 
 Modifier les parcours dans `mcp/claude_code_plugin/commands/`, puis régénérer.
 Le générateur adapte seulement les arguments, les liens entre commandes et
-le contexte Codex. Le paquet `mcp/dist/rayonne-codex-0.6.0.tar.gz` contient
+le contexte Codex. Le paquet `mcp/dist/rayonne-codex-0.7.0.tar.gz` contient
 uniquement les fichiers nécessaires au plugin, jamais `.venv` ni les caches.
-La copie publique est distribuée ici sous `plugins/rayonne-codex`. Les commandes
-de maintenance ci-dessus se lancent dans le dépôt source Rayonne.
+La copie publique est distribuée ici sous `plugins/rayonne-codex`.
+Les scripts de maintenance cités ci-dessus vivent dans le dépôt source Rayonne.

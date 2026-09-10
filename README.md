@@ -57,6 +57,6 @@ et vérifie les fichiers indexés avant publication ; il ne pousse rien lui-mêm
 ## Rayonne pour Codex
 
 L’adaptateur [`rayonne-codex`](plugins/rayonne-codex/README.md) est disponible
-dans la marketplace `sponge-theory-codex` : 81 outils marketing Rayonne, neuf
+dans la marketplace `sponge-theory-codex` : 82 outils marketing Rayonne, neuf
 parcours métier et configuration sécurisée dans le trousseau macOS. Il utilise
-le serveur publié `rayonne-mcp==0.6.0`.
+le serveur publié `rayonne-mcp==0.7.0`.

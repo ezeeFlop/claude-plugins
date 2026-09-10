@@ -14,8 +14,8 @@ async def check():
             await session.initialize()
             listed = await session.list_tools()
             names = {tool.name for tool in listed.tools}
-            expected = {"rayonne_overview", "rayonne_list_workspaces", "rayonne_upload_product_asset", "rayonne_chat_storyboard"}
-            if len(names) != 81 or not expected <= names:
+            expected = {"rayonne_onboard_workspace", "rayonne_overview", "rayonne_list_workspaces", "rayonne_upload_product_asset", "rayonne_chat_storyboard"}
+            if len(names) != 82 or not expected <= names:
                 raise RuntimeError("Unexpected tool catalogue")
             result = await session.call_tool("rayonne_overview", {})
             if result.isError:
@@ -23,7 +23,7 @@ async def check():
             payload = json.loads(next(item.text for item in result.content if item.type == "text"))
             if not isinstance(payload, dict) or "error" in payload:
                 raise RuntimeError("Overview failed")
-            print("MCP initialization OK; 81 tools present; workspace overview OK.")
+            print("MCP initialization OK; 82 tools present; workspace overview OK.")
 
 
 if __name__ == "__main__":

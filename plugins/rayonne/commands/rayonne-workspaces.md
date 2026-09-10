@@ -26,3 +26,9 @@ Aide à piloter plusieurs espaces Rayonne depuis une seule clé.
    avant d'appeler `rayonne_delete_workspace` — IRRÉVERSIBLE. L'espace
    d'origine de la clé est refusé (409) : le supprimer couperait l'accès en
    plein vol.
+
+6. Quand l’URL produit et la langue sont renseignées, termine avec
+   `rayonne_onboard_workspace` sur l’espace choisi (clé d’administration).
+   L’espace devient accessible dans l’interface sans wizard. Cette action
+   conserve les briefs corrigés et les stratégies en brouillon ; elle ne
+   lance aucune analyse et n’active ni stratégie ni autopilote.
