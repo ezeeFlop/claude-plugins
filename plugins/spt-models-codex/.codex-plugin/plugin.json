@@ -1,0 +1,29 @@
+{
+  "name": "spt-models-codex",
+  "version": "1.10.0",
+  "description": "SPT Models GPU inference and model catalogue for Codex",
+  "author": {
+    "name": "Sponge Theory",
+    "email": "support@sponge-theory.io"
+  },
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "homepage": "https://models.sponge-theory.dev",
+  "repository": "https://github.com/ezeeFlop/claude-plugins",
+  "license": "MIT",
+  "interface": {
+    "displayName": "SPT Models for Codex",
+    "shortDescription": "GPU models, speech, images and video",
+    "longDescription": "Discover SPT models and run inference using their prompting guides. Includes secure macOS setup.",
+    "developerName": "Sponge Theory",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Configure SPT Models.",
+      "List the models available on my SPT stack."
+    ]
+  }
+}

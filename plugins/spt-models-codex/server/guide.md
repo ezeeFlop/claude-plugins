@@ -1,0 +1,200 @@
+# SPT Models — agent workflow
+
+Single source of truth for how an LLM agent should use the SPT Models MCP
+server.  Loaded at server startup as the FastMCP `instructions=` (visible to
+Claude Desktop), exposed as the MCP resource `spt://guide` (re-readable by
+any agent), and wrapped as a Claude Code SKILL inside the plugin bundle.
+
+This is a private GPU stack with a curated catalogue of LLM / VLM / image /
+video / audio / embedding / rerank models.
+
+## Golden rules (read these first)
+
+1. **To run inference, just call the inference tool.** The platform auto-loads
+   the model on the first request and auto-evicts the least-recently-used model
+   when VRAM is tight. You do **not** pre-load. **Never call `load_model` before
+   an inference tool.** A model showing `loaded: false` is fine — calling the
+   inference tool (`chat`, `generate_image`, `tts`, …) loads it on demand. The
+   first call to a cold model can take tens of seconds (big diffusion models
+   longer); that's the load, not an error. `load_model` / `unload_model` are
+   ops-only tools (deliberate pre-warm, pin, or free VRAM) — not the normal flow.
+
+2. **Always call `get_model_info(slug)` first and apply `recommended_params`.**
+   They are model-specific and getting them wrong ruins the output — e.g. 30
+   steps + CFG 7.5 on a distilled *Turbo* model (which wants ~8 steps, guidance
+   ~1.0), or the default 512×512 square for a wide hero banner.
+
+3. **Resolution and model-specific knobs go through `extra`.** For image models,
+   set the size with `extra={"width": W, "height": H}` using a resolution from
+   the model's guide — this is the authoritative channel and always wins. The
+   top-level `size="WxH"` arg is OpenAI-compatible and also maps to the
+   resolution, but `extra` width/height is the reliable one. `extra` is also how
+   you pass any model-specific flag (e.g. ErnieImage's `use_pe`) and non-standard
+   params on `chat` / `complete` / `generate_music` (e.g. `top_k`).
+
+4. **Never invent a model name** — only use names returned by `list_models`.
+   Both kinds of entry are valid: canonical slugs, and *aliases* (entries
+   carrying `alias_of: <slug>` — stable client-facing names such as `gpt-4`
+   or `default-llm` that an admin pointed at a catalogue model). An alias
+   works everywhere a slug does: every inference tool, `get_model_info`,
+   `load_model`, `unload_model`. It is the same model, not a second one —
+   when an alias and its target both match a request, use the canonical slug
+   (unless the user named the alias) and never present the pair to the user
+   as two different models.
+
+## 1. Discover
+
+Call `list_models(type=<kind>)` to see what's available.  Map the user's
+intent to a model type:
+
+| User says                                   | type        |
+|---------------------------------------------|-------------|
+| génère une image / generate an image        | `image_gen` |
+| génère une vidéo / generate a video         | `video_gen` |
+| génère du son, de la musique, un sound effect | `sound_gen` |
+| lis ce texte, voix off, TTS                 | `tts`       |
+| transcris cet audio, speech-to-text         | `stt`       |
+| chat, réponds, raisonne                     | `llm`       |
+| analyse cette image, VLM                    | `vlm`       |
+| embeddings, vectorise                       | `embedding` |
+| reranke, classe des documents               | `rerank`    |
+
+Before counting candidates, fold aliases into their target: an entry with
+`alias_of` is the same model as the slug it names, so drop it from the list
+(or keep only the slug).  If exactly one model remains, pick it.  If several,
+show the user a short list (`slug — short description`) and ask which one.
+
+Each verbose entry carries a `description` (one line on what the model does)
+and `capabilities` (short functional tags such as `128k context`,
+`tool calling`, `FR/EN`).  Use them to choose between candidates and to write
+that short list — you do not need `get_model_info` just to tell two models
+apart.  Both are empty when nothing is known about the model; that is a
+"no data" signal, not a claim that the model lacks the capability.
+
+## 2. Read the prompting guide
+
+Once the model is chosen, call `get_model_info(slug)` and read the
+`prompting_guide` field.  Keys you may find:
+
+- `system_prompt` / `format` — required structure for the prompt
+- `example_prompts` — concrete good prompts to imitate
+- `recommended_params` — temperature, steps, guidance/cfg, **width/height**,
+  etc.  Pass these in the inference call unless the user explicitly overrides.
+  For image models, feed width/height through `extra` (see golden rule 3).
+- `do_dont` — hard constraints; respect them
+- `limitations` — surface to the user when relevant
+
+Reformulate the user's intent into a prompt that matches the guide.  For
+image / video / sound models this often means adding style descriptors,
+switching to English, or using a specific tag syntax.
+
+## 3. Run inference
+
+Call the matching tool with the params from the prompting guide.  **The model
+loads automatically on this call** — you never load it yourself.
+
+| type        | tool                                                     |
+|-------------|----------------------------------------------------------|
+| `llm`       | `chat(model, messages, ...)` or `complete(model, prompt, ...)` |
+| `vlm`       | `chat(model, messages with image url or base64, ...)`    |
+| `image_gen` | `generate_image(model, prompt, ...)`                     |
+| `video_gen` | `generate_video(model, prompt, image_b64?, last_frame_b64?, video_b64?, ...)` |
+| `sound_gen` | `generate_music(model, prompt, ...)`                     |
+| `tts`       | `tts(model, input, voice?, ...)`                         |
+| `stt`       | `transcribe(model, audio_b64, ...)`                      |
+| `embedding` | `embed(model, input, ...)`                               |
+| `rerank`    | `rerank(model, query, documents, ...)`                   |
+
+Video/image/music generations go through a server-side job that is polled
+automatically — no client timeout to worry about; the first generation on a
+large model can take 20+ minutes.
+
+Video inputs are all base64: `image_b64` anchors the FIRST frame (any i2v
+model); `last_frame_b64` anchors the LAST frame and `video_b64` feeds a source
+MP4 as frame guides from frame 0 (video-to-video at `video_strength` 1.0 =
+faithful re-render, lower = the prompt takes over; a `num_frames` longer than
+the source continues it). `last_frame_b64` combines with either; `image_b64`
+and `video_b64` do not. Only models whose guide lists these fields honour
+them (LTX-2.5 today); the source audio is never kept, the model regenerates
+the soundtrack from the prompt.
+
+Text-to-speech through this MCP `tts` tool is always a complete file. The HTTP
+API (`POST /v1/audio/speech` with `"stream": true`) streams audio as it is
+generated on capable models (`capabilities` contains `"streaming"`) — use it
+from an application, not from here.
+
+### Worked example — image generation
+
+```
+get_model_info("ernie-image-turbo")
+# guide → supported resolutions incl. 1376×768, recommended 8 steps,
+#         guidance 1.0, optional use_pe (prompt enhancer)
+
+generate_image(
+    model="ernie-image-turbo",
+    prompt="…detailed prompt written per the guide…",
+    num_inference_steps=8,
+    guidance_scale=1.0,
+    extra={"width": 1376, "height": 768, "use_pe": True},
+)
+```
+
+The first call triggers the load (tens of seconds for big diffusion models);
+subsequent calls reuse the loaded model and are fast.  Without `extra` width/
+height you get 512×512 — too small/square for most real uses.
+
+### Worked example — transcription
+
+`transcribe` takes two optional knobs beyond `language`:
+
+- `mode` — the transcription policy, on models that expose one. `"verbatim"`
+  keeps every filler, stutter, repetition and vocal sound ("um", "th- the");
+  `"intended"` returns the clean readable sentence. Today only
+  `crisperwhisper-2.0-large` honours it; the other STT backends ignore it
+  silently, so passing it is never an error — it simply has no effect. Omit it
+  to keep the model's own default.
+- `timestamp_granularities` — `["word"]` and/or `["segment"]`, mirroring the
+  OpenAI field. On `crisperwhisper-2.0-large` word timings are returned *by
+  default* and they cost real time — 4.0 s vs 1.8 s on a 15 s clip — so pass
+  `["segment"]` to opt out when the text alone is enough. The timings come back
+  nested per segment as `segments[].words` (`{start, end, word}` each), not in a
+  top-level `words` array.
+
+Choose `verbatim` when the disfluencies *are* the signal — medical or legal
+transcripts, speech therapy, interview analysis, dubbing. Choose `intended`
+when the user wants prose: meeting notes, articles, summaries.
+
+```
+transcribe(
+    model="crisperwhisper-2.0-large",
+    audio_b64="…base64 of the audio file…",
+    mode="verbatim",
+    timestamp_granularities=["word"],
+)
+```
+
+**Always cite which model you used** at the end of your response
+("Generated with `ernie-image-turbo`" / "Transcribed with `whisperx-large-v3`").
+
+## Resources for grounding
+
+- `spt://models` — full catalogue (resource, not tool)
+- `spt://model/<slug>` — single-model details (resource)
+- `spt://guide` — this document, re-readable any time
+
+Resources are fine to read silently for context; prefer them over extra
+`list_models` calls when you only need a quick re-check.
+
+## What NOT to do
+
+- **Don't call `load_model` before an inference tool** — inference auto-loads
+  (and the platform auto-evicts an LRU model if VRAM is short). Use
+  `load_model` / `unload_model` only for deliberate ops (pre-warm, pin, free).
+- Don't call an inference tool without first reading the model's prompting guide.
+- Don't rely on a bare `generate_image(size=…)` and assume the resolution
+  stuck — set `extra={"width": …, "height": …}` from the model's supported
+  resolutions.
+- Don't invent a model name — slugs and aliases both come from `list_models`.
+- Don't list an alias and its target (`alias_of`) as two separate choices.
+- Don't drop or paraphrase the user's prompt — reformulate it per the guide,
+  preserving the intent.

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "spt-models": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "${PLUGIN_ROOT}",
+        "scripts/launch.py"
+      ],
+      "startup_timeout_sec": 120,
+      "tool_timeout_sec": 4000
+    }
+  }
+}
