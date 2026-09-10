@@ -53,3 +53,8 @@ serveur ; mettre à jour cette copie puis régénérer les deux plugins ensemble
 Publication de Spongram : voir [SPONGRAM_RELEASE.md](SPONGRAM_RELEASE.md).
 Le contrôle `python3 scripts/check_spongram_release.py` valide les deux adaptateurs
 et vérifie les fichiers indexés avant publication ; il ne pousse rien lui-même.
+
+## SPT Models for Codex
+
+The `spt-models-codex` adapter is listed in the `sponge-theory-codex` marketplace.
+See [installation and secure setup](plugins/spt-models-codex/README.md).
