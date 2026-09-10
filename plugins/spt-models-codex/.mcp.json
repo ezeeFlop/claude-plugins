@@ -4,12 +4,19 @@
       "command": "uv",
       "args": [
         "run",
-        "--directory",
-        "${PLUGIN_ROOT}",
+        "--locked",
         "scripts/launch.py"
       ],
       "startup_timeout_sec": 120,
-      "tool_timeout_sec": 4000
+      "tool_timeout_sec": 4000,
+      "cwd": ".",
+      "env_vars": [
+        "SPT_BASE_URL",
+        "SPT_API_KEY",
+        "SPT_ADMIN_TOKEN",
+        "SPT_REQUEST_TIMEOUT",
+        "SPT_VERIFY_TLS"
+      ]
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "spt-models-codex",
-  "version": "1.10.0",
+  "version": "1.10.0+codex.20260910103534",
   "description": "SPT Models GPU inference and model catalogue for Codex",
   "author": {
     "name": "Sponge Theory",
