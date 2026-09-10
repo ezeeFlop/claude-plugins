@@ -1,0 +1,29 @@
+{
+  "name": "rayonne-codex",
+  "version": "0.6.0",
+  "description": "Pilote Rayonne depuis Codex : brief, stratégie, contenus, médias, publication, vidéos et espaces.",
+  "author": {
+    "name": "Sponge Theory",
+    "email": "contact@sponge-theory.ai"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Rayonne pour Codex",
+    "shortDescription": "Votre marketing Rayonne depuis Codex.",
+    "longDescription": "Pilote Rayonne depuis Codex : brief, stratégie, contenus, médias, publication, vidéos et espaces.",
+    "developerName": "Sponge Theory",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Fais le point sur mon espace Rayonne.",
+      "Prépare un contenu LinkedIn dans Rayonne.",
+      "Inspecte les médias de mon dernier contenu."
+    ]
+  },
+  "mcpServers": "./.mcp.json",
+  "homepage": "https://rayonne.sponge-theory.dev",
+  "license": "Sponge Theory Proprietary"
+}
