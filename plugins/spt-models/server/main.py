@@ -42,7 +42,7 @@ except ImportError:
         )
         raise SystemExit(1) from exc
 
-from spt_client import SPTClient
+from spt_client import SPTClient, read_audio_input
 
 logging.basicConfig(
     level=os.environ.get("SPT_LOG_LEVEL", "INFO").upper(),
@@ -312,6 +312,9 @@ async def generate_video(
     model: str,
     prompt: str,
     image_b64: str | None = None,
+    last_frame_b64: str | None = None,
+    video_b64: str | None = None,
+    video_strength: float | None = None,
     negative_prompt: str | None = None,
     num_frames: int | None = None,
     fps: int | None = None,
@@ -328,13 +331,25 @@ async def generate_video(
     Video generation is SLOW (minutes); the request timeout applies.
 
     Call `get_model_info(slug)` first: frames, fps, resolution and steps are
-    model-specific.  `image_b64` supplies a base64 reference image for
-    image-to-video models.  The response contains base64-encoded video data
-    (`b64_json`) — decode it and write to a file (usually .mp4).
+    model-specific.  `image_b64` supplies a base64 FIRST-frame image
+    (image-to-video).  LTX-2.5 also takes `last_frame_b64` (LAST frame,
+    first/last-frame-to-video, combinable with `image_b64` or `video_b64`) and
+    `video_b64` (base64 MP4 whose frames guide the output from frame 0:
+    video-to-video, or a continuation when `num_frames` exceeds the source;
+    `video_strength` 0-1, 1.0 = faithful re-render; exclusive with
+    `image_b64`; source audio is regenerated, not kept).  The response
+    contains base64-encoded video data (`b64_json`) — decode it and write to
+    a file (usually .mp4).
     """
     payload: dict[str, Any] = {"model": model, "prompt": prompt}
     if image_b64 is not None:
         payload["image"] = image_b64
+    if last_frame_b64 is not None:
+        payload["last_frame"] = last_frame_b64
+    if video_b64 is not None:
+        payload["video"] = video_b64
+    if video_strength is not None:
+        payload["video_strength"] = video_strength
     if negative_prompt is not None:
         payload["negative_prompt"] = negative_prompt
     if num_frames is not None:
@@ -396,12 +411,21 @@ async def generate_music(
     extra: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Generate music / sound from a text prompt (sound_gen models:
-    stable-audio-*, ace-step, yue, diffrhythm).  Call `get_model_info(slug)` for
+    stable-audio-*, ace-step, yue2, diffrhythm).  Call `get_model_info(slug)` for
     the prompting guide first — these models want Stable-Audio-style descriptive
     prompts (genre, instruments, BPM, mood, production), not speech text.
+    Lyrics-to-song models (minimax-music3, yue2) take the words to sing in
+    `extra={"lyrics": ...}`; `prompt` stays the style description.
 
     Returns `{created, model, audio, format, _compute_time_ms}` where `audio`
-    is base64 — decode it and write to a .wav file.
+    is base64 — decode it and write to a .wav file.  Some models add optional
+    metadata (yue2-3b does; read it with `.get()`, absent means no score):
+    `score_abc` — the ABC score the song followed (null with cot=off), `seed` —
+    the seed used, `truncated` — `{"abc", "semantic"}` token-ceiling flags.  To
+    re-render an edited score, pass it back as `extra={"abc": ...}` with the
+    same `seed`.  To cover an existing song with yue2-3b: get its score from
+    `transcribe_music(task="melody_full")`, review it, then pass
+    `extra={"abc": <score>, "cot": "melody", "lyrics": <words that fit>}`.
     """
     payload: dict[str, Any] = {"model": model, "input": prompt}
     if audio_end_in_s is not None:
@@ -460,6 +484,50 @@ async def transcribe(
 
 
 @mcp.tool()
+async def transcribe_music(
+    model: str,
+    audio_b64: str | None = None,
+    audio_path: str | None = None,
+    content_type: str | None = None,
+    task: str = "full",
+    max_seconds: float | None = None,
+    include_midi: bool = False,
+) -> dict[str, Any]:
+    """Transcribe a song recording into a score (music_transcription models:
+    sheetsage2).  Pass the audio as EXACTLY ONE of `audio_b64` (base64) or
+    `audio_path` (a file on the machine running this MCP server, read locally —
+    prefer it for real songs).  Uploads are limited to 100 MB: send MP3, FLAC or
+    M4A for long songs.
+
+    `task`: "full" (melody and chord symbols), "melody_full" (both melodies, no
+    chords — the score for a cover), "melody_vocal" (sung melody only).
+    `max_seconds` transcribes only the beginning; files longer than 1200 s need it.
+
+    Returns `{abc, abc_error, header, keys, sections, stats, warnings,
+    diagnostics, ...}` (+ `midi` base64 parts with `include_midi`).  `abc` CAN
+    BE NULL: read `abc_error` then.  A transcription can contain musical errors
+    even when its notation is valid — review it before using it.
+
+    Cover recipe: `transcribe_music(task="melody_full")`, write lyrics with one
+    section tag per `% verse`/`% chorus` block and about one syllable per sung
+    note (`sections[].vocal_notes`), then `generate_music(model="yue2-3b",
+    prompt=<new style, tempo = header.tempo>, extra={"abc": abc, "cot":
+    "melody", "lyrics": ...})`.  The weights are CC BY-NC 4.0 (non-commercial),
+    and transcribing a song grants no right to it.
+    """
+    audio_bytes, filename, ctype = read_audio_input(audio_b64, audio_path, content_type)
+    return await _get_client().transcribe_music(
+        model=model,
+        audio_bytes=audio_bytes,
+        filename=filename,
+        content_type=ctype,
+        task=task,
+        max_seconds=max_seconds,
+        include_midi=include_midi,
+    )
+
+
+@mcp.tool()
 async def rerank(
     model: str,
     query: str,
@@ -472,6 +540,49 @@ async def rerank(
     if top_n is not None:
         payload["top_n"] = top_n
     return await _get_client().rerank(payload)
+
+
+@mcp.tool()
+async def classify(
+    model: str,
+    questions: dict[str, Any],
+    input: str | dict[str, Any] | list[Any] | None = None,
+    items: list[dict[str, Any]] | None = None,
+    on_truncation: str | None = None,
+) -> dict[str, Any]:
+    """Ask typed questions of a document with a `classification` model (Laya).
+
+    `input` is ONE document: a text, a JSON object, or a list of conversation
+    turns (a list is one structured content, never a batch).  `items` is the
+    batch form instead: `[{"id": ..., "input": ...}]`, answered document by
+    document with the results under the same ids.  Exactly one of the two.
+
+    `questions` maps an id to `{"type", "instructions", "criteria"}`:
+      choice — labels (list) or {label: description}; answer = `choice` +
+               `probabilities` per label
+      score  — ordered level descriptions (list); answer = expected level
+               `score` + `probabilities` per level + `legend`
+      noul   — yes/no, optional {"true": ..., "false": ...}; answer = `noul` = P(true)
+    `confidence` on choice/score is 1 - normalised entropy (how concentrated
+    the distribution is), NOT a probability of being right; on noul it is
+    max(P, 1-P).  Nothing is calibrated on your data: read `noul` /
+    `probabilities` and decide the threshold yourself.
+
+    Each question sees at most `limits.max_len` tokens (instructions and options
+    first, then the document) and option descriptions are cut at 48 tokens.  By
+    default a request the model would truncate is refused with the counts;
+    `on_truncation="truncate"` answers anyway and fills `truncation`.  The
+    response also says which `device` actually ran (cuda / mps / cpu)."""
+    if (input is None) == (items is None):
+        raise ValueError("pass exactly one of `input` (one document) or `items` (a batch)")
+    payload: dict[str, Any] = {"model": model, "questions": questions}
+    if input is not None:
+        payload["input"] = input
+    else:
+        payload["items"] = items
+    if on_truncation is not None:
+        payload["on_truncation"] = on_truncation
+    return await _get_client().classify(payload)
 
 
 # ---------------------------------------------------------------------------

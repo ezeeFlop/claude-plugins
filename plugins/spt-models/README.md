@@ -2,17 +2,31 @@
 
 Inference and model-catalogue access for the [SPT Models](https://models.sponge-theory.dev)
 GPU stack, directly inside Claude Code: chat, completion, embeddings, image /
-video / audio / music generation, transcription, and rerank — over an
+video / audio / music generation, speech and music transcription, rerank and
+typed document classification — over an
 OpenAI-compatible API, with per-model prompting guides the agent reads before
 each call.
 
 ## Install
 
-**Via the Sponge Theory marketplace (recommended):**
+Add the public Sponge Theory marketplace once, then install the plugin from it.
+In a Claude Code session:
 
 ```
 /plugin marketplace add ezeeFlop/claude-plugins
 /plugin install spt-models@sponge-theory
+```
+
+`/plugin install` opens the plugin's details: choose a scope (**Install for you**
+makes it available in every project on this machine), then fill in the form
+described below. If Claude Code prints `Run /reload-plugins to activate`, run it.
+
+From a shell instead (the plugin loads at the next start of Claude Code; the
+configuration form appears then):
+
+```bash
+claude plugin marketplace add ezeeFlop/claude-plugins
+claude plugin install spt-models@sponge-theory
 ```
 
 The MCP server is a small Python (stdio) proxy vendored inside the plugin. Its
@@ -44,12 +58,34 @@ The form feeds these environment variables into the MCP server:
 | `SPT_REQUEST_TIMEOUT` | `300` | HTTP timeout (seconds); raise for large diffusion models. |
 | `SPT_VERIFY_TLS` | `true` | Set `false` only for self-signed certs. |
 
-*If the form doesn't appear (older Claude Code) or to change values later:* run
-`/plugin configure spt-models@sponge-theory`, or set the same `SPT_*` variables
-in the `env` block of `~/.claude/settings.json` or in your shell before
-launching Claude Code. The server reads them from the environment either way.
+*To change values later:* run `/plugin`, open **Installed** → `spt-models`, then
+**Configure options**. You can also set the same `SPT_*` variables in the `env`
+block of `~/.claude/settings.json` or in your shell before launching Claude Code;
+the server reads them from the environment either way.
 
 Verify with `/mcp` — the `spt-models` server should show **connected**.
+
+## Update
+
+Third-party marketplaces do not auto-update by default. Either turn auto-update
+on once (`/plugin` → **Marketplaces** → `sponge-theory` → **Enable auto-update**),
+or update by hand:
+
+```bash
+claude plugin marketplace update sponge-theory
+claude plugin update spt-models@sponge-theory
+```
+
+then `/reload-plugins` in any open session.
+
+## Uninstall
+
+```bash
+claude plugin uninstall spt-models@sponge-theory
+```
+
+Do not install this plugin next to the pre-configured `.plugin` bundle that the
+SPT admin UI can generate for a key: both declare the same `spt-models` MCP server.
 
 ## Workflow
 
@@ -79,11 +115,20 @@ diff them.
 
 ## What's included
 
-- **MCP server**: 14 tools — `list_models`, `get_model_info`, `chat`,
+- **MCP server**: 16 tools — `list_models`, `get_model_info`, `chat`,
   `complete`, `embed`, `generate_image`, `generate_video`, `generate_music`,
-  `tts`, `transcribe`, `rerank`, plus admin-gated `load_model`, `unload_model`,
-  `refresh_prompting_guide` — plus the `spt://models` and `spt://guide`
-  resources and the `spt://model/{slug}` resource template.
+  `tts`, `transcribe`, `transcribe_music`, `rerank`, `classify`, plus
+  admin-gated `load_model`, `unload_model`, `refresh_prompting_guide` — plus
+  the `spt://models` and `spt://guide` resources and the `spt://model/{slug}`
+  resource template.
+- **`classify`** (plugin 1.13.0+, gateway with `POST /v1/classifications`):
+  typed questions — `choice`, `score`, yes/no — asked of one document (`input`)
+  or a batch (`items`). It returns per-label probabilities and a confidence
+  that measures how concentrated the distribution is, not the chance of being
+  right: nothing is calibrated on your data, so pick your own thresholds.
+- **`transcribe_music`** (plugin 1.12.0+): turns a song recording into a score,
+  with optional MIDI. Pass `audio_path` (a file on your machine, preferred for
+  real songs) or `audio_b64`.
 - **Model aliases** (gateway ≥ 1.1.0 with migration 015): `list_models` also
   returns admin-defined aliases (`gpt-4`, `default-llm`, …) marked with
   `alias_of: <slug>`; every inference tool accepts either name and the

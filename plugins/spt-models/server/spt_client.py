@@ -12,9 +12,13 @@ when SPT_ADMIN_TOKEN isn't configured.
 from __future__ import annotations
 
 import asyncio
+import base64
+import binascii
 import logging
+import mimetypes
 import os
 import time
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -37,6 +41,33 @@ def _float_env(name: str, default: float) -> float:
         return float(raw)
     except ValueError:
         return default
+
+
+def read_audio_input(
+    audio_b64: str | None, audio_path: str | None, content_type: str | None,
+) -> tuple[bytes, str, str]:
+    """``(bytes, filename, content_type)`` from exactly one of ``audio_b64`` / ``audio_path``.
+
+    ``audio_path`` is a file on the machine running this MCP server, read here —
+    a long song never has to travel through the conversation as base64.  Without
+    an explicit ``content_type`` a path gets the type of its suffix
+    (``application/octet-stream`` when unknown: FFmpeg probes the content anyway)
+    and base64 gets ``audio/wav``.
+    """
+    has_b64, has_path = bool(audio_b64), bool(audio_path)
+    if has_b64 == has_path:
+        raise ValueError("Pass exactly one of audio_b64 or audio_path")
+    if has_path:
+        path = Path(audio_path).expanduser()
+        if not path.is_file():
+            raise ValueError(f"audio_path is not a readable file: {path}")
+        guessed = mimetypes.guess_type(path.name)[0]
+        return path.read_bytes(), path.name, content_type or guessed or "application/octet-stream"
+    try:
+        data = base64.b64decode(audio_b64, validate=True)
+    except (binascii.Error, ValueError):
+        raise ValueError("audio_b64 is not valid base64") from None
+    return data, "audio", content_type or "audio/wav"
 
 
 class SPTClient:
@@ -176,8 +207,9 @@ class SPTClient:
         """POST /v1/audio/music — sound/music generation.
 
         Unlike tts() (raw bytes for voice models), sound_gen models return JSON
-        ``{created, model, audio: <base64>, format, _compute_time_ms}`` — parse
-        and return it.
+        ``{created, model, audio: <base64>, format, _compute_time_ms}``, plus the
+        optional ``score_abc`` / ``seed`` / ``truncated`` some models report —
+        parse and return it whole.
         """
         client = await self._get_client()
         resp = await client.post(
@@ -214,6 +246,53 @@ class SPTClient:
             data=data,
             headers=self._api_headers(),
         )
+        resp.raise_for_status()
+        return resp.json()
+
+    async def transcribe_music(
+        self,
+        model: str,
+        audio_bytes: bytes,
+        filename: str = "audio",
+        content_type: str = "audio/wav",
+        task: str | None = None,
+        max_seconds: float | None = None,
+        include_midi: bool | None = None,
+        *,
+        poll_interval: float = 5.0,
+    ) -> dict[str, Any]:
+        """POST /v1/audio/music/transcriptions as a job — the score as JSON.
+
+        A cold load plus a long song can outlast an MCP call, so the request is
+        always a job, polled like the generation tools.
+        """
+        data: dict[str, Any] = {"model": model}
+        if task:
+            data["task"] = task
+        if max_seconds is not None:
+            data["max_seconds"] = str(max_seconds)
+        if include_midi:
+            data["include_midi"] = "true"
+        resp = await self.run_multipart_job(
+            "/v1/audio/music/transcriptions",
+            files={"file": (filename, audio_bytes, content_type)},
+            data=data,
+            poll_interval=poll_interval,
+        )
+        return resp.json()
+
+    async def classify(self, payload: dict[str, Any]) -> dict[str, Any]:
+        client = await self._get_client()
+        resp = await client.post(
+            "/v1/classifications",
+            json=payload,
+            headers=self._api_headers(),
+        )
+        if resp.status_code == 404:
+            raise RuntimeError(
+                "This SPT gateway does not expose /v1/classifications — typed "
+                "decisions need gateway >= 1.8. Upgrade the gateway."
+            )
         resp.raise_for_status()
         return resp.json()
 
@@ -258,6 +337,25 @@ class SPTClient:
             path, json={**payload, "async": True},
             headers=self._api_headers(), timeout=120.0,
         )
+        return await self._follow_job(client, resp, poll_interval=poll_interval, max_wait=max_wait)
+
+    async def run_multipart_job(
+        self, path: str, files: dict[str, Any], data: dict[str, Any],
+        *, poll_interval: float = 5.0, max_wait: float = 3600.0,
+    ) -> httpx.Response:
+        """Même contrat que :meth:`run_generation_job`, pour une route multipart
+        (``async`` voyage comme champ de formulaire)."""
+        client = await self._get_client()
+        resp = await client.post(
+            path, files=files, data={**data, "async": "true"},
+            headers=self._api_headers(), timeout=120.0,
+        )
+        return await self._follow_job(client, resp, poll_interval=poll_interval, max_wait=max_wait)
+
+    async def _follow_job(
+        self, client: httpx.AsyncClient, resp: httpx.Response,
+        *, poll_interval: float, max_wait: float,
+    ) -> httpx.Response:
         resp.raise_for_status()
         body = resp.json() if "json" in resp.headers.get("content-type", "") else None
         if not (isinstance(body, dict) and body.get("job_id")):

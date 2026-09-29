@@ -4,7 +4,8 @@ description: >
   Use when the user asks for any inference task — generate an image,
   audio, video, music, transcribe (including verbatim vs intended
   transcripts and word-level timestamps), chat, complete, embed,
-  rerank, text-to-speech. Discovers the SPT Models catalogue, reads the
+  rerank, text-to-speech, music transcription, typed document
+  classification. Discovers the SPT Models catalogue, reads the
   prompting guide for the chosen model, then calls the appropriate
   inference tool with parameters from the guide.
 ---
@@ -109,21 +110,73 @@ loads automatically on this call** — you never load it yourself.
 | `llm`       | `chat(model, messages, ...)` or `complete(model, prompt, ...)` |
 | `vlm`       | `chat(model, messages with image url or base64, ...)`    |
 | `image_gen` | `generate_image(model, prompt, ...)`                     |
-| `video_gen` | `generate_video(model, prompt, ...)`                     |
-| `sound_gen` | `generate_music(model, prompt, ...)`                     |
+| `video_gen` | `generate_video(model, prompt, image_b64?, last_frame_b64?, video_b64?, ...)` |
+| `sound_gen` | `generate_music(model, prompt, ...)` — may also return `score_abc`, `seed`, `truncated` |
+| `music_transcription` | `transcribe_music(model, audio_b64 \| audio_path, task?, ...)` — returns an ABC score (can be null: read `abc_error`) |
 | `tts`       | `tts(model, input, voice?, ...)`                         |
 | `stt`       | `transcribe(model, audio_b64, ...)`                      |
 | `embedding` | `embed(model, input, ...)`                               |
 | `rerank`    | `rerank(model, query, documents, ...)`                   |
+| `classification` | `classify(model, questions, input \| items, on_truncation?)` — typed questions (choice / score / noul) over ONE document, full distributions back |
 
 Video/image/music generations go through a server-side job that is polled
 automatically — no client timeout to worry about; the first generation on a
 large model can take 20+ minutes.
 
+Video inputs are all base64: `image_b64` anchors the FIRST frame (any i2v
+model); `last_frame_b64` anchors the LAST frame and `video_b64` feeds a source
+MP4 as frame guides from frame 0 (video-to-video at `video_strength` 1.0 =
+faithful re-render, lower = the prompt takes over; a `num_frames` longer than
+the source continues it). `last_frame_b64` combines with either; `image_b64`
+and `video_b64` do not. Only models whose guide lists these fields honour
+them (LTX-2.5 today); the source audio is never kept, the model regenerates
+the soundtrack from the prompt.
+
 Text-to-speech through this MCP `tts` tool is always a complete file. The HTTP
 API (`POST /v1/audio/speech` with `"stream": true`) streams audio as it is
 generated on capable models (`capabilities` contains `"streaming"`) — use it
 from an application, not from here.
+
+### Worked example — typed decisions on a message
+
+```
+classify(model="laya-multilingual",
+         input="Ma facture de septembre comporte un double prélèvement...",
+         questions={
+           "department": {"type": "choice", "instructions": "Quel service doit traiter ce message ?",
+                          "criteria": {"billing": "factures, paiements", "technical": "bugs, pannes",
+                                       "sales": "tarifs", "other": "tout le reste"}},
+           "urgency": {"type": "score", "instructions": "Niveau d'urgence ?",
+                       "criteria": ["pas urgent", "bientôt", "bloquant"]},
+           "board_billing": {"type": "noul", "instructions": "Relève du tableau Facturation ?"}})
+# → answers.department.choice + probabilities; answers.urgency.score (expected
+#   level) + probabilities; answers.board_billing.noul = P(true).
+#   `confidence` is concentration, not correctness — decide from the
+#   probabilities.  `input` is ONE document; several documents go in `items`.
+```
+
+### Worked example — cover a song
+
+A music_transcription model turns a recording into a score; yue2-3b sings a
+score in a new style. There is no audio-reference input to yue2-3b itself.
+
+```
+transcribe_music(model="sheetsage2", audio_path="~/Music/song.mp3", task="melody_full")
+# → abc (two voices, % verse / % chorus comments), header.tempo, sections[].vocal_notes
+#   Check abc is not null and read warnings: a transcription can be musically
+#   wrong even when its notation is valid.
+
+generate_music(
+    model="yue2-3b",
+    prompt="English, intimate jazz ballad, brushed drums, upright bass, 86 BPM",
+    extra={"abc": abc, "cot": "melody",
+           "lyrics": "[Verse]\n...one syllable per sung note...\n\n[Chorus]\n..."},
+)
+```
+
+Keep the style's tempo equal to the score's `Q:`. Uploads are limited to 100 MB
+(use MP3, FLAC or M4A). Both models' weights are CC BY-NC 4.0 (non-commercial),
+and transcribing a song grants no right to it.
 
 ### Worked example — image generation
 
