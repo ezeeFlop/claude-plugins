@@ -2,19 +2,26 @@
 
 > **NeoKanban by Sponge Theory** — your task board, in Claude Code.
 
-Manage tasks, projects and boards, and run audio transcription with speaker
-diarization, directly from Claude Code. The plugin is 100% static and carries
-**no secret**: it talks to your NeoKanban instance over authenticated
+Manage tasks, projects and boards, search and read your meetings (AI notes and
+full transcripts), handle email-derived actions, and run audio transcription with
+speaker diarization, directly from Claude Code. The plugin is 100% static and
+carries **no secret**: it talks to your NeoKanban instance over authenticated
 streamable HTTP (`type: http`). Your instance URL and MCP token are entered
 once, natively, when you enable the plugin.
 
 ## What it does
 
-Exposes the 17 NeoKanban MCP tools:
+Exposes the NeoKanban MCP tools (the list is served live by your instance):
 
-- **Tasks** — `create_task`, `get_task`, `list_tasks`, `update_task`, `delete_task`
+- **Tasks** — `create_task`, `get_task`, `list_tasks`, `update_task`, `delete_task`,
+  `ensure_task`, `list_task_boards`
 - **Projects** — `create_project`, `get_project`, `list_projects`, `update_project`, `delete_project`
 - **Boards** — `create_board`, `get_board`, `list_boards`, `update_board`, `delete_board`
+- **Meetings (read-only)** — `list_meetings`, `get_meeting`, `get_meeting_transcript`,
+  `get_meeting_notes`, and `search_meetings` (semantic search in the AI notes and the
+  full transcripts, filterable by notes/transcript, project or meeting)
+- **Emails** — `search_emails`, `get_email`, `list_mail_actions`, `get_mail_action`,
+  `resolve_mail_action`, `approve_mail_action`
 - **Transcription** — `transcribe_audio` (async job, WhisperX + diarization on the
   spt-models cluster) and `get_transcription_status` (poll for the transcript)
 

@@ -1,7 +1,7 @@
 {
   "name": "neokanban",
-  "version": "0.1.0",
-  "description": "NeoKanban by Sponge Theory — manage tasks, projects and boards, and run audio transcription with speaker diarization, directly from Claude Code.",
+  "version": "0.2.0",
+  "description": "NeoKanban by Sponge Theory — manage tasks, projects and boards, search your meetings (AI notes and full transcripts), handle email actions and run audio transcription with speaker diarization, directly from Claude Code.",
   "author": {
     "name": "Sponge Theory",
     "email": "support@sponge-theory.io",
@@ -9,7 +9,7 @@
   },
   "homepage": "https://kanban.sponge-theory.dev",
   "license": "Sponge Theory Proprietary",
-  "keywords": ["kanban", "task-management", "project-management", "transcription", "mcp", "neokanban", "sponge-theory"],
+  "keywords": ["kanban", "task-management", "project-management", "meetings", "transcription", "mcp", "neokanban", "sponge-theory"],
   "userConfig": {
     "api_url": {
       "type": "string",
