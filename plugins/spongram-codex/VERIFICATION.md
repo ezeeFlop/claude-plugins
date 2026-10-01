@@ -1,3 +1,13 @@
+# Codex 0.5.2 — 2026-10-01
+
+Native Keychain migration, synthetic repeated-process reads, isolated plugin
+installation, both actual Codex MCP runtimes and live MCP initialize/tools/list
+passed. No memories were read/written by the connection checks. Claude remains
+0.5.1 with identical files. See `CODEX_KEYCHAIN_RELEASE.md` in the marketplace
+repository for full scope and maintenance of the stable native identity.
+
+## Previous verification
+
 # Spongram 0.5.1 verification — 2026-09-10
 
 - 21 unit/integration tests pass. Includes generated shared-core parity, Claude

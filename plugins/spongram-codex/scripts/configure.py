@@ -7,7 +7,8 @@ from pathlib import Path
 import subprocess
 import sys
 from connection import (DEFAULT_INSTANCE, Keychain, SetupError, account, atomic_write,
-                        directory, load_profile, normalize_instance, validate_key, read_secret)
+                        directory, load_profile, normalize_instance, validate_key, read_setup_secret as read_secret,
+                        owned_source, prepare_keychain)
 import claude_credentials
 from codex_config import CodexConfig, server_config
 from check_connection import probe
@@ -43,32 +44,45 @@ def reuse_saved(terminal=False, origin="Spongram"):
 
 
 def save(instance, key, store, config, verify=probe, source=None):
+    instance, key = normalize_instance(instance), validate_key(key)
     verify(instance + "/mcp", key)
     name = account(instance)
-    source = source or {"kind": "spongram", "account": name}
-    private_key = source["kind"] == "spongram"
-    previous_key = store.read(name) if private_key else None
+    source = owned_source(name)
+    previous_key = store.read(name)
     path = directory() / "connection.json"
     previous_profile = path.read_bytes() if path.exists() else None
-    for filename in ("connection.py", "auth_headers.py"):
-        atomic_write(directory() / "runtime" / filename,
-                     (Path(__file__).parent / filename).read_bytes())
+    runtime = {directory() / "runtime" / filename: (Path(__file__).parent / filename).read_bytes()
+               for filename in ("connection.py", "auth_headers.py", "native_keychain.py")}
+    previous_runtime = {p: p.read_bytes() if p.exists() else None for p in runtime}
+    key_attempted = False
     try:
-        if private_key:
-            store.write(name, key)
+        for target, data in runtime.items():
+            atomic_write(target, data)
+        key_attempted = True
+        store.write(name, key)
         atomic_write(path, (json.dumps({"instance_url": instance, "account": name, "credential": source}, indent=2) + "\n").encode())
         config.write(server_config(instance, source))
     except Exception:
-        if private_key:
-            if previous_key is None:
-                store.delete(name)
+        if key_attempted:
+            store.delete(name) if previous_key is None else store.write(name, previous_key)
+        for target, data in {**previous_runtime, path: previous_profile}.items():
+            if data is None:
+                target.unlink(missing_ok=True)
             else:
-                store.write(name, previous_key)
-        if previous_profile is None:
-            path.unlink(missing_ok=True)
-        else:
-            atomic_write(path, previous_profile)
+                atomic_write(target, data)
         raise
+
+
+
+def migrate():
+    profile = load_profile()
+    prepare_keychain()
+    key = read_secret(profile["credential"])
+    if key is None:
+        raise SetupError("Saved key unavailable; run interactive setup")
+    with CodexConfig() as config:
+        save(profile["instance_url"], key, Keychain(interactive=True), config)
+    print("Migration verified: Codex-owned Keychain storage ready. Claude Code unchanged. Start a new Codex thread.")
 
 
 def main():
@@ -78,17 +92,22 @@ def main():
     ui.add_argument("--terminal", action="store_true", help="User-operated terminal, hidden key input")
     parser.add_argument("--status", action="store_true", help="Report profile presence without reading the key")
     parser.add_argument("--remove", action="store_true", help="Remove this setup's MCP connection and active key")
+    parser.add_argument("--migrate", action="store_true", help="Import the saved key into Codex-owned native storage; no key input")
     args = parser.parse_args()
+    if args.migrate:
+        migrate()
+        return
     if args.status:
         load_profile()
         print("Spongram profile saved. Run check_connection.py to verify authentication.")
         return
-    store = Keychain()
+    prepare_keychain()
+    store = Keychain(interactive=True)
     if args.remove:
         profile = load_profile()
         with CodexConfig() as config:
             config.write(None)
-        if profile["credential"]["kind"] == "spongram":
+        if profile["credential"].get("storage") == "native-v1":
             store.delete(profile["account"])
         (directory() / "connection.json").unlink()
         print("Spongram MCP connection removed; Codex-owned active key removed if present. Claude Code is unchanged.")

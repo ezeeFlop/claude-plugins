@@ -144,7 +144,7 @@ class SharedCore(unittest.TestCase):
         self.assertFalse((CODEX / "hooks").exists())
         self.assertFalse((CODEX / ".claude-plugin").exists())
         market = json.loads((ROOT / ".agents/plugins/marketplace.json").read_text())
-        self.assertEqual([p["name"] for p in market["plugins"]], ["spongram-codex"])
+        self.assertIn("spongram-codex", [p["name"] for p in market["plugins"]])
 
     def test_secret_free_config_and_custom_instance(self):
         instance = normalize_instance("https://example.test/spongram/")

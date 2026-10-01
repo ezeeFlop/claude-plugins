@@ -61,24 +61,33 @@ class Setup(unittest.TestCase):
         self.store.write.assert_called_with(connection.account(self.instance), self.key)
         self.assertEqual((connection.directory() / 'connection.json').read_bytes(), before)
 
-    def test_claude_reference_does_not_copy_or_modify_any_key(self):
+    def test_failed_migration_restores_old_runtime_too(self):
+        runtime = connection.directory() / 'runtime'
+        runtime.mkdir(parents=True)
+        old = {'connection.py': b'# old reader', 'auth_headers.py': b'# old helper'}
+        for name, data in old.items():
+            (runtime / name).write_bytes(data)
+        self.config.write.side_effect = connection.SetupError('concurrent change')
+        with self.assertRaises(connection.SetupError):
+            configure.save(self.instance, self.key, self.store, self.config, verify=Mock())
+        self.assertEqual({p.name: p.read_bytes() for p in runtime.iterdir()}, old)
+        self.assertFalse((connection.directory() / 'connection.json').exists())
+
+    def test_claude_key_is_imported_without_modifying_claude(self):
         source = {'kind': 'claude', 'service': 'Claude Code-credentials',
                   'account': 'test-user', 'plugin_id': 'spongram@sponge-theory'}
         configure.save(self.instance, self.key, self.store, self.config, verify=Mock(), source=source)
-        self.store.read.assert_not_called()
-        self.store.write.assert_not_called()
-        self.store.delete.assert_not_called()
-        self.assertEqual(connection.load_profile()['credential'], source)
-        with patch.object(connection, 'Keychain') as keychain:
+        self.store.write.assert_called_once_with(connection.account(self.instance), self.key)
+        self.assertEqual(connection.load_profile()['credential'],
+                         connection.owned_source(connection.account(self.instance)))
+        with patch.object(connection, 'LegacyKeychain') as keychain:
             keychain.return_value.read.return_value = json.dumps({
                 'claudeAiOauth': {'accessToken': 'unrelated-secret'},
                 'pluginSecrets': {'spongram@sponge-theory': {'brain_key': self.key},
                                   'other@plugin': {'brain_key': 'unrelated-plugin'}}})
-            self.assertEqual(connection.credentials(), (self.instance + '/mcp', self.key))
-            keychain.return_value.read.return_value = json.dumps({
-                'pluginSecrets': {'spongram@sponge-theory': {'brain_key': 'rotated-test-only'}}})
-            self.assertEqual(connection.credentials()[1], 'rotated-test-only')
+            self.assertEqual(connection.read_setup_secret(source), self.key)
             keychain.return_value.write.assert_not_called()
+            keychain.return_value.delete.assert_not_called()
 
     def test_claude_discovery_only_reuses_same_instance(self):
         root = Path(self.temp.name) / '.claude'
@@ -112,7 +121,7 @@ class Setup(unittest.TestCase):
     def test_external_keychain_cannot_be_modified(self):
         if sys.platform != 'darwin':
             self.skipTest('macOS only')
-        store = connection.Keychain('Claude Code-credentials')
+        store = connection.LegacyKeychain('Claude Code-credentials')
         with self.assertRaises(connection.SetupError):
             store.write('test-user', self.key)
         with self.assertRaises(connection.SetupError):

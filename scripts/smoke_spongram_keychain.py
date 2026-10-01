@@ -9,11 +9,12 @@ import uuid
 
 SCRIPTS = Path(__file__).resolve().parents[1] / 'plugins/spongram-codex/scripts'
 sys.path.insert(0, str(SCRIPTS))
-from connection import Keychain
+from connection import Keychain, prepare_keychain, owned_source
 
 
 def main():
-    store = Keychain()
+    prepare_keychain()
+    store = Keychain(interactive=True)
     name = 'spongram-release-smoke-' + uuid.uuid4().hex
     key = secrets.token_urlsafe(32)
     try:
@@ -21,10 +22,13 @@ def main():
         store.write(name, key)
         assert store.read(name) == key
         result = subprocess.run([sys.executable, str(SCRIPTS / 'auth_headers.py'),
-                                 json.dumps({'kind': 'spongram', 'account': name})],
+                                 json.dumps(owned_source(name))],
                                 capture_output=True, text=True, timeout=30)
         assert result.returncode == 0
         assert json.loads(result.stdout)['Authorization'] == 'Bearer ' + key
+        for _ in range(8):
+            # New process each time, always with Keychain interaction disabled.
+            assert Keychain().read(name) == key
         replacement = secrets.token_urlsafe(32)
         store.write(name, replacement)
         assert store.read(name) == replacement

@@ -8,6 +8,7 @@ import re
 from pathlib import Path
 import sys
 import tempfile
+import native_keychain
 from urllib.parse import urlsplit
 
 SERVICE = "ai.sponge-theory.spongram.codex"
@@ -74,7 +75,7 @@ def atomic_write(path, data, mode=0o600):
             os.unlink(temp)
 
 
-class Keychain:
+class LegacyKeychain:
     """Security.framework directly: no secret in argv, shell or environment."""
     def __init__(self, service=SERVICE):
         self.service = service
@@ -105,7 +106,7 @@ class Keychain:
         return c.c_void_p.in_dll(library, name).value
 
     def perform(self, operation, name, value=None):
-        if self.service != SERVICE and operation != "read":
+        if operation != "read":
             raise SetupError("External credential stores are read-only")
         owned = []
 
@@ -168,14 +169,14 @@ class Keychain:
         self.perform("delete", name)
 
 
-def read_secret(source):
+def _read_legacy_secret(source):
     if source.get("kind") == "spongram":
-        key = Keychain().read(source["account"])
+        key = LegacyKeychain().read(source["account"])
     elif source.get("kind") == "claude":
         if (not re.fullmatch(r"Claude Code-credentials(?:-[0-9a-f]{8})?", source["service"])
                 or source["plugin_id"] not in ("spongram@sponge-theory", "spongram")):
             raise SetupError("Unsupported Claude credential reference")
-        raw = Keychain(source["service"]).read(source["account"])
+        raw = LegacyKeychain(source["service"]).read(source["account"])
         if raw is None:
             return None
         try:
@@ -194,3 +195,57 @@ def credentials():
     if key is None:
         raise SetupError("Brain key missing from Keychain. Run spongram-setup.")
     return profile["instance_url"] + "/mcp", key
+
+
+STORAGE = "native-v1"
+
+
+def prepare_keychain():
+    try:
+        native_keychain.install_helper()
+    except native_keychain.NativeKeychainError as error:
+        raise SetupError(str(error)) from None
+
+
+class Keychain:
+    """Only the stable native executable accesses Codex-owned v2 items."""
+    def __init__(self, service=SERVICE, *, interactive=False):
+        if service != SERVICE:
+            raise SetupError("External credential stores are read-only")
+        self.interactive = interactive
+
+    def perform(self, operation, name, value=None):
+        try:
+            return native_keychain.perform(SERVICE + ".v2", operation, name, value,
+                                           interactive=self.interactive)
+        except native_keychain.NativeKeychainError as error:
+            raise SetupError(str(error)) from None
+
+    def read(self, name):
+        return self.perform("read", name)
+
+    def write(self, name, value):
+        self.perform("write", name, validate_key(value))
+
+    def delete(self, name):
+        self.perform("delete", name)
+
+
+def owned_source(name):
+    return {"kind": "spongram", "account": name, "storage": STORAGE}
+
+
+def read_secret(source):
+    """Runtime path: no legacy lookup, migration, fallback, or macOS dialog."""
+    if source.get("kind") != "spongram" or source.get("storage") != STORAGE:
+        raise SetupError("Credential migration required; run the plugin setup with --migrate")
+    key = Keychain().read(source["account"])
+    return validate_key(key) if key is not None else None
+
+
+def read_setup_secret(source):
+    """Explicit setup only: read legacy storage once, without modifying it."""
+    if source.get("kind") == "spongram" and source.get("storage") == STORAGE:
+        key = Keychain(interactive=True).read(source["account"])
+        return validate_key(key) if key is not None else None
+    return _read_legacy_secret(source)

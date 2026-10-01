@@ -45,23 +45,36 @@ root and explicit `CLAUDE_CONFIG_DIR` / `CLAUDE_SECURESTORAGE_CONFIG_DIR` are su
 If no matching profile/key is accessible, the masked input remains available.
 Ambiguous profiles with different keys are not guessed.
 
-When you select **Réutiliser**, Codex stores a reference to Claude's existing
-Keychain entry. It does not copy, update or delete Claude's key, settings or plugin.
-The header helper reads the current key at connection time, so a rotation in Claude
-is picked up on a fresh connection (Codex can cache headers during a connection).
-Removing Claude's credential will also disconnect a Codex connection referencing it;
-rerun setup to supply an independent key if desired.
+When you select **Réutiliser**, setup imports only the selected plugin key into
+`ai.sponge-theory.spongram.codex.v2`. It never updates or deletes Claude's key,
+settings or plugin. Claude stores several secrets in a single item: only explicit
+setup reads that item, extracts the selected brain key in process, and never
+returns/logs the other fields. Runtime does not access that item at all.
 
-Claude stores multiple credentials in a single JSON Keychain item. The helper must
-read that item in process to extract `pluginSecrets[spongram@sponge-theory].brain_key`;
-other values are neither returned, written, nor logged. This compatibility reader
-was checked against Claude Code 2.1.267 and is isolated in `claude_credentials.py`
-and `connection.py`. An unknown future storage layout falls back to manual input.
-It never reads Claude's plaintext `.credentials.json` or `codemap/connection.env`.
+The independent Codex copy does not follow later Claude key rotations. Use
+interactive setup to change the key in Codex when rotating credentials.
 
-A newly entered key goes into service `ai.sponge-theory.spongram.codex`, under an
-account derived from the instance URL. It is never saved in an environment variable,
-command argument, plugin cache, repository, or Codex config file.
+## Fix repeated Keychain prompts / upgrade to 0.5.2
+
+After upgrading the plugin, run:
+
+```sh
+python3 <plugin-root>/scripts/configure.py --migrate
+```
+
+This verifies the existing connection, imports its key into the new Codex-owned
+entry and refreshes the durable MCP header helper. macOS may ask once to read the
+legacy item. The key is never printed, written in plaintext or passed in argv.
+Claude's item and old Codex entries are retained unchanged.
+
+All normal reads use the same bundled native executable installed at
+`~/.sponge-theory/codex-keychain/v1/spt-codex-keychain`. It has a local ad-hoc code
+signature (not a Developer ID signature), identical bytes across the three Codex
+plugins, and a stable path outside Python environments and plugin caches. Plugin
+updates reuse that identity. The helper only accepts the three Codex v2 services.
+Runtime disables Keychain interaction: a locked or inaccessible item fails with a
+setup diagnostic rather than opening repeated dialogs. Unlock the login keychain
+and rerun `--migrate` to repair access. Do not grant all applications access.
 
 ## Durable configuration and updates
 
@@ -74,15 +87,15 @@ server named `spongram` that was not created by this setup is left untouched.
 - `~/.spongram/codex/connection.json`: URL and non-secret credential reference.
 - `~/.spongram/codex/runtime/`: private copies of the Keychain reader scripts.
 - Codex `config.toml`: URL, `X-Spongram-Client: codex`, and a header-helper command.
-- macOS Keychain: the existing Claude entry or the newly entered Codex key.
+- macOS Keychain: an independent Codex-owned v2 entry.
 
 Runtime/profile files have mode 600, new private directories 700. Keychain is
 accessed via Security.framework; the secret is not passed to a subprocess in argv.
 Only the MCP runtime invokes `auth_headers.py`: its stdout is the authentication
 header and must never be displayed by the agent. Use `check_connection.py` instead.
 
-After a plugin update, run **Configure Spongram** again and choose **Réutiliser**
-to refresh the durable helper scripts. No key re-entry is required. Version 0.5.0
+After a plugin update, run `configure.py --migrate` to refresh the durable
+helper scripts. No key re-entry is required. Version 0.5.0
 users can stop supplying `SPONGRAM_BRAIN_KEY` after successful setup; this version
 does not use it. Updating from 0.5.0 removes its bundled MCP connection on a new
 session, avoiding duplicate connections.

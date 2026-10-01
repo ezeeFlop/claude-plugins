@@ -11,7 +11,9 @@ private Keychain header helper. Start a new session after setup. Never run
 `auth_headers.py` as an agent tool: its stdout contains the Bearer credential.
 Use `scripts/check_connection.py` for diagnostics; it only reports success/failure.
 Do not ask for a key in chat or inspect credential values. The setup/helper alone
-may read the selected Spongram credential from Claude's Keychain store.
+may import the selected Spongram credential from Claude's Keychain store once.
+For an existing profile, run setup with `--migrate`. Runtime reads only the
+Codex-owned native Keychain entry and never prompts or falls back to Claude.
 Respect AGENTS.md, Codex instructions, sandbox and tool approvals.
 
 This adapter has no automatic hooks or transcript capture. For a task worth

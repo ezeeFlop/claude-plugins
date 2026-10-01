@@ -20,7 +20,15 @@ a matching saved key or a masked brain-key field. These are local system dialogs
 browser. The user types directly into the dialog; no key goes through chat.
 Setup checks the existing Codex profile and the co-installed Claude Spongram
 profile for the same URL before requesting a key. Choosing Réutiliser for a Claude
-key stores a read-only reference; the script never modifies the Claude store.
+key copies only that plugin key to a Codex-owned entry; Claude stays unchanged.
+
+For an existing installation or repeated Keychain prompts, run
+`python3 <plugin-root>/scripts/configure.py --migrate`. This keeps the endpoint and
+key, verifies the server and refreshes the durable header helper. macOS may ask
+once to import the legacy key; normal runtime never opens Keychain dialogs.
+The bundled native helper is locally signed, installed at a stable path and
+shared by the three Codex adapters. Never invoke it directly as an agent tool.
+Rotating a Claude key no longer rotates its independent Codex copy.
 
 Use the client's normal approval path if opening the dialogs, writing user config,
 accessing Keychain, or testing HTTPS requires it. Never bypass a rejection.

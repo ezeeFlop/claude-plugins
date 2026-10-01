@@ -1,6 +1,6 @@
 [project]
 name = "rayonne-codex"
-version = "0.7.0"
+version = "0.7.1"
 requires-python = ">=3.10"
 dependencies = ["rayonne-mcp==0.7.0"]
 

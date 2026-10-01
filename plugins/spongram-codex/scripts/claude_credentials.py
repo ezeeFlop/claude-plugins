@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import re
 import unicodedata
-from connection import SetupError, normalize_instance, read_secret
+from connection import SetupError, normalize_instance, read_setup_secret as read_secret
 
 PLUGIN_IDS = ("spongram@sponge-theory", "spongram")
 

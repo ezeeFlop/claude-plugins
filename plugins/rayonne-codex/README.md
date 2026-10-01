@@ -27,9 +27,9 @@ uv run --locked scripts/check_connection.py
 ```
 
 Dans ton propre terminal, `--terminal` remplace `--gui` (clé saisie sans écho).
-La configuration propose de réutiliser la clé Rayonne de Claude, en lecture
-seule, ou stocke une nouvelle clé dans le trousseau sous
-`ai.sponge-theory.rayonne.codex`. L'URL, la référence du credential et le
+La configuration importe une fois la clé Rayonne choisie vers une entrée Codex
+dédiée `ai.sponge-theory.rayonne.codex.v2`, sans modifier Claude. Une clé neuve
+peut aussi être saisie dans le champ masqué. L'URL, la référence du credential et le
 choix lecture seule sont enregistrés dans `~/.rayonne/codex/connection.json`
 (mode 0600) ; ce fichier ne contient pas de clé. La vérification ne publie
 rien : elle initialise MCP, contrôle 82 outils et lit l'aperçu de l'espace.
@@ -62,7 +62,25 @@ python3 mcp/build/build_codex_plugin.py
 
 Modifier les parcours dans `mcp/claude_code_plugin/commands/`, puis régénérer.
 Le générateur adapte seulement les arguments, les liens entre commandes et
-le contexte Codex. Le paquet `mcp/dist/rayonne-codex-0.7.0.tar.gz` contient
+le contexte Codex. Le paquet `mcp/dist/rayonne-codex-0.7.1.tar.gz` contient
 uniquement les fichiers nécessaires au plugin, jamais `.venv` ni les caches.
 La copie publique est distribuée ici sous `plugins/rayonne-codex`.
 Les scripts de maintenance cités ci-dessus vivent dans le dépôt source Rayonne.
+
+## Migration 0.7.1 : fin des demandes répétées du trousseau
+
+Après mise à jour, depuis la copie installée :
+
+```sh
+uv run --locked scripts/configure.py --migrate
+```
+
+La migration conserve l’URL et le mode lecture seule, vérifie l’accès et importe
+la clé existante sans l’afficher. macOS peut demander une autorisation lors de
+l’import initial. L’assistant natif partagé est installé à l’emplacement stable
+`~/.sponge-theory/codex-keychain/v1/spt-codex-keychain` ; sa signature est locale
+(ad-hoc), sans certificat Developer ID. Les lectures normales n’ouvrent aucune
+fenêtre : si le trousseau est verrouillé, déverrouille-le puis relance la migration.
+Aucune clé Claude n’est modifiée ou supprimée. Les rotations de clé Claude ne
+sont plus reprises automatiquement dans la copie Codex. Le serveur PyPI reste
+`rayonne-mcp==0.7.0` : cette version corrige uniquement l’adaptateur Codex.

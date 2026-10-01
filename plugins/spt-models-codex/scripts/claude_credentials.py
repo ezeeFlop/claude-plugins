@@ -1,4 +1,4 @@
-"""Read-only discovery of the co-installed Rayonne Claude Code credentials."""
+"""Read-only discovery of the co-installed SPT Models Claude Code credentials."""
 import getpass
 import hashlib
 import json
@@ -8,7 +8,7 @@ import re
 import unicodedata
 from connection import SetupError, normalize_instance, read_setup_secret as read_secret
 
-PLUGIN_IDS = ("rayonne@sponge-theory", "rayonne")
+PLUGIN_IDS = ("spt-models@sponge-theory", "spt-models")
 
 
 def read_json(path):
@@ -20,7 +20,7 @@ def read_json(path):
 
 
 def profiles():
-    """Only inspect the normal/explicit Claude config root and Rayonne metadata."""
+    """Only inspect the normal/explicit Claude config root and SPT Models metadata."""
     root = Path(os.environ.get("CLAUDE_CONFIG_DIR") or Path.home() / ".claude")
     settings = read_json(root / "settings.json").get("pluginConfigs", {})
     installed = read_json(root / "plugins/installed_plugins.json").get("plugins", {})
@@ -32,14 +32,14 @@ def profiles():
         user = "claude-code-user"
     result = []
     for plugin in PLUGIN_IDS:
-        option = settings.get(plugin, {}).get("options", {}).get("api_url")
+        option = settings.get(plugin, {}).get("options", {}).get("spt_base_url")
         instances = [option] if option else []
         if not option:
             for entry in installed.get(plugin, []):
                 if entry.get("scope") != "user" or not entry.get("installPath"):
                     continue
                 manifest = read_json(Path(entry["installPath"]) / ".claude-plugin/plugin.json")
-                default = manifest.get("userConfig", {}).get("api_url", {}).get("default")
+                default = manifest.get("userConfig", {}).get("spt_base_url", {}).get("default")
                 if default:
                     instances.append(default)
         for value in instances:
@@ -64,5 +64,5 @@ def find(instance):
         if key:
             candidates.append((profile["credential"], key))
     if len(candidates) > 1 and len({key for _, key in candidates}) > 1:
-        raise SetupError("Several Claude Rayonne keys match this URL; enter the intended key in the masked dialog")
+        raise SetupError("Several Claude SPT Models keys match this URL; enter the intended key in the masked dialog")
     return candidates[0] if candidates else None

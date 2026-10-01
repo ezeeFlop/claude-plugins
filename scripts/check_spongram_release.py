@@ -21,8 +21,8 @@ def main():
     version = claude['version']
     if not re.fullmatch(r'\d+\.\d+\.\d+', version):
         raise ValueError('Use a release version, without a local cachebuster')
-    if codex['version'] != version or entry['version'] != version:
-        raise ValueError('The two adapters and Claude marketplace must have matching versions')
+    if not re.fullmatch(r'\d+\.\d+\.\d+', codex['version']) or entry['version'] != version:
+        raise ValueError('Claude adapter and marketplace must match; Codex has its own release version')
     cm = read_json('.agents/plugins/marketplace.json')
     ce = next(p for p in cm['plugins'] if p['name'] == 'spongram-codex')
     if ce['source'] != {'source': 'local', 'path': './plugins/spongram-codex'}:
@@ -53,7 +53,7 @@ def main():
         if any(re.search(pattern, data) for pattern in patterns):
             raise ValueError('Possible credential staged in ' + name + ' (value redacted)')
         count += 1
-    print(f'Spongram {version}: preflight OK; {count} staged files scanned.')
+    print(f'Spongram Claude {version}, Codex {codex["version"]}: preflight OK; {count} staged files scanned.')
     if not count:
         print('Stage the release files and rerun to scan the publication contents.')
 

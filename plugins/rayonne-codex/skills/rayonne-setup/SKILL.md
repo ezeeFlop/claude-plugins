@@ -19,8 +19,16 @@ Réglages → Clés API (plan Business).
 
 Ne demande jamais la clé dans la conversation, ne lis pas les secrets,
 n'affiche pas les variables d'environnement et ne lance pas les helpers
-Keychain isolément. Le script seul manipule le credential. Une référence à
-la clé Claude reste en lecture seule ; la configuration Claude est préservée.
+Keychain isolément. Le script seul manipule le credential. Une clé Claude est importée une fois dans une entrée dédiée Codex ;
+la configuration et la clé Claude restent intactes.
+
+Pour migrer une configuration existante, lance
+`uv run --locked scripts/configure.py --migrate` depuis la copie installée.
+L’URL et le mode lecture seule sont conservés, la connexion est vérifiée.
+macOS peut demander un accès lors de cet import initial ; les lectures normales
+sont non interactives et passent par un assistant natif à signature locale,
+installé à un emplacement stable. Ne lance jamais cet assistant directement.
+Une rotation de la clé Claude doit désormais être reportée dans Codex.
 Respecte les autorisations Codex pour le formulaire et le trousseau.
 
 Après configuration, vérifie depuis la même copie installée :

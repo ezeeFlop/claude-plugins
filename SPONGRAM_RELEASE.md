@@ -17,8 +17,9 @@ The server's Codex persona adaptation is a separate server release.
    them. Rebase the release commit onto the latest `origin/main` before pushing.
 2. Update shared rules/helpers in `shared/spongram`; client instructions and
    scripts live in `plugins/spongram` and `plugins/spongram-codex` respectively.
-3. Set the same release version in both `plugin.json` manifests and the Spongram
-   entry of `.claude-plugin/marketplace.json`. Do not use a local Codex cachebuster
+3. For shared-core changes, update both adapters and keep the Claude manifest
+   aligned with its Claude marketplace entry. A Codex-only fix bumps only the
+   Codex manifest; do not republish or change the Claude adapter. Do not use a local Codex cachebuster
    for a public release. The Codex marketplace uses the adapter manifest version.
 4. Run `python3 scripts/build_spongram.py`, review the changes, then stage only
    the release files:
@@ -46,7 +47,7 @@ Create the directories before invoking the CLIs.
 - Claude: `claude plugin marketplace add <checkout>` then
   `claude plugin install spongram@sponge-theory`.
 
-Both should install version 0.5.1 for this release. Claude should report missing
+Check the version declared by each adapter; their patch releases can differ. Claude should report missing
 required connection settings in the empty profile. Do not configure a real key
 for this packaging test. No session hooks need to run.
 

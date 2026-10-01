@@ -60,3 +60,12 @@ L’adaptateur [`rayonne-codex`](plugins/rayonne-codex/README.md) est disponible
 dans la marketplace `sponge-theory-codex` : 82 outils marketing Rayonne, neuf
 parcours métier et configuration sécurisée dans le trousseau macOS. Il utilise
 le serveur publié `rayonne-mcp==0.7.0`.
+
+## Codex Keychain update — 2026-10-01
+
+Spongram Codex 0.5.2, Rayonne Codex 0.7.1 and SPT Models Codex 1.13.1 use a
+stable native Keychain helper and independent encrypted entries. Update the
+marketplace, reinstall the desired Codex plugins and run their setup with
+`--migrate` once. See [release details](CODEX_KEYCHAIN_RELEASE.md).
+The Claude plugins and their marketplace are unchanged. NeoKanban, NeoRAG,
+AudiGEO, Oriflux and SPT-AI do not use these Codex Python credential readers.

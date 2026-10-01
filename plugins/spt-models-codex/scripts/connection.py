@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rayonne profile and macOS Keychain access. Never print credentials."""
+"""SPT Models profile and macOS Keychain access. Never print credentials."""
 import ctypes as c
 import hashlib
 import json
@@ -11,8 +11,8 @@ import tempfile
 import native_keychain
 from urllib.parse import urlsplit
 
-SERVICE = "ai.sponge-theory.rayonne.codex"
-DEFAULT_INSTANCE = "https://rayonne.sponge-theory.dev"
+SERVICE = "ai.sponge-theory.spt-models.codex"
+DEFAULT_INSTANCE = "https://models.sponge-theory.dev"
 
 
 class SetupError(Exception):
@@ -20,7 +20,7 @@ class SetupError(Exception):
 
 
 def directory():
-    return Path.home() / ".rayonne" / "codex"
+    return Path.home() / ".spt-models" / "codex"
 
 
 def normalize_instance(value):
@@ -36,7 +36,7 @@ def normalize_instance(value):
             or "\\" in value):
         raise SetupError("Use an HTTPS instance URL without credentials, query or fragment")
     if parsed.path not in ("", "/"):
-        raise SetupError("Use the Rayonne origin without a path")
+        raise SetupError("Use the gateway origin without a path")
     return value
 
 
@@ -45,7 +45,7 @@ def account(instance):
 
 
 def validate_key(key):
-    if not isinstance(key, str) or not key.startswith("rk_") or len(key) > 8192 or any(ord(ch) < 33 or ord(ch) > 126 for ch in key):
+    if not key or len(key) > 8192 or any(ord(ch) < 33 or ord(ch) > 126 for ch in key):
         raise SetupError("Enter the API key without spaces or the Bearer prefix")
     return key
 
@@ -57,10 +57,9 @@ def load_profile():
         if profile["account"] != account(instance):
             raise ValueError()
         return {"instance_url": instance, "account": account(instance),
-                "read_only": validate_read_only(profile.get("read_only", False)),
-                "credential": profile.get("credential", {"kind": "rayonne", "account": account(instance)})}
+                "credential": profile.get("credential", {"kind": "spt-models", "account": account(instance)})}
     except (OSError, ValueError, KeyError, TypeError):
-        raise SetupError("Rayonne is not configured. Run the rayonne-setup skill.") from None
+        raise SetupError("SPT Models is not configured. Run the spt-models-setup skill.") from None
 
 
 def atomic_write(path, data, mode=0o600):
@@ -171,29 +170,23 @@ class LegacyKeychain:
 
 
 def _read_legacy_secret(source):
-    if source.get("kind") == "rayonne":
+    if source.get("kind") == "spt-models":
         key = LegacyKeychain().read(source["account"])
     elif source.get("kind") == "claude":
         if (not re.fullmatch(r"Claude Code-credentials(?:-[0-9a-f]{8})?", source["service"])
-                or source["plugin_id"] not in ("rayonne@sponge-theory", "rayonne")):
+                or source["plugin_id"] not in ("spt-models@sponge-theory", "spt-models")):
             raise SetupError("Unsupported Claude credential reference")
         raw = LegacyKeychain(source["service"]).read(source["account"])
         if raw is None:
             return None
         try:
             # Claude stores one JSON item; extract only the selected plugin's key.
-            key = json.loads(raw).get("pluginSecrets", {}).get(source["plugin_id"], {}).get("api_key")
+            key = json.loads(raw).get("pluginSecrets", {}).get(source["plugin_id"], {}).get("spt_api_key")
         except (ValueError, AttributeError, TypeError):
             return None
     else:
         raise SetupError("Unsupported credential source")
     return validate_key(key) if key is not None else None
-
-
-def validate_read_only(value):
-    if not isinstance(value, bool):
-        raise SetupError("Invalid read-only setting")
-    return value
 
 
 STORAGE = "native-v1"
@@ -231,12 +224,12 @@ class Keychain:
 
 
 def owned_source(name):
-    return {"kind": "rayonne", "account": name, "storage": STORAGE}
+    return {"kind": "spt-models", "account": name, "storage": STORAGE}
 
 
 def read_secret(source):
     """Runtime path: no legacy lookup, migration, fallback, or macOS dialog."""
-    if source.get("kind") != "rayonne" or source.get("storage") != STORAGE:
+    if source.get("kind") != "spt-models" or source.get("storage") != STORAGE:
         raise SetupError("Credential migration required; run the plugin setup with --migrate")
     key = Keychain().read(source["account"])
     return validate_key(key) if key is not None else None
@@ -244,7 +237,7 @@ def read_secret(source):
 
 def read_setup_secret(source):
     """Explicit setup only: read legacy storage once, without modifying it."""
-    if source.get("kind") == "rayonne" and source.get("storage") == STORAGE:
+    if source.get("kind") == "spt-models" and source.get("storage") == STORAGE:
         key = Keychain(interactive=True).read(source["account"])
         return validate_key(key) if key is not None else None
     return _read_legacy_secret(source)

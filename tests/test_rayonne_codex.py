@@ -92,10 +92,11 @@ def test_launch_preserves_read_only(adapter, monkeypatch):
     assert os.environ['RAYONNE_API_KEY'] == 'rk_test_only'
 
 
-def test_claude_reference_never_written(adapter, tmp_path):
-    class NoWrites(Store):
-        def write(self, *args):
-            raise AssertionError('must not write Claude credential')
+def test_claude_key_imported_to_owned_entry(adapter, tmp_path):
+    store = Store()
     source = {'kind': 'claude', 'service': 'Claude Code-credentials', 'account': 'test', 'plugin_id': 'rayonne@sponge-theory'}
-    adapter['configure'].save('https://rayonne.example', 'rk_test_only', NoWrites(), source, verify=lambda *a: None)
-    assert json.loads((tmp_path / 'connection.json').read_text())['credential'] == source
+    adapter['configure'].save('https://rayonne.example', 'rk_test_only', store, source, verify=lambda *a: None)
+    saved = json.loads((tmp_path / 'connection.json').read_text())['credential']
+    assert saved['kind'] == 'rayonne'
+    assert saved['storage'] == 'native-v1'
+    assert store.value == 'rk_test_only'
