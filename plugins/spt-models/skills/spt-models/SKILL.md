@@ -4,8 +4,8 @@ description: >
   Use when the user asks for any inference task — generate an image,
   audio, video, music, transcribe (including verbatim vs intended
   transcripts and word-level timestamps), chat, complete, embed,
-  rerank, text-to-speech, music transcription, typed document
-  classification. Discovers the SPT Models catalogue, reads the
+  rerank, text-to-speech, music transcription, vocal / accompaniment
+  separation, typed document classification. Discovers the SPT Models catalogue, reads the
   prompting guide for the chosen model, then calls the appropriate
   inference tool with parameters from the guide.
 ---
@@ -113,6 +113,7 @@ loads automatically on this call** — you never load it yourself.
 | `video_gen` | `generate_video(model, prompt, image_b64?, last_frame_b64?, video_b64?, ...)` |
 | `sound_gen` | `generate_music(model, prompt, ...)` — may also return `score_abc`, `seed`, `truncated` |
 | `music_transcription` | `transcribe_music(model, audio_b64 \| audio_path, task?, ...)` — returns an ABC score (can be null: read `abc_error`) |
+| `audio_separation` | `separate_audio(model, audio_b64 \| audio_path, stems?)` — vocals / accompaniment WAVs with the input's exact length, written to disk (paths returned) |
 | `tts`       | `tts(model, input, voice?, ...)`                         |
 | `stt`       | `transcribe(model, audio_b64, ...)`                      |
 | `embedding` | `embed(model, input, ...)`                               |
@@ -253,3 +254,11 @@ Resources are fine to read silently for context; prefer them over extra
 - Don't list an alias and its target (`alias_of`) as two separate choices.
 - Don't drop or paraphrase the user's prompt — reformulate it per the guide,
   preserving the intent.
+
+## Timing sung lyrics
+
+Speech models struggle on a mixed song (whisperx returned 0 words on a yue2-3b
+mix, 43 and 54 on its isolated vocals).  Run `separate_audio(model="htdemucs",
+audio_path=..., stems="vocals")`, then `transcribe(model="whisperx-large-v3",
+audio_b64=<the vocal stem>, language=...)`.  The stem has the mix's exact sample
+count, so the word times apply to the mix unchanged.  Limit: 90 s per call.

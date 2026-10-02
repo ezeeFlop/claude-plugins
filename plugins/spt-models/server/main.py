@@ -528,6 +528,51 @@ async def transcribe_music(
 
 
 @mcp.tool()
+async def separate_audio(
+    model: str,
+    audio_b64: str | None = None,
+    audio_path: str | None = None,
+    content_type: str | None = None,
+    stems: str = "vocals",
+    output_dir: str | None = None,
+    return_base64: bool = False,
+) -> dict[str, Any]:
+    """Split a mixed song into stems (audio_separation models: htdemucs).
+
+    Pass the audio as EXACTLY ONE of `audio_b64` (base64) or `audio_path` (a
+    file on the machine running this MCP server).  Up to 90 s and 50 MB.
+    `stems`: "vocals" (default), "accompaniment" or "vocals,accompaniment".
+
+    Each stem is a WAV with the INPUT's sample rate, channel count and exact
+    number of samples — times measured on the vocal stem (e.g. word timestamps
+    from `transcribe` with whisperx-large-v3) apply to the mix unchanged.
+
+    By default the stems are WRITTEN to `output_dir` (a temporary directory when
+    omitted) and the result lists their paths: a 40 s stereo stem is ~8 MB, far
+    too big to return inline.  `return_base64=True` returns them as base64
+    instead.  Returns `{stems: {name: path_or_base64}, sample_rate, channels,
+    samples, duration_s, model}`.
+    """
+    import tempfile
+
+    audio_bytes, filename, ctype = read_audio_input(audio_b64, audio_path, content_type)
+    result = await _get_client().separate_audio(
+        model=model, audio_bytes=audio_bytes, filename=filename, content_type=ctype, stems=stems,
+    )
+    if return_base64:
+        return result
+    target = Path(output_dir).expanduser() if output_dir else Path(tempfile.mkdtemp(prefix="spt-stems-"))
+    target.mkdir(parents=True, exist_ok=True)
+    base = Path(filename).stem or "audio"
+    paths = {}
+    for name, b64 in (result.get("stems") or {}).items():
+        path = target / f"{base}.{name}.wav"
+        path.write_bytes(base64.b64decode(b64))
+        paths[name] = str(path)
+    return {**{k: v for k, v in result.items() if k != "stems"}, "stems": paths}
+
+
+@mcp.tool()
 async def rerank(
     model: str,
     query: str,

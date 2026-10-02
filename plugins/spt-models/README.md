@@ -2,8 +2,8 @@
 
 Inference and model-catalogue access for the [SPT Models](https://models.sponge-theory.dev)
 GPU stack, directly inside Claude Code: chat, completion, embeddings, image /
-video / audio / music generation, speech and music transcription, rerank and
-typed document classification — over an
+video / audio / music generation, speech and music transcription, vocal /
+accompaniment separation, rerank and typed document classification — over an
 OpenAI-compatible API, with per-model prompting guides the agent reads before
 each call.
 
@@ -115,9 +115,10 @@ diff them.
 
 ## What's included
 
-- **MCP server**: 16 tools — `list_models`, `get_model_info`, `chat`,
+- **MCP server**: 17 tools — `list_models`, `get_model_info`, `chat`,
   `complete`, `embed`, `generate_image`, `generate_video`, `generate_music`,
-  `tts`, `transcribe`, `transcribe_music`, `rerank`, `classify`, plus
+  `tts`, `transcribe`, `transcribe_music`, `separate_audio`, `rerank`,
+  `classify`, plus
   admin-gated `load_model`, `unload_model`, `refresh_prompting_guide` — plus
   the `spt://models` and `spt://guide` resources and the `spt://model/{slug}`
   resource template.
@@ -126,6 +127,10 @@ diff them.
   or a batch (`items`). It returns per-label probabilities and a confidence
   that measures how concentrated the distribution is, not the chance of being
   right: nothing is calibrated on your data, so pick your own thresholds.
+- **`separate_audio`** (plugin 1.14.0+, gateway with `POST /v1/audio/separations`):
+  splits a song (up to 90 s) into vocals / accompaniment WAVs with the input's
+  exact length, written to disk (paths returned) — time sung lyrics by running
+  `transcribe` on the vocal stem.
 - **`transcribe_music`** (plugin 1.12.0+): turns a song recording into a score,
   with optional MIDI. Pass `audio_path` (a file on your machine, preferred for
   real songs) or `audio_b64`.

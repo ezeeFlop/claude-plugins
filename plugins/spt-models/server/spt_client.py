@@ -281,6 +281,32 @@ class SPTClient:
         )
         return resp.json()
 
+    async def separate_audio(
+        self,
+        model: str,
+        audio_bytes: bytes,
+        filename: str = "audio",
+        content_type: str = "audio/wav",
+        stems: str | None = None,
+        *,
+        poll_interval: float = 2.0,
+    ) -> dict[str, Any]:
+        """POST /v1/audio/separations as a job — stems as base64 WAVs.
+
+        Always a job, like transcribe_music: a cold load (venv + weights) can
+        outlast an MCP call even though the separation itself takes seconds.
+        """
+        data: dict[str, Any] = {"model": model}
+        if stems:
+            data["stems"] = stems
+        resp = await self.run_multipart_job(
+            "/v1/audio/separations",
+            files={"file": (filename, audio_bytes, content_type)},
+            data=data,
+            poll_interval=poll_interval,
+        )
+        return resp.json()
+
     async def classify(self, payload: dict[str, Any]) -> dict[str, Any]:
         client = await self._get_client()
         resp = await client.post(
