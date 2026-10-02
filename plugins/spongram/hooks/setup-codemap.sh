@@ -33,6 +33,40 @@ cwd=$(printf '%s' "$input" | python3 -c "import json,sys;print(json.load(sys.std
 REPO_ROOT=$(cd "$cwd" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null) || exit 0
 [ -n "$REPO_ROOT" ] || exit 0
 
+# A LINKED worktree does not get the code map wired in — see the comment in
+# post-commit.sh for why. Here we abstain with ONE explicit message (no
+# git/mkdir noise further down: in a real worktree ``.git`` is a FILE, so the
+# ``mkdir -p .../hooks`` below would fail anyway).
+# ``--path-format`` only exists since git 2.31; an older git rejects it, or
+# echoes it back verbatim. Fallback in that case: the relative ``rev-parse``
+# output, made absolute via ``cd`` + ``pwd -P`` (same method for both
+# --git-dir and --git-common-dir, so they stay comparable). On a recent git
+# the output is already absolute: unchanged behavior.
+_spongram_git_abs() {
+  local out dir
+  out="$(git -C "$REPO_ROOT" rev-parse --path-format=absolute "$@" 2>/dev/null)"
+  case "$out" in
+    /*|[A-Za-z]:/*) printf '%s\n' "$out"; return 0 ;;
+  esac
+  out="$(git -C "$REPO_ROOT" rev-parse "$@" 2>/dev/null)" || return 0
+  [ -n "$out" ] || return 0
+  dir="$(cd "$REPO_ROOT" 2>/dev/null && cd "$(dirname "$out")" 2>/dev/null && pwd -P)" || return 0
+  printf '%s/%s\n' "$dir" "$(basename "$out")"
+}
+GIT_DIR_ABS="$(_spongram_git_abs --git-dir)"
+GIT_COMMON_DIR="$(_spongram_git_abs --git-common-dir)"
+if [ -z "$GIT_DIR_ABS" ] || [ -z "$GIT_COMMON_DIR" ]; then
+  exit 0
+fi
+if [ "$GIT_DIR_ABS" != "$GIT_COMMON_DIR" ]; then
+  echo "[spongram-codemap] code map not installed in a linked worktree ($REPO_ROOT)" >&2
+  exit 0
+fi
+case "$GIT_COMMON_DIR" in
+  */.git) REPO_NAME="$(basename "$(dirname "$GIT_COMMON_DIR")")" ;;
+  *) REPO_NAME="$(basename "$REPO_ROOT")" ;;
+esac
+
 # Resolve our own location from $0 — independent of CLAUDE_PLUGIN_ROOT, which
 # churns on plugin update.
 SELF_DIR=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || exit 0
@@ -73,18 +107,22 @@ if [ -f "$SELF_DIR/codemap-run.sh" ]; then
 fi
 
 # ── Install the post-commit hook (idempotent), preserving any user content. ──
+# ``--git-path hooks`` respects ``core.hooksPath`` (falls back to
+# ``$GIT_DIR_ABS/hooks`` if the lookup itself fails for some reason).
 MARK="# spongram-codemap-hook"
-HOOK="$REPO_ROOT/.git/hooks/post-commit"
+GIT_HOOKS_DIR="$(_spongram_git_abs --git-path hooks)"
+[ -n "$GIT_HOOKS_DIR" ] || GIT_HOOKS_DIR="$GIT_DIR_ABS/hooks"
+HOOK="$GIT_HOOKS_DIR/post-commit"
 if ! { [ -f "$HOOK" ] && grep -q "$MARK" "$HOOK"; }; then
-  mkdir -p "$REPO_ROOT/.git/hooks"
+  mkdir -p "$GIT_HOOKS_DIR"
   { echo "$MARK"; cat "$SELF_DIR/post-commit.sh"; } >>"$HOOK"
   chmod +x "$HOOK"
 fi
 
 # ── First build if the map was never seeded for this repo (detached). ──
 # Requires a resolved connection; skip silently otherwise.
-STATE="$REPO_ROOT/.git/spongram-codemap.json"
-LOCK="$REPO_ROOT/.git/spongram-codemap.lock"
+STATE="$GIT_DIR_ABS/spongram-codemap.json"
+LOCK="$GIT_DIR_ABS/spongram-codemap.lock"
 if [ -z "${SPONGRAM_CODEMAP_SKIP_BUILD:-}" ] && [ -n "$SPONGRAM_BASE_URL" ] && [ ! -f "$STATE" ]; then
   if command -v "${SPONGRAM_CODEMAP_CMD[0]}" >/dev/null 2>&1 || [ -x "${SPONGRAM_CODEMAP_CMD[0]}" ]; then
     (
@@ -96,7 +134,7 @@ if [ -z "${SPONGRAM_CODEMAP_SKIP_BUILD:-}" ] && [ -n "$SPONGRAM_BASE_URL" ] && [
       trap 'rm -rf "$LOCK"' EXIT
       "${SPONGRAM_CODEMAP_CMD[@]}" build "$REPO_ROOT" \
         --base-url "$SPONGRAM_BASE_URL" --key "${SPONGRAM_BRAIN_KEY:-local}" \
-        --repo "$(basename "$REPO_ROOT")" --state "$STATE" \
+        --repo "$REPO_NAME" --state "$STATE" \
         >>"$HOME/.spongram/codemap/last.log" 2>&1
     ) &
   fi
