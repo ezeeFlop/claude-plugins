@@ -17,7 +17,11 @@ Vérifie ce qui accompagnera un post et corrige si besoin.
 1. Si la valeur fournie dans la demande n'est pas un id de contenu, demande lequel — ou propose
    `rayonne_list_content` pour le retrouver.
 2. `rayonne_content_media` pour voir la sélection résolue : URL publique,
-   dimensions, durée.
+   dimensions, durée, et d'où vient chaque média (`source` : écran de
+   l'argument, capture de la galerie, illustration IA, carte de marque).
+   `rayonne_get_content` porte `media_selection` : pourquoi cette capture
+   (`chosen.matched`), ou pourquoi la galerie n'a rien donné
+   (`fallthrough`).
 3. Si une ressource a disparu, la raison de l'abandon est dans la réponse —
    explique-la simplement, sans jargon technique.
 4. Selon le cas :
@@ -39,6 +43,9 @@ Vérifie ce qui accompagnera un post et corrige si besoin.
      en prévenant que ça VERROUILLE la pièce : plus aucune régénération de
      texte ni recalcul automatique n'y touchera tant que
      `rayonne_recompute_content_media` n'est pas rappelé.
+   - un écran ne doit plus partir dans les posts automatiques (écran de
+     connexion, donnée sensible) → `rayonne_update_product_asset` avec
+     `auto_posts=false` : il reste disponible à la main et pour la vidéo.
 5. Termine par `rayonne_preview_content` pour montrer le résultat final,
    texte et médias ensemble, avant publication.
 

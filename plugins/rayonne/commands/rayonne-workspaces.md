@@ -22,6 +22,13 @@ Aide à piloter plusieurs espaces Rayonne depuis une seule clé.
    des vidéos) — ne donne que les champs à changer, les autres restent
    intacts. `video_music` prend `{"preset": ..., "level": ...}` ; une seule
    des deux clés suffit, l'autre garde sa valeur.
+   `ai_disclosure_recommended` règle la mention IA là où elle est
+   recommandée, pour tout l'espace : coupée, elle ne tombe que sur ce qu'un
+   humain a approuvé dans l'app — jamais sur dev.to ni Mastodon (obligatoire),
+   ni sur ce que l'autopilote ou l'API ont approuvé. `venue_settings` choisit
+   le placement du lien par venue (`{"linkedin": {"link_placement": "body"}}`,
+   `null` rend le défaut ; la clé s'écrit `link_placement`, une entrée vide
+   est refusée) parmi `link_placement_options` de l'espace — 422 sinon.
 5. Pour fermer un espace : NOMME-le toujours explicitement à l'utilisateur
    avant d'appeler `rayonne_delete_workspace` — IRRÉVERSIBLE. L'espace
    d'origine de la clé est refusé (409) : le supprimer couperait l'accès en

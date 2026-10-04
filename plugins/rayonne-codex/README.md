@@ -1,7 +1,7 @@
 # Rayonne pour Codex
 
-Adaptateur Codex du plugin Claude Code Rayonne 0.7.0 : les **82 mêmes
-outils**, le même serveur PyPI `rayonne-mcp==0.7.0` et son guide métier.
+Adaptateur Codex du plugin Claude Code Rayonne 0.8.0 : les **118 mêmes
+outils**, le même serveur PyPI `rayonne-mcp==0.8.0` et son guide métier.
 Aucun code serveur propriétaire n'est embarqué dans cet adaptateur.
 
 ## Installation et configuration
@@ -32,7 +32,7 @@ dédiée `ai.sponge-theory.rayonne.codex.v2`, sans modifier Claude. Une clé neu
 peut aussi être saisie dans le champ masqué. L'URL, la référence du credential et le
 choix lecture seule sont enregistrés dans `~/.rayonne/codex/connection.json`
 (mode 0600) ; ce fichier ne contient pas de clé. La vérification ne publie
-rien : elle initialise MCP, contrôle 82 outils et lit l'aperçu de l'espace.
+rien : elle initialise MCP, contrôle 118 outils et lit l'aperçu de l'espace.
 Ouvre ensuite un **nouveau fil Codex** pour charger skills et outils.
 
 Un déploiement sans trousseau peut fournir ensemble `RAYONNE_API_URL` et
@@ -64,8 +64,9 @@ Modifier les parcours dans `mcp/claude_code_plugin/commands/`, puis régénérer
 Le générateur adapte seulement les arguments, les liens entre commandes et
 le contexte Codex. Le paquet `mcp/dist/rayonne-codex-0.7.1.tar.gz` contient
 uniquement les fichiers nécessaires au plugin, jamais `.venv` ni les caches.
-La copie publique est distribuée ici sous `plugins/rayonne-codex`.
-Les scripts de maintenance cités ci-dessus vivent dans le dépôt source Rayonne.
+La copie publique est distribuée dans `ezeeFlop/claude-plugins`, sous
+`plugins/rayonne-codex`. Le code natif partagé et sa procédure de mise à jour
+sont versionnés dans `shared/codex-keychain` de cette marketplace.
 
 ## Migration 0.7.1 : fin des demandes répétées du trousseau
 

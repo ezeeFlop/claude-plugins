@@ -20,3 +20,14 @@ Accompagne la publication d'un contenu approuvé.
    c'est la preuve.
 5. Propose `rayonne_create_tracking_link` : une URL nue ne mesure rien, le
    redirect est ce qui écrit la métrique d'acquisition.
+6. Une soumission `api` garée (`needs_review`) dit pourquoi : lis son
+   `reason` et son indice avec `rayonne_get_submission`, et rends le geste tel
+   quel (recréer le mot de passe d'application Bluesky, débloquer le compte
+   sur bsky.app, passer la publication Hashnode en Pro, attendre que l'admin
+   ouvre la vidéo Bluesky). La carte de lien et la vidéo Bluesky sont
+   derrière des interrupteurs d'admin éteints par défaut : ne les promets
+   jamais. Ne relance jamais un motif permanent avant que sa cause soit
+   corrigée. Un envoi LinkedIn ou Hashnode garé pour
+   `founder_approval_required` ne repart que validé par le fondateur dans
+   l'application : `rayonne_retry_submission` y répond 409, comme à un envoi
+   qui a peut-être déjà publié (`not_retryable`).
