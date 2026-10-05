@@ -1,7 +1,7 @@
 # SPT Models for Codex
 
-Codex adapter for the SPT Models GPU stack. Ships the MCP bundle 1.13.0
-(16 tools), model prompting guides, and secure macOS setup. The Claude Code
+Codex adapter for the SPT Models GPU stack. Ships the MCP bundle 1.14.1
+(17 tools, with MCP annotations), model prompting guides, and secure macOS setup. The Claude Code
 plugin is independent and unchanged.
 
 ## Install
@@ -71,3 +71,18 @@ Do not rebuild or re-sign the released native helper on ordinary plugin updates.
 
 Uninstall with `codex plugin remove spt-models-codex@sponge-theory-codex`.
 The connection profile and Keychain entry are retained for reinstallation.
+
+## Approvals
+
+Every tool declares MCP annotations: `list_models` and `get_model_info` are
+read-only, inference tools are neither read-only nor destructive, and
+`unload_model` / `refresh_prompting_guide` are destructive. In a session whose
+approval policy is `never`, a tool that needs approval is refused outright
+("MCP tool call requires approval, but approval policy is never"). To run the
+whole catalogue without prompts, add to `~/.codex/config.toml`:
+
+```toml
+[plugins."spt-models-codex@sponge-theory-codex".mcp_servers.spt-models]
+default_tools_approval_mode = "approve"
+```
+

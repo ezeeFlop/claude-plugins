@@ -134,6 +134,10 @@ diff them.
 - **`transcribe_music`** (plugin 1.12.0+): turns a song recording into a score,
   with optional MIDI. Pass `audio_path` (a file on your machine, preferred for
   real songs) or `audio_b64`.
+- **Tool annotations** (plugin 1.14.1+): `list_models` and `get_model_info` are
+  read-only, inference tools are non-destructive, `unload_model` and
+  `refresh_prompting_guide` are destructive — clients can approve reads
+  automatically.
 - **Model aliases** (gateway ≥ 1.1.0 with migration 015): `list_models` also
   returns admin-defined aliases (`gpt-4`, `default-llm`, …) marked with
   `alias_of: <slug>`; every inference tool accepts either name and the

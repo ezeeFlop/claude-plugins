@@ -74,6 +74,27 @@ except FileNotFoundError:
 mcp = _Server("spt-models", instructions=_AGENT_GUIDE)
 
 
+# MCP tool annotations (hints for clients: Codex's "writes" approval mode, ...).
+# Wire names are camelCase; SDK 2.x maps them to its snake_case fields.  An SDK
+# older than mcp 1.8 has no `annotations` parameter: the tool is then registered
+# without hints rather than failing the import.
+_READ = {"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False}
+# Inference changes nothing the caller owns, but it is not read-only: the first
+# call may auto-load the model (evicting an idle one), and it consumes GPU.
+_INFER = {"readOnlyHint": False, "destructiveHint": False, "idempotentHint": False, "openWorldHint": False}
+_ADMIN_LOAD = {"readOnlyHint": False, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False}
+_ADMIN_OVERWRITE = {"readOnlyHint": False, "destructiveHint": True, "idempotentHint": True, "openWorldHint": False}
+
+
+def _tool(hints: dict[str, bool]):
+    try:
+        from mcp.types import ToolAnnotations
+
+        return mcp.tool(annotations=ToolAnnotations.model_validate(hints))
+    except (ImportError, TypeError):
+        return mcp.tool()
+
+
 # A single shared client across all tools to keep the connection pool warm.
 _client: SPTClient | None = None
 
@@ -89,7 +110,7 @@ def _get_client() -> SPTClient:
 # Discovery tools
 # ---------------------------------------------------------------------------
 
-@mcp.tool()
+@_tool(_READ)
 async def list_models(verbose: bool = True) -> dict[str, Any]:
     """List all models registered on the SPT stack.
 
@@ -108,7 +129,7 @@ async def list_models(verbose: bool = True) -> dict[str, Any]:
     return await _get_client().list_models(verbose=verbose)
 
 
-@mcp.tool()
+@_tool(_READ)
 async def get_model_info(slug: str) -> dict[str, Any]:
     """Return full info for one model.
 
@@ -139,7 +160,7 @@ async def get_model_info(slug: str) -> dict[str, Any]:
 # Admin tools (require SPT_ADMIN_TOKEN)
 # ---------------------------------------------------------------------------
 
-@mcp.tool()
+@_tool(_ADMIN_LOAD)
 async def load_model(slug: str) -> dict[str, Any]:
     """Ops tool — pre-load / pin a model onto a GPU node.
 
@@ -156,7 +177,7 @@ async def load_model(slug: str) -> dict[str, Any]:
     return await _get_client().load_model(slug)
 
 
-@mcp.tool()
+@_tool(_ADMIN_OVERWRITE)
 async def unload_model(slug: str) -> dict[str, Any]:
     """Ops tool — manually free a model's GPU memory.
 
@@ -167,7 +188,7 @@ async def unload_model(slug: str) -> dict[str, Any]:
     return await _get_client().unload_model(slug)
 
 
-@mcp.tool()
+@_tool(_ADMIN_OVERWRITE)
 async def refresh_prompting_guide(slug: str) -> dict[str, Any]:
     """Re-run AI extraction of the prompting guide for one model.  Useful after
     a model card update.  Requires the admin token."""
@@ -178,7 +199,7 @@ async def refresh_prompting_guide(slug: str) -> dict[str, Any]:
 # Inference tools
 # ---------------------------------------------------------------------------
 
-@mcp.tool()
+@_tool(_INFER)
 async def chat(
     model: str,
     messages: list[dict[str, Any]],
@@ -217,7 +238,7 @@ async def chat(
     return await _get_client().chat(payload)
 
 
-@mcp.tool()
+@_tool(_INFER)
 async def complete(
     model: str,
     prompt: str,
@@ -247,7 +268,7 @@ async def complete(
     return await _get_client().complete(payload)
 
 
-@mcp.tool()
+@_tool(_INFER)
 async def embed(
     model: str,
     input: str | list[str],
@@ -260,7 +281,7 @@ async def embed(
     return await _get_client().embed(payload)
 
 
-@mcp.tool()
+@_tool(_INFER)
 async def generate_image(
     model: str,
     prompt: str,
@@ -307,7 +328,7 @@ async def generate_image(
     return resp.json()
 
 
-@mcp.tool()
+@_tool(_INFER)
 async def generate_video(
     model: str,
     prompt: str,
@@ -372,7 +393,7 @@ async def generate_video(
     return resp.json()
 
 
-@mcp.tool()
+@_tool(_INFER)
 async def tts(
     model: str,
     input: str,
@@ -399,7 +420,7 @@ async def tts(
     }
 
 
-@mcp.tool()
+@_tool(_INFER)
 async def generate_music(
     model: str,
     prompt: str,
@@ -452,7 +473,7 @@ async def generate_music(
     }
 
 
-@mcp.tool()
+@_tool(_INFER)
 async def transcribe(
     model: str,
     audio_b64: str,
@@ -483,7 +504,7 @@ async def transcribe(
     )
 
 
-@mcp.tool()
+@_tool(_INFER)
 async def transcribe_music(
     model: str,
     audio_b64: str | None = None,
@@ -527,7 +548,52 @@ async def transcribe_music(
     )
 
 
-@mcp.tool()
+@_tool(_INFER)
+async def separate_audio(
+    model: str,
+    audio_b64: str | None = None,
+    audio_path: str | None = None,
+    content_type: str | None = None,
+    stems: str = "vocals",
+    output_dir: str | None = None,
+    return_base64: bool = False,
+) -> dict[str, Any]:
+    """Split a mixed song into stems (audio_separation models: htdemucs).
+
+    Pass the audio as EXACTLY ONE of `audio_b64` (base64) or `audio_path` (a
+    file on the machine running this MCP server).  Up to 90 s and 50 MB.
+    `stems`: "vocals" (default), "accompaniment" or "vocals,accompaniment".
+
+    Each stem is a WAV with the INPUT's sample rate, channel count and exact
+    number of samples — times measured on the vocal stem (e.g. word timestamps
+    from `transcribe` with whisperx-large-v3) apply to the mix unchanged.
+
+    By default the stems are WRITTEN to `output_dir` (a temporary directory when
+    omitted) and the result lists their paths: a 40 s stereo stem is ~8 MB, far
+    too big to return inline.  `return_base64=True` returns them as base64
+    instead.  Returns `{stems: {name: path_or_base64}, sample_rate, channels,
+    samples, duration_s, model}`.
+    """
+    import tempfile
+
+    audio_bytes, filename, ctype = read_audio_input(audio_b64, audio_path, content_type)
+    result = await _get_client().separate_audio(
+        model=model, audio_bytes=audio_bytes, filename=filename, content_type=ctype, stems=stems,
+    )
+    if return_base64:
+        return result
+    target = Path(output_dir).expanduser() if output_dir else Path(tempfile.mkdtemp(prefix="spt-stems-"))
+    target.mkdir(parents=True, exist_ok=True)
+    base = Path(filename).stem or "audio"
+    paths = {}
+    for name, b64 in (result.get("stems") or {}).items():
+        path = target / f"{base}.{name}.wav"
+        path.write_bytes(base64.b64decode(b64))
+        paths[name] = str(path)
+    return {**{k: v for k, v in result.items() if k != "stems"}, "stems": paths}
+
+
+@_tool(_INFER)
 async def rerank(
     model: str,
     query: str,
@@ -542,7 +608,7 @@ async def rerank(
     return await _get_client().rerank(payload)
 
 
-@mcp.tool()
+@_tool(_INFER)
 async def classify(
     model: str,
     questions: dict[str, Any],
