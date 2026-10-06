@@ -43,6 +43,7 @@ except ImportError:
         raise SystemExit(1) from exc
 
 from spt_client import SPTClient, read_audio_input
+import spt_outputs
 
 logging.basicConfig(
     level=os.environ.get("SPT_LOG_LEVEL", "INFO").upper(),
@@ -281,6 +282,28 @@ async def embed(
     return await _get_client().embed(payload)
 
 
+def _deliver(result: dict[str, Any], target: "spt_outputs.Target | None", model: str) -> dict[str, Any]:
+    """The gateway response as-is, or — with `output_path` — its files written
+    to disk and listed under `files`, every non-base64 field kept."""
+    if target is None:
+        return result
+    fields, media = spt_outputs.extract_media(result)
+    return {**fields, "files": spt_outputs.write(target, media, model)}
+
+
+def _speech_audio(body: bytes, content_type: str) -> tuple[bytes, dict[str, Any]]:
+    """/v1/audio/speech answers a JSON envelope `{audio: <base64>, format, ...}`
+    (or raw audio on gateways that predate it): the audio bytes and the other
+    envelope fields."""
+    if "json" in (content_type or ""):
+        import json as _json
+
+        envelope = _json.loads(body)
+        audio = base64.b64decode(envelope.get("audio") or "")
+        return audio, {k: v for k, v in envelope.items() if k != "audio"}
+    return body, {}
+
+
 @_tool(_INFER)
 async def generate_image(
     model: str,
@@ -293,6 +316,8 @@ async def generate_image(
     seed: int | None = None,
     response_format: str = "b64_json",
     extra: dict[str, Any] | None = None,
+    output_path: str | None = None,
+    overwrite: bool = False,
 ) -> dict[str, Any]:
     """Generate one or more images from a prompt.
 
@@ -305,8 +330,21 @@ async def generate_image(
     Use `extra` for model-specific flags as well (e.g. ErnieImage's `use_pe`).
 
     Call `get_model_info(slug)` first and apply `recommended_params` (steps,
-    guidance, width/height). `response_format="b64_json"` returns base64 PNGs.
+    guidance, width/height). `response_format="b64_json"` returns base64 PNGs
+    (image-to-3D models such as trellis-2-4b return a GLB the same way).
+
+    `output_path` (RECOMMENDED for agents): the result is written to disk and
+    the answer lists `files: [{path, bytes, mime_type, ...}]` instead of base64
+    — MCP clients truncate inline base64 beyond a few hundred KB, so without it
+    the file can be lost.  A file path is used as-is; a directory (existing, or
+    ending with "/", or without extension) or several results get
+    `<model>-<YYYYmmdd-HHMMSS>-<index>.<ext>` names, the extension coming from
+    the real content.  `~` is expanded, parent directories are created, and the
+    destination is checked BEFORE generating.  An existing file is never
+    replaced unless `overwrite=True`.  All other response fields are kept.
+    Images also report `width` / `height`.
     """
+    target = spt_outputs.prepare(output_path, overwrite, expected_count=n) if output_path else None
     payload: dict[str, Any] = {
         "model": model,
         "prompt": prompt,
@@ -325,7 +363,7 @@ async def generate_image(
     if extra:
         payload.update(extra)
     resp = await _get_client().run_generation_job("/v1/images/generations", payload)
-    return resp.json()
+    return _deliver(resp.json(), target, model)
 
 
 @_tool(_INFER)
@@ -345,6 +383,8 @@ async def generate_video(
     guidance_scale: float | None = None,
     seed: int | None = None,
     extra: dict[str, Any] | None = None,
+    output_path: str | None = None,
+    overwrite: bool = False,
 ) -> dict[str, Any]:
     """Generate a video from a text prompt (video_gen models).
 
@@ -360,8 +400,20 @@ async def generate_video(
     `video_strength` 0-1, 1.0 = faithful re-render; exclusive with
     `image_b64`; source audio is regenerated, not kept).  The response
     contains base64-encoded video data (`b64_json`) — decode it and write to
-    a file (usually .mp4).
+    a file (usually .mp4), or better, pass `output_path`.
+
+    `output_path` (RECOMMENDED for agents): the result is written to disk and
+    the answer lists `files: [{path, bytes, mime_type, ...}]` instead of base64
+    — MCP clients truncate inline base64 beyond a few hundred KB, so without it
+    the file can be lost.  A file path is used as-is; a directory (existing, or
+    ending with "/", or without extension) or several results get
+    `<model>-<YYYYmmdd-HHMMSS>-<index>.<ext>` names, the extension coming from
+    the real content.  `~` is expanded, parent directories are created, and the
+    destination is checked BEFORE generating.  An existing file is never
+    replaced unless `overwrite=True`.  All other response fields are kept.
+    Videos also report `duration_s`.
     """
+    target = spt_outputs.prepare(output_path, overwrite) if output_path else None
     payload: dict[str, Any] = {"model": model, "prompt": prompt}
     if image_b64 is not None:
         payload["image"] = image_b64
@@ -390,32 +442,59 @@ async def generate_video(
     if extra:
         payload.update(extra)
     resp = await _get_client().run_generation_job("/v1/videos/generations", payload)
-    return resp.json()
+    return _deliver(resp.json(), target, model)
 
 
 @_tool(_INFER)
 async def tts(
     model: str,
     input: str,
-    voice: str = "alloy",
+    voice: str | None = None,
     response_format: str = "mp3",
-    speed: float = 1.0,
+    speed: float | None = None,
+    extra: dict[str, Any] | None = None,
+    output_path: str | None = None,
+    overwrite: bool = False,
 ) -> dict[str, Any]:
-    """Text-to-speech synthesis.  Returns `{audio_b64, content_type}` —
-    decode `audio_b64` with base64 and write to a file with the matching
-    extension (mp3, wav, ogg, flac).
+    """Text-to-speech synthesis.  Returns `{audio_b64, content_type,
+    size_bytes}`; `content_type` is read from the audio itself — some models
+    answer WAV whatever `response_format` asks, so write the file with the
+    extension that matches `content_type`, or pass `output_path`.
+
+    `output_path` (RECOMMENDED for agents): the result is written to disk and
+    the answer lists `files: [{path, bytes, mime_type, ...}]` instead of base64
+    — MCP clients truncate inline base64 beyond a few hundred KB, so without it
+    the file can be lost.  A file path is used as-is; a directory (existing, or
+    ending with "/", or without extension) or several results get
+    `<model>-<YYYYmmdd-HHMMSS>-<index>.<ext>` names, the extension coming from
+    the real content.  `~` is expanded, parent directories are created, and the
+    destination is checked BEFORE generating.  An existing file is never
+    replaced unless `overwrite=True`.  All other response fields are kept.
+    Audio also reports `duration_s`.
+
+    `voice` and `speed` are sent only when given: voices are model-specific
+    (read `get_model_info`), and omnivoice refuses OpenAI-style voice IDs — it
+    takes `extra={"instruct": "female, middle-aged, british accent"}` (a closed
+    vocabulary: an unknown term is refused with the list of valid ones) or
+    `extra={"ref_audio": <base64>, "ref_text": ...}` for cloning.  `extra`
+    carries any other model-specific field.
     """
-    payload = {
-        "model": model,
-        "input": input,
-        "voice": voice,
-        "response_format": response_format,
-        "speed": speed,
-    }
-    audio_bytes, content_type = await _get_client().tts(payload)
+    target = spt_outputs.prepare(output_path, overwrite) if output_path else None
+    payload: dict[str, Any] = {"model": model, "input": input, "response_format": response_format}
+    if voice is not None:
+        payload["voice"] = voice
+    if speed is not None:
+        payload["speed"] = speed
+    if extra:
+        payload.update(extra)
+    body, content_type = await _get_client().tts(payload)
+    audio_bytes, fields = _speech_audio(body, content_type)
+    if target is not None:
+        files = spt_outputs.write(target, [spt_outputs.Media(audio_bytes, content_type)], model)
+        return {**fields, "files": files}
     return {
         "audio_b64": base64.b64encode(audio_bytes).decode("ascii"),
-        "content_type": content_type,
+        "content_type": spt_outputs.describe(audio_bytes, None)["mime_type"],
         "size_bytes": len(audio_bytes),
     }
 
@@ -430,6 +509,8 @@ async def generate_music(
     negative_prompt: str | None = None,
     seed: int | None = None,
     extra: dict[str, Any] | None = None,
+    output_path: str | None = None,
+    overwrite: bool = False,
 ) -> dict[str, Any]:
     """Generate music / sound from a text prompt (sound_gen models:
     stable-audio-*, ace-step, yue2, diffrhythm).  Call `get_model_info(slug)` for
@@ -447,7 +528,21 @@ async def generate_music(
     same `seed`.  To cover an existing song with yue2-3b: get its score from
     `transcribe_music(task="melody_full")`, review it, then pass
     `extra={"abc": <score>, "cot": "melody", "lyrics": <words that fit>}`.
+    `format` is the gateway's label: some models (stable-audio) answer WAV
+    under "mp3" — with `output_path` the real type is read from the bytes.
+
+    `output_path` (RECOMMENDED for agents): the result is written to disk and
+    the answer lists `files: [{path, bytes, mime_type, ...}]` instead of base64
+    — MCP clients truncate inline base64 beyond a few hundred KB, so without it
+    the file can be lost.  A file path is used as-is; a directory (existing, or
+    ending with "/", or without extension) or several results get
+    `<model>-<YYYYmmdd-HHMMSS>-<index>.<ext>` names, the extension coming from
+    the real content.  `~` is expanded, parent directories are created, and the
+    destination is checked BEFORE generating.  An existing file is never
+    replaced unless `overwrite=True`.  All other response fields are kept.
+    Audio also reports `duration_s`.
     """
+    target = spt_outputs.prepare(output_path, overwrite) if output_path else None
     payload: dict[str, Any] = {"model": model, "input": prompt}
     if audio_end_in_s is not None:
         payload["audio_end_in_s"] = audio_end_in_s
@@ -464,13 +559,14 @@ async def generate_music(
     resp = await _get_client().run_generation_job("/v1/audio/music", payload)
     ctype = resp.headers.get("content-type", "")
     if "json" in ctype:
-        return resp.json()                   # vieille gateway (déjà b64)
-    return {
+        return _deliver(resp.json(), target, model)
+    result = {                               # raw audio body (old gateway)
         "created": int(time.time()),
         "model": model,
         "audio": base64.b64encode(resp.content).decode(),
         "format": "wav",
     }
+    return _deliver(result, target, model)
 
 
 @_tool(_INFER)

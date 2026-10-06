@@ -70,6 +70,29 @@ def read_audio_input(
     return data, "audio", content_type or "audio/wav"
 
 
+def _raise_for_status(resp: httpx.Response) -> None:
+    """`raise_for_status()`, but carrying the gateway's own message.
+
+    A bare "400 Bad Request" leaves an agent guessing; the gateway explains the
+    refusal (`{"error": {"message"}}` or `{"detail"}`), so put that in the
+    exception text.  Still an httpx.HTTPStatusError with the response attached.
+    """
+    if not resp.is_error:
+        return
+    detail = None
+    try:
+        body = resp.json()
+        if isinstance(body, dict):
+            err = body.get("error")
+            detail = (err.get("message") if isinstance(err, dict) else err) or body.get("detail")
+    except Exception:
+        detail = (resp.text or "")[:500] or None
+    message = f"{resp.status_code} {resp.reason_phrase} for {resp.request.method} {resp.request.url.path}"
+    if detail:
+        message += f": {detail}"
+    raise httpx.HTTPStatusError(message, request=resp.request, response=resp)
+
+
 class SPTClient:
     """HTTP client wrapper.  Reuses a single AsyncClient across calls."""
 
@@ -133,13 +156,13 @@ class SPTClient:
         client = await self._get_client()
         params = {"verbose": "true"} if verbose else {}
         resp = await client.get("/v1/models", params=params, headers=self._api_headers())
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()
 
     async def get_model(self, slug: str) -> dict[str, Any]:
         client = await self._get_client()
         resp = await client.get(f"/v1/models/{slug}", headers=self._api_headers())
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()
 
     async def chat(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -149,7 +172,7 @@ class SPTClient:
             json=payload,
             headers=self._api_headers(),
         )
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()
 
     async def complete(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -159,7 +182,7 @@ class SPTClient:
             json=payload,
             headers=self._api_headers(),
         )
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()
 
     async def embed(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -169,7 +192,7 @@ class SPTClient:
             json=payload,
             headers=self._api_headers(),
         )
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()
 
     async def generate_image(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -179,7 +202,7 @@ class SPTClient:
             json=payload,
             headers=self._api_headers(),
         )
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()
 
     async def generate_video(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -189,7 +212,7 @@ class SPTClient:
             json=payload,
             headers=self._api_headers(),
         )
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()
 
     async def tts(self, payload: dict[str, Any]) -> tuple[bytes, str]:
@@ -200,7 +223,7 @@ class SPTClient:
             json=payload,
             headers=self._api_headers(),
         )
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.content, resp.headers.get("content-type", "audio/mpeg")
 
     async def generate_music(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -217,7 +240,7 @@ class SPTClient:
             json=payload,
             headers=self._api_headers(),
         )
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()
 
     async def transcribe(
@@ -246,7 +269,7 @@ class SPTClient:
             data=data,
             headers=self._api_headers(),
         )
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()
 
     async def transcribe_music(
@@ -319,7 +342,7 @@ class SPTClient:
                 "This SPT gateway does not expose /v1/classifications — typed "
                 "decisions need gateway >= 1.8. Upgrade the gateway."
             )
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()
 
     async def rerank(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -340,7 +363,7 @@ class SPTClient:
                 "not available on this stack yet. Use an embedding model + "
                 "cosine similarity as a workaround, or upgrade the gateway."
             )
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()
 
     # -- Mode job (gateway >= 1.4) ------------------------------------------
@@ -382,7 +405,7 @@ class SPTClient:
         self, client: httpx.AsyncClient, resp: httpx.Response,
         *, poll_interval: float, max_wait: float,
     ) -> httpx.Response:
-        resp.raise_for_status()
+        _raise_for_status(resp)
         body = resp.json() if "json" in resp.headers.get("content-type", "") else None
         if not (isinstance(body, dict) and body.get("job_id")):
             return resp                      # vieille gateway: réponse synchrone
@@ -393,7 +416,7 @@ class SPTClient:
                 f"/v1/jobs/{job_id}",
                 headers=self._api_headers(), timeout=60.0,
             )
-            j.raise_for_status()
+            _raise_for_status(j)
             status = j.json().get("status")
             if status in ("succeeded", "failed", "interrupted"):
                 break
@@ -406,7 +429,7 @@ class SPTClient:
             f"/v1/jobs/{job_id}/result",
             headers=self._api_headers(), timeout=120.0,
         )
-        result.raise_for_status()            # rejoue le code d'origine si failed
+        _raise_for_status(result)            # rejoue le code d'origine si failed
         return result
 
     # --- /admin/api/* ----------------------------------------------------
@@ -417,7 +440,7 @@ class SPTClient:
             f"/admin/api/models/{slug}/load",
             headers=self._admin_headers(),
         )
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()
 
     async def unload_model(self, slug: str) -> dict[str, Any]:
@@ -426,7 +449,7 @@ class SPTClient:
             f"/admin/api/models/{slug}/unload",
             headers=self._admin_headers(),
         )
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()
 
     async def refresh_prompting_guide(self, slug: str) -> dict[str, Any]:
@@ -435,5 +458,5 @@ class SPTClient:
             f"/admin/api/models/{slug}/enrich-prompting-guide",
             headers=self._admin_headers(),
         )
-        resp.raise_for_status()
+        _raise_for_status(resp)
         return resp.json()

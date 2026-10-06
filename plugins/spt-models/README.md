@@ -134,6 +134,10 @@ diff them.
 - **`transcribe_music`** (plugin 1.12.0+): turns a song recording into a score,
   with optional MIDI. Pass `audio_path` (a file on your machine, preferred for
   real songs) or `audio_b64`.
+- **`output_path`** (plugin 1.15.0+) on `generate_image`, `generate_video`,
+  `generate_music` and `tts`: the tool writes the file itself and returns
+  `files: [{path, bytes, mime_type, width/height | duration_s}]`. Use it by
+  default — inline base64 is truncated by MCP clients beyond a few hundred KB.
 - **Tool annotations** (plugin 1.14.1+): `list_models` and `get_model_info` are
   read-only, inference tools are non-destructive, `unload_model` and
   `refresh_prompting_guide` are destructive — clients can approve reads

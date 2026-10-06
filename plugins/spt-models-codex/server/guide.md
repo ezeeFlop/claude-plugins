@@ -42,6 +42,19 @@ video / audio / embedding / rerank models.
    (unless the user named the alias) and never present the pair to the user
    as two different models.
 
+5. **Pass `output_path` to every generation tool** (`generate_image`,
+   `generate_video`, `generate_music`, `tts`).  Inline base64 is truncated by
+   MCP clients beyond a few hundred KB — one 1376x768 PNG (1.2 MB) is already
+   lost.  With `output_path` the tool writes the file itself and answers
+   `files: [{path, bytes, mime_type, width/height | duration_s}]`, keeping every
+   other response field (`seed`, `score_abc`, `truncated`, ...).  Give a file
+   path, or a directory (ending with "/") to get
+   `<model>-<YYYYmmdd-HHMMSS>-<index>.<ext>` names — always a directory when
+   asking for several images.  The destination is checked before generating;
+   an existing file is never replaced unless `overwrite=True`.  Trust
+   `mime_type`, not the gateway's `format` label: some models answer WAV under
+   "mp3".
+
 ## 1. Discover
 
 Call `list_models(type=<kind>)` to see what's available.  Map the user's
@@ -97,12 +110,12 @@ loads automatically on this call** — you never load it yourself.
 |-------------|----------------------------------------------------------|
 | `llm`       | `chat(model, messages, ...)` or `complete(model, prompt, ...)` |
 | `vlm`       | `chat(model, messages with image url or base64, ...)`    |
-| `image_gen` | `generate_image(model, prompt, ...)`                     |
-| `video_gen` | `generate_video(model, prompt, image_b64?, last_frame_b64?, video_b64?, ...)` |
-| `sound_gen` | `generate_music(model, prompt, ...)` — may also return `score_abc`, `seed`, `truncated` |
+| `image_gen` | `generate_image(model, prompt, ..., output_path=)` — PNG, or a GLB for image-to-3D (trellis-2-4b) |
+| `video_gen` | `generate_video(model, prompt, image_b64?, last_frame_b64?, video_b64?, ..., output_path=)` |
+| `sound_gen` | `generate_music(model, prompt, ..., output_path=)` — may also return `score_abc`, `seed`, `truncated` |
 | `music_transcription` | `transcribe_music(model, audio_b64 \| audio_path, task?, ...)` — returns an ABC score (can be null: read `abc_error`) |
 | `audio_separation` | `separate_audio(model, audio_b64 \| audio_path, stems?)` — vocals / accompaniment WAVs with the input's exact length, written to disk (paths returned) |
-| `tts`       | `tts(model, input, voice?, ...)`                         |
+| `tts`       | `tts(model, input, voice?, extra?, output_path=)` — voices are model-specific; omnivoice takes `extra={"instruct": ...}` |
 | `stt`       | `transcribe(model, audio_b64, ...)`                      |
 | `embedding` | `embed(model, input, ...)`                               |
 | `rerank`    | `rerank(model, query, documents, ...)`                   |
@@ -242,6 +255,8 @@ Resources are fine to read silently for context; prefer them over extra
 - Don't list an alias and its target (`alias_of`) as two separate choices.
 - Don't drop or paraphrase the user's prompt — reformulate it per the guide,
   preserving the intent.
+- Don't call a generation tool without `output_path`, and don't try to decode
+  inline base64 from a large result: it arrives truncated.
 
 ## Timing sung lyrics
 

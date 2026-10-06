@@ -1,7 +1,7 @@
 # SPT Models for Codex
 
-Codex adapter for the SPT Models GPU stack. Ships the MCP bundle 1.14.1
-(17 tools, with MCP annotations), model prompting guides, and secure macOS setup. The Claude Code
+Codex adapter for the SPT Models GPU stack. Ships the MCP bundle 1.15.0
+(17 tools, with MCP annotations; generation tools write files with `output_path`), model prompting guides, and secure macOS setup. The Claude Code
 plugin is independent and unchanged.
 
 ## Install
