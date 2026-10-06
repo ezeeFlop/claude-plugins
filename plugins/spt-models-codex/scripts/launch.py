@@ -1,4 +1,5 @@
-"""Resolve SPT credentials privately, then run the bundled stdio server."""
+"""Resolve SPT credentials privately, then start the stdio server through
+server/launcher.py: the newest version the gateway ships, else the bundled one."""
 import os
 from pathlib import Path
 import runpy
@@ -29,4 +30,4 @@ if __name__ == "__main__":
         configure_environment()
     except (SetupError, OSError, ValueError, KeyError, TypeError):
         sys.exit("SPT Models credentials unavailable. Run the spt-models-setup skill.")
-    runpy.run_path(str(Path(__file__).resolve().parents[1] / "server/main.py"), run_name="__main__")
+    runpy.run_path(str(Path(__file__).resolve().parents[1] / "server/launcher.py"), run_name="__main__")

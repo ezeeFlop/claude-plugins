@@ -78,6 +78,14 @@ claude plugin update spt-models@sponge-theory
 
 then `/reload-plugins` in any open session.
 
+The MCP server itself does not wait for that: at each start it asks your
+gateway which server version it ships and, when that is newer than the
+installed one, downloads it once (checksum-verified, cached in
+`~/Library/Caches/spt-models-mcp` on macOS) and runs it. A gateway upgrade thus
+reaches the plugin at the next session, without reinstalling or retyping the
+key; if the gateway is unreachable, the installed version runs. Set
+`SPT_AUTO_UPDATE=false` in the environment to always run the installed version.
+
 ## Uninstall
 
 ```bash

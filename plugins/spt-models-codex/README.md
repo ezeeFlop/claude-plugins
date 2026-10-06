@@ -1,6 +1,6 @@
 # SPT Models for Codex
 
-Codex adapter for the SPT Models GPU stack. Ships the MCP bundle 1.15.1
+Codex adapter for the SPT Models GPU stack. Ships the MCP bundle 1.16.0
 (17 tools, with MCP annotations; generation tools write files with `output_path`), model prompting guides, and secure macOS setup. The Claude Code
 plugin is independent and unchanged.
 
@@ -52,6 +52,17 @@ HTTP request timeout defaults to 3900 seconds; the bundled MCP tool timeout
 is 4000 seconds. The startup timeout is 120 seconds for initial uv setup.
 Large media are returned as base64, so client output limits can still matter;
 long video/file delivery is not validated by the catalogue smoke test.
+
+## Updates
+
+`scripts/launch.py` starts the server through `server/launcher.py`: at each
+start it asks the gateway which server version it ships and, when that is
+newer than the installed one, downloads it once (checksum-verified, cached in
+`~/Library/Caches/spt-models-mcp` on macOS), installs its dependencies with uv
+and runs it. A gateway upgrade thus reaches Codex at the next session, without
+`codex plugin marketplace upgrade`; if the gateway is unreachable, the
+installed version runs. Set `SPT_AUTO_UPDATE=false` in the environment
+inherited by Codex to always run the installed version.
 
 ## Migration 1.13.1 and maintenance
 

@@ -2,7 +2,7 @@
   "mcpServers": {
     "spt-models": {
       "command": "uv",
-      "args": ["run", "--directory", "${CLAUDE_PLUGIN_ROOT}", "server/main.py"],
+      "args": ["run", "--directory", "${CLAUDE_PLUGIN_ROOT}", "server/launcher.py"],
       "env": {
         "SPT_BASE_URL": "${user_config.spt_base_url}",
         "SPT_API_KEY": "${user_config.spt_api_key}",
