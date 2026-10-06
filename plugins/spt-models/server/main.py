@@ -331,7 +331,11 @@ async def generate_image(
 
     Call `get_model_info(slug)` first and apply `recommended_params` (steps,
     guidance, width/height). `response_format="b64_json"` returns base64 PNGs
-    (image-to-3D models such as trellis-2-4b return a GLB the same way).
+    (image-to-3D models such as trellis-2-4b return a GLB the same way);
+    `response_format="url"` returns `data[i].url` links valid one hour that
+    need no API key (gateway >= 1.10.3) — small answers, for handing the file
+    to someone else.  With `output_path` the file is always fetched as
+    base64 and written locally, whatever `response_format` says.
 
     `output_path` (RECOMMENDED for agents): the result is written to disk and
     the answer lists `files: [{path, bytes, mime_type, ...}]` instead of base64
@@ -350,7 +354,7 @@ async def generate_image(
         "prompt": prompt,
         "n": n,
         "size": size,
-        "response_format": response_format,
+        "response_format": "b64_json" if target is not None else response_format,
     }
     if negative_prompt is not None:
         payload["negative_prompt"] = negative_prompt

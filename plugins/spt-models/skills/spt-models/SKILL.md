@@ -65,7 +65,8 @@ video / audio / embedding / rerank models.
    asking for several images.  The destination is checked before generating;
    an existing file is never replaced unless `overwrite=True`.  Trust
    `mime_type`, not the gateway's `format` label: some models answer WAV under
-   "mp3".
+   "mp3".  For images only, `response_format="url"` is the other light option:
+   links valid one hour, no API key needed — to hand a file to someone else.
 
 ## 1. Discover
 
