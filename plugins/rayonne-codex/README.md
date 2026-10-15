@@ -1,7 +1,7 @@
 # Rayonne pour Codex
 
-Adaptateur Codex du plugin Claude Code Rayonne 0.8.0 : les **118 mêmes
-outils**, le même serveur PyPI `rayonne-mcp==0.8.0` et son guide métier.
+Adaptateur Codex du plugin Claude Code Rayonne 0.9.0 : les **129 mêmes
+outils**, le même serveur PyPI `rayonne-mcp==0.9.0` et son guide métier.
 Aucun code serveur propriétaire n'est embarqué dans cet adaptateur.
 
 ## Installation et configuration
@@ -32,7 +32,7 @@ dédiée `ai.sponge-theory.rayonne.codex.v2`, sans modifier Claude. Une clé neu
 peut aussi être saisie dans le champ masqué. L'URL, la référence du credential et le
 choix lecture seule sont enregistrés dans `~/.rayonne/codex/connection.json`
 (mode 0600) ; ce fichier ne contient pas de clé. La vérification ne publie
-rien : elle initialise MCP, contrôle 118 outils et lit l'aperçu de l'espace.
+rien : elle initialise MCP, contrôle 129 outils et lit l'aperçu de l'espace.
 Ouvre ensuite un **nouveau fil Codex** pour charger skills et outils.
 
 Un déploiement sans trousseau peut fournir ensemble `RAYONNE_API_URL` et

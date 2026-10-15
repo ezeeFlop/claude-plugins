@@ -36,7 +36,7 @@ format `rk_…`, plan Business).
 
 ## Outils
 
-118 outils, un par verbe de l'API publique — table complète groupée par
+129 outils, un par verbe de l'API publique — table complète groupée par
 module (M1 brief, M2 stratégie, M3 contenu, M3 kit de vente et médias, M4
 soumission et pièces jointes du kit, M5 analytics, M9 vidéo et storyboard,
 avatars vidéo, galerie produit, audit, espaces de l'organisation,
@@ -83,6 +83,13 @@ médias d'un post sans quitter Claude : `rayonne_content_media`,
 Chaque outil d'écriture (générer, éditer, publier, planifier…) consomme du
 quota du workspace ; la génération vidéo est en plus **facturée**. Coche
 **Mode lecture seule** à l'installation pour les désactiver.
+
+Version 0.9.0 : `rayonne_reset_content` remet en relecture sans rien
+réécrire — la réécriture depuis le brief corrigé est
+`rayonne_regenerate_content` ; les comptes connectés (lecture,
+déconnexion), le badge « attention requise », la revue hebdo lue en entier,
+la page GEO en lecture et la couverture vendeuse arrivent (10 outils
+ajoutés, détail dans [`mcp/README.md`](../README.md#090)).
 
 Version 0.8.0 : la réalité du fondateur, le plan modifiable et ses
 expériences, la liste « À faire », le plan de lancement et ses gardes, les

@@ -9,7 +9,13 @@ sinon demande lequel).
 1. `rayonne_list_platforms` pour retrouver le slug de la venue ET son mode
    d'exécution. Dis-le à l'utilisateur : sur une venue `semi_auto` (Reddit,
    Hacker News, Discord…), Rayonne prépare un kit, c'est lui qui poste.
-2. `rayonne_generate_content` avec le bon `content_type` pour la venue.
+2. `rayonne_generate_content` avec un `content_type` que la venue prend :
+   ses `content_types` dans `rayonne_list_platforms`, `default_content_type`
+   d'abord (Product Hunt : `product_hunt_post`, Reddit : `reddit_comment`, un
+   annuaire : `directory_long`). Une liste vide a sa raison
+   (`content_types_reason`) : Hacker News, c'est l'utilisateur qui écrit ;
+   YouTube, TikTok, une vidéo (`rayonne_create_video`). Sans venue
+   (`channel: ""`) : article de blog, pitchs, script vidéo.
    Cela consomme le quota mensuel — préviens avant, pas après.
 3. Attends, puis `rayonne_get_content` pour lire le texte RÉELLEMENT généré
    (la liste ne rend que des métadonnées). Regarde aussi
