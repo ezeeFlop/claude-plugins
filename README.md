@@ -28,6 +28,14 @@ the Codex adapter provides guided macOS setup with Keychain storage.
 | **oriflux** | [Oriflux](https://oriflux.sponge-theory.dev) cookieless web + product + API analytics in Claude Code — read-only traffic, sessions, geography and API health through Oriflux's typed metric registry, plus `/oriflux:projects` and `/oriflux:overview` commands. Static remote-HTTP plugin (no PyPI); works with cloud or self-hosted instances. On enable, enter your API base URL (`https://api.oriflux.sponge-theory.dev`) and a read-scoped `ofx_read_…` key (Oriflux dashboard, shown once). |
 | **rayonne** | [Rayonne](https://rayonne.sponge-theory.dev) marketing autopilot for SaaS in Claude Code — product brief, Bullseye strategy, multi-channel content with its selling kit and media, native publishing or paste-ready Mode C kits, rendered videos and their storyboard workshop, AARRR metrics (129 tools, 9 commands including `/rayonne:rayonne-status`, `/rayonne:rayonne-content` and `/rayonne:rayonne-workspaces`). A key minted by an organisation admin drives every workspace of that organisation, and with the administration option it creates and deletes them. Requires the Business plan (API access). On enable, enter your `rk_…` API key (Réglages → Clés API, shown once). Needs [`uv`](https://docs.astral.sh/uv/) installed — the plugin runs its MCP server via `uvx rayonne-mcp`. |
 
+## Oriflux 0.2.0 — plugins et SDK
+
+Le [catalogue Oriflux](ORIFLUX_RELEASE.md) regroupe l’installation Claude Code,
+le bundle Claude Desktop, le SDK Python publié sur PyPI et le paquet Node
+installable depuis les [releases publiques](https://github.com/ezeeFlop/claude-plugins/releases/tag/oriflux-v0.2.0).
+Les réglages Codex et VS Code y sont également référencés. Les clés agents
+peuvent être limitées par projet, opérations et expiration.
+
 ## Layout
 
 ```

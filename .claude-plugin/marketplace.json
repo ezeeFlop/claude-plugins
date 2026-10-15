@@ -149,14 +149,14 @@
     {
       "name": "oriflux",
       "displayName": "Oriflux",
-      "description": "Analytics web + produit + API, sans cookie, dans Claude Code — trafic, sessions, géographie et santé des API — en lecture seule via le registre de métriques typé d'Oriflux, depuis votre instance Oriflux (cloud ou self-host).",
+      "description": "Analytics web, produit et API : périmètres projet, requêtes typées, géographie, funnels, rétention, alertes, insights et Ask selon les permissions ; connexion à votre instance Oriflux.",
       "author": {
         "name": "Sponge Theory",
         "email": "support@sponge-theory.io",
         "url": "https://sponge-theory.io"
       },
       "category": "productivity",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "keywords": [
         "analytics",
         "web-analytics",

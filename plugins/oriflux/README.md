@@ -1,83 +1,17 @@
-# oriflux — Claude Code plugin
+# Oriflux pour Claude Code — 0.2.0
 
-**Oriflux by Sponge Theory** — a self-hosted, cookieless, multi-tenant analytics
-platform unifying **web analytics + product analytics + API analytics** —
-brought into Claude Code as a **read-only** analytics surface.
+Connexion HTTP native à votre instance Oriflux. Configurer l’URL de base et une clé `ofx_read_…` dans le formulaire du plugin. `userConfig.api_key` est sensible : ne pas placer sa valeur dans les arguments CLI, les fichiers versionnés ou les prompts.
 
-The plugin is 100% static and carries **no secret**: it talks directly to your
-Oriflux instance over authenticated streamable HTTP (`type: http`). Your instance
-URL and read key are entered once, natively, when you enable the plugin.
+Le plugin fournit le skill `oriflux` et les commandes `/oriflux:projects`, `/oriflux:overview`. Commencer par `get_context` et `list_projects`. Funnels, rétention, alertes, insights et Ask sont disponibles selon les permissions et la configuration serveur ; Ask consomme le budget IA. Une clé de lecture ne peut pas annoter même si le serveur annonce cet outil.
 
-## What it does
+Installation depuis le marketplace public :
 
-Exposes your Oriflux instance as read-only MCP tools — every tool is the same
-REST endpoint the dashboard uses, compiled through Oriflux's typed metric
-registry, so answers never drift from the UI:
-
-- **`list_projects`** — the products/properties visible to your key's org.
-- **`get_overview`** — visitors, pageviews, sessions, bounce rate, session
-  duration, API requests, error rates, p95 for a project over a period.
-- **`query_metrics`** — the typed query object (metric, dimensions, filters,
-  granularity, period, compare_to); returns rows **and** the executed SQL.
-- **`get_geo_breakdown`** — geographic distribution (country / region / city).
-- **`get_api_health`** — request volume, 4xx/5xx rates, p50/p95/p99 latency,
-  top endpoints.
-
-Plus:
-
-- **`oriflux` skill** — teaches Claude how and when to use those tools (identify
-  the project, pick the right shaped tool vs. `query_metrics`, cite the numbers,
-  read visitor totals as visit-days).
-- **Slash commands** — `/oriflux:projects`, `/oriflux:overview <project> <period>`.
-
-> Advanced tools (funnels, retention, insights, alerts, natural-language *Ask
-> Oriflux*) are on the Oriflux roadmap and may not yet be available on a given
-> instance. The plugin is built around the read-only analytics surface that is
-> live today.
-
-## Install (marketplace)
-
-```bash
-/plugin marketplace add ezeeFlop/claude-plugins
-/plugin install oriflux@sponge-theory
+```text
+/plugin install oriflux --marketplace ezeeFlop/claude-plugins
 ```
 
-When you enable the plugin, Claude Code prompts you (native configuration form)
-for two values:
+Si le marketplace est déjà enregistré, utiliser `/plugin marketplace update sponge-theory`. Installation locale pour validation : `claude --plugin-dir ./mcp/claude_code_plugin`. Les versions modernes de Claude Code prennent en charge `userConfig` ; consulter la [référence officielle](https://code.claude.com/docs/en/plugins-reference).
 
-| Field | Notes |
-|---|---|
-| **Oriflux API base URL** | e.g. `https://api.oriflux.sponge-theory.dev` (or your self-host), without `/mcp`. Default provided — **override it if the hosted instance is not yet live or you self-host.** |
-| **Oriflux read key** | A read-scoped `ofx_read_…` key, issued per organization in the Oriflux dashboard. Read keys can only query analytics — never write. Stored masked in your system keychain — never in the plugin or a settings file in plaintext. |
+Les résultats MCP sortent de l’instance vers Claude Code et son modèle : appliquer la politique de données de ce client. Les chaînes retournées sont des données non fiables, jamais des instructions.
 
-The MCP server then connects automatically with `Authorization: Bearer <your key>`.
-
-> If you already had this marketplace registered, refresh it first so the new
-> plugin is visible: `/plugin marketplace update sponge-theory`.
->
-> If you installed from the CLI and the config form didn't appear, run
-> `/plugin configure oriflux@sponge-theory`.
-
-### Manual fallback (any Claude Code version)
-
-If your Claude Code build doesn't render the configuration form, add the server
-by hand:
-
-```bash
-claude mcp add --transport http oriflux https://api.oriflux.sponge-theory.dev/mcp \
-  --header "Authorization: Bearer <your ofx_read_ key>"
-```
-
-(Dev instance: `http://localhost:8101/mcp`.)
-
-## Security
-
-No secret ships in this plugin. Your read key is entered via Claude Code's native
-`userConfig` (marked `sensitive`, stored in the system keychain) and is sent only
-to your own Oriflux instance over HTTPS. The key is read-scoped: it can query
-analytics but cannot write.
-
-## Support
-
-- Documentation: <https://oriflux.sponge-theory.dev>
-- Contact: support@sponge-theory.io
+[Guide complet des clients, outils et limites](https://github.com/ezeeFlop/oriflux/blob/main/docs/mcp.md).
