@@ -2,8 +2,9 @@
 
 Use `client=codex`. At the start of a Spongram task, run
 `python3 <plugin-root>/lib/project_context.py --client codex --cwd <session-working-directory>`.
-Use the same session working directory and any `SPONGRAM_PROJECT` override as
-Claude Code. Read the shared memory rules below before tool calls.
+Use the same session working directory, `.spongram.json` and any
+`SPONGRAM_PROJECT` override as Claude Code.
+Read the shared memory rules below before tool calls.
 
 For first-time setup or credential changes, use the `spongram-setup` skill.
 The setup registers a user-level HTTP MCP server named `spongram`, using a

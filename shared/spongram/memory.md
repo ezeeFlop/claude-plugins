@@ -24,12 +24,17 @@ Every write MUST include `project=<slug>` or `project=global`, and `client=<clie
 - Project-specific: `project=<slug> repo=<owner/name> branch=<branch> client=<client>`.
 - Personal or cross-project: `project=global client=<client>`.
 
-Use the adapter's project context. Omit unknown repo/branch tags. Keep the legacy
-slug for an existing project; do not silently rename its memories. The optional
-`SPONGRAM_PROJECT` override must be identical in both clients. Without a project,
-use `global` only for facts that truly apply across projects; clarify the project
-before saving project-specific facts. The basename fallback can collide: configure
-a distinct override for repositories with the same name.
+Use the adapter's project context. Omit unknown repo/branch tags. The slug comes
+from `SPONGRAM_PROJECT`, else the nearest `.spongram.json` (`{"project": "<slug>"}`,
+searched up to the git root), else the git repository's name (a linked worktree
+uses the main repository's name), else the directory name. Commit a
+`.spongram.json` at the repository root to give several folders or repositories
+one project for both clients (the file must be committed: a session in a linked
+worktree only sees files present in that worktree); `SPONGRAM_PROJECT`, when
+used, must be identical in both clients. Never silently rename existing memories:
+to group older slugs under one project, propose `set_project_alias` to the user.
+Without a project, use `global` only for facts that truly apply across projects;
+clarify the project before saving project-specific facts.
 
 ### Recall before relying on history
 
@@ -51,7 +56,12 @@ The HTTP MCP endpoint exposes the same tools to both clients: `add_memory`,
 `search_nodes`, `search_memory_facts`, `get_episodes`, `get_status`, and
 `code_map_query`, `code_map_neighbors`, `code_map_god_nodes`,
 `code_map_shortest_path`, `code_map_stats`. Discover additional tools from the
-server. Destructive tools (`delete_episode`, `delete_entity_edge`, `clear_graph`)
+server. When it exposes them (Spongram 1.17.0 or later), `list_project_aliases`,
+`set_project_alias` and `remove_project_alias` group several `project=` slugs
+under one canonical project: a `scope.project` search then includes the aliases,
+and no memory is rewritten. Change aliases only at the user's request or with
+their explicit agreement.
+Destructive tools (`delete_episode`, `delete_entity_edge`, `clear_graph`)
 require explicit authorization under the client's rules.
 
 Use the structural map for module relationships, dependencies, central files and

@@ -54,7 +54,7 @@ returns/logs the other fields. Runtime does not access that item at all.
 The independent Codex copy does not follow later Claude key rotations. Use
 interactive setup to change the key in Codex when rotating credentials.
 
-## Fix repeated Keychain prompts / upgrade to 0.5.2
+## Fix repeated Keychain prompts / upgrade from 0.5.1 or earlier
 
 After upgrading the plugin, run:
 
@@ -131,9 +131,11 @@ no longer needed.
 
 ## Memory and code map
 
-The common policy is `shared/spongram/memory.md`. Project identity retains the
-legacy working-directory basename. Use the same `SPONGRAM_PROJECT` override in
-both clients if needed to disambiguate repository names (this is not a secret).
+The common policy is `shared/spongram/memory.md`. Project identity comes from
+`SPONGRAM_PROJECT`, else the nearest `.spongram.json` (`{"project": "<slug>"}`, up
+to the git root), else the git repository's name (worktrees use the main
+repository), else the directory name. A committed `.spongram.json` gives both
+clients the same project without any per-client setting (this is not a secret).
 
 Map queries use MCP without an extractor installation. Explicit map uploads require
 Python 3.10+ with `graphifyy==0.8.35` installed in a dedicated environment:

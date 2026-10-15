@@ -32,6 +32,15 @@ natively, when you enable the plugin.
   `SPONGRAM_DISTILL_ENABLED` on your instance. Disable client-side with
   `SPONGRAM_CAPTURE_DISABLED=1`. Episodes it writes are tagged `capture=auto`.
 
+## Install
+
+From the Sponge Theory marketplace, in Claude Code:
+
+```
+/plugin marketplace add ezeeFlop/claude-plugins
+/plugin install spongram --marketplace ezeeFlop/claude-plugins
+```
+
 ## Setup
 
 When you enable the plugin, Claude Code prompts you (native configuration form)
@@ -106,6 +115,8 @@ This remains the Claude Code entry at `plugins/spongram`; its manifest, MCP
 userConfig and hook events retain their existing interfaces. The Codex adapter
 is `plugins/spongram-codex`. Both are built from `shared/spongram` with
 `python3 scripts/build_spongram.py`. Use the same brain in both clients.
-Set the same `SPONGRAM_PROJECT` override in both environments when needed; default
-slugs preserve the historical session-directory basename. Client tags identify
-provenance and never partition recall.
+The project slug comes from `SPONGRAM_PROJECT`, else the nearest `.spongram.json`
+(`{"project": "<slug>"}`, up to the git root), else the git repository's name
+(worktrees use the main repository), else the directory name; commit a
+`.spongram.json` to share one project across folders and both clients.
+Client tags identify provenance and never partition recall.

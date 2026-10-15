@@ -1,3 +1,48 @@
+# Claude 0.6.0 / Codex 0.6.0 — 2026-10-16
+
+Shared-core release for Spongram server 1.17.0+. The project slug used by the
+memory tags is now resolved from `SPONGRAM_PROJECT`, then the nearest
+`.spongram.json` (`{"project": "<slug>"}`, normalized), then the name of the
+main git repository (sub-folders and linked worktrees resolve to the main
+checkout), then the folder name. The shared rules document the server-side
+project aliases (`list_project_aliases`, `set_project_alias`,
+`remove_project_alias`; read time only, never rewriting episodes). Both adapters
+change together: `lib/project_context.py`, `memory.md`, SKILL, README and
+instructions text, manifests 0.6.0. Keychain, dialog, header-helper and hook
+runtime files are unchanged since 0.5.2.
+
+- `python3 scripts/check_spongram_release.py`: 50 unit tests pass, generated
+  shared-core parity and matching adapter versions (Claude 0.6.0, Codex 0.6.0)
+  OK, staged release files scanned for likely credentials: none. The slug tests
+  cover a repository sub-folder, a linked worktree, the nearest `.spongram.json`
+  (normalized), an invalid nearest file stopping the search, and the
+  `SPONGRAM_PROJECT` override.
+- The shared module is byte-identical (sha256) to the copies tested in the
+  Spongram repository against real git fixtures (worktree, submodule, nested
+  JSON, oversize file, BOM).
+- Slug rule verified live, without any brain key, through the Claude adapter's
+  SessionStart hook from real folders: a `.spongram.json` placed in a
+  repository wins; a sub-folder of a repository without one resolves to the
+  main repository name, not the launch folder.
+- Isolated install proof: with a fresh `CLAUDE_CONFIG_DIR`, `claude plugin
+  install spongram@sponge-theory` installs 0.6.0 and reports its two required
+  connection settings as not yet set; with a fresh `HOME` and `CODEX_HOME`,
+  Codex CLI 0.162.1 installs `spongram-codex@sponge-theory-codex` 0.6.0
+  (`authPolicy: ON_INSTALL`). No real key configured.
+- `claude plugin validate` passes for the adapter and for the marketplace.
+- `python3 scripts/smoke_spongram_mcp.py` (loopback, synthetic auth): actual
+  Codex HTTP MCP, header helper and tools discovery OK.
+- Server side, outside both client runtimes: the alias tools the shared rules
+  refer to were exercised against production Spongram 1.17.0 on a throwaway
+  instance deleted afterwards (MCP initialize contract, tools/list, alias
+  declaration, scoped searches, continuity, export). No user brain was written
+  or read by the packaging checks.
+
+Not re-run for this release: the native Keychain and dialog smokes (their files
+are unchanged since 0.5.2) and cross-client recall inside both clients.
+
+## Previous verification
+
 # Codex 0.5.2 — 2026-10-01
 
 Native Keychain migration, synthetic repeated-process reads, isolated plugin

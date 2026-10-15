@@ -194,6 +194,56 @@ class SharedCore(unittest.TestCase):
             subprocess.run(["bash", "-n", str(script)], check=True)
 
 
+class ProjectSlugRule(unittest.TestCase):
+    """Spongram 1.17.0 : SPONGRAM_PROJECT, puis .spongram.json, puis dépôt principal, puis dossier."""
+
+    def setUp(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.home = Path(temp.name).resolve() / "home"
+        self.repo = self.home / "GITLAB" / "Mon_Depot"
+        (self.repo / "apps" / "web").mkdir(parents=True)
+        env = patch.dict(os.environ, {"HOME": str(self.home), "SPONGRAM_PROJECT": ""})
+        env.start()
+        self.addCleanup(env.stop)
+        self.git("init", "-q")
+        self.git("commit", "-q", "--allow-empty", "-m", "init")
+
+    def git(self, *args):
+        subprocess.run(
+            ["git", "-C", str(self.repo), "-c", "user.email=t@t", "-c", "user.name=t", *args],
+            check=True,
+            capture_output=True,
+        )
+
+    def slug(self, path):
+        return context.context(path, "claude-code")["project_slug"]
+
+    def test_subdirectory_uses_the_repository(self):
+        self.assertEqual(self.slug(self.repo / "apps" / "web"), "mon-depot")
+
+    def test_linked_worktree_uses_the_main_repository(self):
+        worktree = self.repo / ".claude" / "worktrees" / "feature-x"
+        self.git("worktree", "add", "-q", str(worktree), "-b", "feature-x")
+        self.assertEqual(self.slug(worktree), "mon-depot")
+
+    def test_nearest_spongram_json_wins_and_is_normalized(self):
+        (self.repo / ".spongram.json").write_text('{"project": "Mon_Projet"}')
+        (self.repo / "apps" / ".spongram.json").write_bytes(b'\xef\xbb\xbf{"project": "sous-projet"}')
+        self.assertEqual(self.slug(self.repo / "apps" / "web"), "sous-projet")
+        self.assertEqual(self.slug(self.repo), "mon-projet")
+
+    def test_invalid_nearest_file_stops_the_search(self):
+        (self.repo / ".spongram.json").write_text('{"project": "parent"}')
+        (self.repo / "apps" / "web" / ".spongram.json").write_text("{broken")
+        self.assertEqual(self.slug(self.repo / "apps" / "web"), "mon-depot")
+
+    def test_override_beats_the_file(self):
+        (self.repo / ".spongram.json").write_text('{"project": "from-file"}')
+        with patch.dict(os.environ, {"SPONGRAM_PROJECT": "from-env"}):
+            self.assertEqual(self.slug(self.repo), "from-env")
+
+
 class MCPHandshake(unittest.TestCase):
     def test_json_and_sse_session_headers_and_pagination(self):
         calls = []
