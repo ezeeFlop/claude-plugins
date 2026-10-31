@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "rayonne": {
-      "command": "uvx",
-      "args": ["rayonne-mcp@0.9.0"],
+      "command": "uv",
+      "args": ["run", "--locked", "--quiet", "--directory", "${CLAUDE_PLUGIN_ROOT}", "rayonne-mcp"],
       "env": {
         "RAYONNE_API_KEY": "${user_config.api_key}",
         "RAYONNE_API_URL": "${user_config.api_url}",

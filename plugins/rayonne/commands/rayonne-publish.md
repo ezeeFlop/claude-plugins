@@ -6,14 +6,23 @@ Accompagne la publication d'un contenu approuvé.
 
 1. `rayonne_list_content` filtré sur `approved`. S'il n'y a rien, dis-le et
    arrête-toi là.
+   Une VIDÉO ne passe pas par ici : c'est `rayonne_publish_video` (voir
+   `/rayonne-video`).
 2. `rayonne_list_platforms` : choisis la venue avec l'utilisateur, et
-   annonce son mode AVANT de promettre quoi que ce soit.
+   annonce son mode AVANT de promettre quoi que ce soit. Pour une venue
+   `api`, vérifie dans `rayonne_list_accounts` que le compte est connecté
+   (et pas expiré) : sinon, la connexion se fait dans l'application.
    - `api` → Rayonne poste seul.
    - `browser_local` → il faut l'extension navigateur, dans l'onglet où
      l'utilisateur est déjà connecté.
    - `semi_auto` → Rayonne prépare, l'humain poste. Les ToS de ces
      plateformes l'exigent ; ne propose jamais de contourner ça.
-3. `rayonne_create_submission`, en proposant une date si utile.
+3. `rayonne_create_submission`, en proposant une date si utile. Une vidéo
+   (type `video`) ne passe jamais par là (409 `use_video_publish`) :
+   `rayonne_list_video_venues`, demande à l'utilisateur sur lesquels des
+   réseaux `connected` la publier, puis `rayonne_publish_video` avec
+   exactement ces `venues` — rien n'est publié par défaut, ne choisis
+   jamais à sa place. LinkedIn et TikTok : depuis l'application seulement.
 4. En mode `semi_auto`, enchaîne sur `rayonne_submission_kit` et rends le
    deep-link, les blocs à coller et la checklist, prêts à l'emploi. Une fois
    posté, `rayonne_confirm_submission` avec l'URL publique — elle est exigée,

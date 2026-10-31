@@ -18,6 +18,11 @@ Montre le brief produit courant et propose de le corriger.
 4. Si tu proposes une correction, applique-la avec `rayonne_patch_brief`
    seulement après l'accord explicite de l'utilisateur, en ne touchant que
    les champs concernés.
+5. Une PREUVE que l'utilisateur te donne (un chiffre, un client, un
+   témoignage, une certification) va dans le registre des faits, pas
+   seulement dans le brief : `rayonne_create_fact` (relis d'abord
+   `rayonne_list_facts`). Chaque texte s'appuie sur ce registre ; un fait
+   inventé ou un client non autorisé à être cité y est refusé.
 
 Rappelle-lui pourquoi ça compte : tout ce que la plateforme générera
 ensuite hérite de ce brief. Corriger ici coûte une phrase ; corriger en

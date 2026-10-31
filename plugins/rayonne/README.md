@@ -13,7 +13,27 @@ vidéos, métriques AARRR.
 ```
 
 Claude Code demande alors ta **clé API** (Rayonne → Réglages → Clés API,
-format `rk_…`, plan Business).
+format `rk_…`, plan Business). Prérequis : [`uv`](https://docs.astral.sh/uv/).
+
+Le serveur démarre par `uv run --locked` sur le verrou livré avec le plugin
+(`uv.lock`) : rien n'est résolu sur PyPI au lancement. Le tout premier
+démarrage installe l'environnement (quelques secondes), les suivants
+prennent ~0,2 s, hors ligne compris.
+
+### Mettre à jour
+
+```
+/plugin marketplace update sponge-theory
+/plugin update rayonne@sponge-theory
+```
+
+### Le serveur ne démarre pas ?
+
+- `/mcp` → `rayonne` → **Reconnect** ;
+- un premier démarrage lent (réseau, antivirus) : allonge le délai de
+  démarrage des serveurs MCP dans `~/.claude/settings.json` —
+  `"env": {"MCP_TIMEOUT": "120000"}` — puis relance Claude Code ;
+- `uv --version` doit répondre : sans `uv`, le serveur ne peut pas partir.
 
 ## Commandes
 
@@ -36,7 +56,8 @@ format `rk_…`, plan Business).
 
 ## Outils
 
-129 outils, un par verbe de l'API publique — table complète groupée par
+167 outils — ceux du serveur publié qu'épingle le verrou (`rayonne-mcp==0.10.0`),
+un par verbe de l'API publique — table complète groupée par
 module (M1 brief, M2 stratégie, M3 contenu, M3 kit de vente et médias, M4
 soumission et pièces jointes du kit, M5 analytics, M9 vidéo et storyboard,
 avatars vidéo, galerie produit, audit, espaces de l'organisation,
@@ -48,13 +69,28 @@ inscriptible (`rayonne_upload_product_asset`,
 `rayonne_update_product_asset`, `rayonne_suggest_asset_caption`,
 `rayonne_delete_product_asset`), l'atelier vidéo s'ouvre en entier (avatars
 `rayonne_list_avatars`, `rayonne_generate_avatar`, `rayonne_update_avatar`,
-`rayonne_cutout_avatar` ; relecture `rayonne_reopen_storyboard`,
+`rayonne_cutout_avatar` ; relecture `rayonne_reopen_storyboard`, `rayonne_cancel_reopen_storyboard`,
 `rayonne_assist_storyboard`, `rayonne_chat_storyboard`,
 `rayonne_storyboard_thumbnail`, `rayonne_update_video`,
 `rayonne_music_presets`), et un kit Mode C accepte des visuels déposés à la
 main (`rayonne_upload_submission_asset`,
 `rayonne_generate_submission_assets`, `rayonne_list_submission_assets`,
 `rayonne_delete_submission_asset`).
+
+Une vidéo livrée avant le bandeau produit de la première image le reçoit
+en deux outils : `rayonne_suggest_video_cover` propose le texte (chiffres
+vérifiés sur les faits produit), `rayonne_set_video_cover` le pose et refait
+la vidéo à partir du montage — offert, rien n'est facturé.
+
+TikTok ne rend aucun lien cliquable dans une légende : le seul est le champ
+« Site web » du profil. `rayonne_list_accounts` rend ce lien (`bio_link`, la
+page du compte TikTok qui mène à chacun de ses produits) et
+`rayonne_confirm_bio_link` coche « Mon lien est dans ma bio TikTok » quand
+l'utilisateur dit l'avoir collé. Même chose pour YouTube : aucun lien de la
+description d'un Short n'est cliquable, seuls ceux de la chaîne le sont ; un
+compte YouTube connecté rend son `bio_link` (la page YouTube de l'espace,
+qui mène à son produit) et `rayonne_confirm_bio_link(platform_slug="youtube")` coche
+« Mon lien est sur ma chaîne YouTube ».
 
 Les deux outils de dépôt prennent un **chemin de fichier local** : le
 serveur tourne sur ta machine et lit les octets lui-même — un chemin fautif

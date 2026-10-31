@@ -1,0 +1,16 @@
+# The Claude Code plugin's launcher (review R9-01, 2026-10-31): `uvx
+# rayonne-mcp@X` re-resolved on PyPI at every start and the session's MCP
+# timeout cut it. The plugin now runs `uv run --locked --directory
+# ${CLAUDE_PLUGIN_ROOT} rayonne-mcp` against this committed lock: no
+# resolution, ~0.2 s once the environment exists, offline included. Like the
+# Codex adapter it pins the PUBLISHED server — a pin to a version not on PyPI
+# cannot start — and moves right after the PyPI upload (`uv lock`, step 2 of
+# the publish steps in ../README.md).
+[project]
+name = "rayonne-claude-code"
+version = "0.10.0"
+requires-python = ">=3.10"
+dependencies = ["rayonne-mcp==0.10.0"]
+
+[tool.uv]
+package = false
