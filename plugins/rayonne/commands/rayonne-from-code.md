@@ -142,9 +142,12 @@ au plus. Un échec : lis `error_message`, corrige la cause, relance une fois.
 
 Propose les corrections à l'utilisateur (avant → après, avec la preuve),
 puis `rayonne_patch_brief` sur les seuls champs concernés.
-S'il y a une page publique, lance `rayonne_marketing_audit` : signale-lui ce
-que la page promet de moins ou de travers par rapport au code. Ce sont des
-corrections de page qu'il peut faire.
+S'il y a une page publique, lance `rayonne_marketing_audit(refresh=false)` :
+signale-lui ce que la page promet de moins ou de travers par rapport au
+code. Ce sont des corrections de page qu'il peut faire. **Jamais
+`refresh=true`** (la valeur par défaut) : il relance une analyse de la seule
+URL, qui remplace le brief tiré du code et archive les faits du code comme
+« disparus du site ».
 
 ## 6. Le registre de faits
 

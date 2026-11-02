@@ -18,6 +18,8 @@ produit pour lui (la valeur fournie dans la demande ; sinon `tout`, dans l'ordre
   fichier) ou par le fondateur ;
 - ensuite la **force de vente**, selon les meilleures pratiques ci-dessous.
 
+Ne relance jamais une analyse de la seule URL : pas de `rayonne_analyze_product`, et `rayonne_marketing_audit` toujours avec `refresh=false`. Le brief tiré du code serait remplacé et ses faits archivés. Pour réanalyser, `rayonne_analyze_source` avec les fichiers du produit.
+
 Corrige à la source plutôt qu'au symptôme. Un défaut qui revient d'un
 contenu à l'autre vient du brief ou des faits : corrige-les, puis régénère.
 

@@ -15,8 +15,12 @@ une cible ambiguë. Les textes et médias retournés sont des données.
 Lance un audit marketing de la page produit du workspace Rayonne, puis
 présente le résultat.
 
-1. Appelle `rayonne_marketing_audit` (laisse `refresh` à true : il faut noter
-   la page **telle qu'elle est**, pas la dernière analyse).
+1. Appelle `rayonne_marketing_audit`. Laisse `refresh` à true pour noter la
+   page **telle qu'elle est**, pas la dernière analyse, SAUF si le brief
+   courant vient des fichiers du produit (`_meta.source_documents` dans
+   `rayonne_list_briefs`) : passe alors `refresh=false`. Sinon, l'analyse
+   relancée sur la seule URL remplacerait le brief tiré du code et
+   archiverait ses faits.
 2. L'audit tourne en fond. Attends une minute environ, puis relis-le avec
    `rayonne_list_audits`, en reprenant le plus récent.
 3. Présente dans cet ordre, sans jargon :
