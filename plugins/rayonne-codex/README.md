@@ -1,7 +1,7 @@
 # Rayonne pour Codex
 
 Adaptateur Codex du plugin Claude Code Rayonne 0.9.0 : les **129 mêmes
-outils**, le même serveur PyPI `rayonne-mcp==0.12.0` et son guide métier.
+outils**, le même serveur PyPI `rayonne-mcp==0.13.0` et son guide métier.
 Aucun code serveur propriétaire n'est embarqué dans cet adaptateur.
 
 ## Installation et configuration
@@ -87,4 +87,4 @@ l’import initial. L’assistant natif partagé est installé à l’emplacemen
 fenêtre : si le trousseau est verrouillé, déverrouille-le puis relance la migration.
 Aucune clé Claude n’est modifiée ou supprimée. Les rotations de clé Claude ne
 sont plus reprises automatiquement dans la copie Codex. Le serveur PyPI reste
-`rayonne-mcp==0.12.0` : cette version corrige uniquement l’adaptateur Codex.
+`rayonne-mcp==0.13.0` : cette version corrige uniquement l’adaptateur Codex.

@@ -280,7 +280,10 @@ et corrige-la sur place. N'en crée une nouvelle que si le fondateur le
 demande, par exemple si le brief a beaucoup changé. Elle reste un brouillon
 à côté de l'active jusqu'à ce qu'il l'active.
 Sinon, `rayonne_create_strategy`, avec `objectives` tirés de l'objectif à 90
-jours, puis relis `rayonne_current_strategy` jusqu'au plan. Vérifie :
+jours. La génération prend 3 à 10 minutes. Relis `rayonne_list_strategies`
+toutes les 30 secondes environ. Tant que `generating` est vrai, elle avance
+(`generation_stage` : `scoring`, puis `plan`), ce n'est pas un blocage.
+Vérifie ensuite :
 - **3 canaux au plus en focus** (anneau intérieur), cohérents avec le
   produit. Un outil pour développeurs va là où les développeurs lisent.
   Sans page publique, pas d'annuaires ni de SEO tant qu'elle n'existe pas.
@@ -292,6 +295,13 @@ jours, puis relis `rayonne_current_strategy` jusqu'au plan. Vérifie :
 Corrige avec `rayonne_edit_plan_action`, `rayonne_remove_plan_action` et
 `rayonne_add_plan_action`. Présente le plan à l'utilisateur, puis
 `rayonne_activate_strategy` seulement sur son « oui » explicite.
+
+Un plan à refaire (par exemple sur un brief plus récent) : relève d'abord ses
+retouches (`plan_90d_jsonb._meta.edits`, et leur nombre dans
+`edited_actions`), puis réapplique celles qui valent encore au nouveau plan.
+`rayonne_delete_strategy` répond 409 `strategy_has_edits` tant que des
+retouches seraient perdues. Ne passe `confirm_edits=true` qu'avec l'accord de
+l'utilisateur.
 
 ## 11. Les questions de visibilité IA
 
