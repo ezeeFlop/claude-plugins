@@ -26,7 +26,7 @@ the Codex adapter provides guided macOS setup with Keychain storage.
 | **neokanban** | [NeoKanban](https://kanban.sponge-theory.dev) task, project and board management — plus audio transcription with speaker diarization — directly from Claude Code. On enable, enter your instance URL and an `nk_mcp_…` token (NeoKanban web UI → Settings → Integrations → MCP, shown once at creation). |
 | **spt-ai** | Manage the content of your [Sponge-Theory.ai](https://sponge-theory.ai) site from Claude Code — create/edit/translate/share blog posts, products, external-SaaS entries, tiers and digital products, upload media and update site config. Static remote-HTTP plugin (no PyPI). On enable, enter your API base URL (`https://apisaas.sponge-theory.ai`) and a service API key (`spt_…`, created in your site admin → Settings → API keys, shown once). |
 | **oriflux** | [Oriflux](https://oriflux.sponge-theory.dev) cookieless web + product + API analytics in Claude Code — read-only traffic, sessions, geography and API health through Oriflux's typed metric registry, plus `/oriflux:projects` and `/oriflux:overview` commands. Static remote-HTTP plugin (no PyPI); works with cloud or self-hosted instances. On enable, enter your API base URL (`https://api.oriflux.sponge-theory.dev`) and a read-scoped `ofx_read_…` key (Oriflux dashboard, shown once). |
-| **rayonne** | [Rayonne](https://rayonne.sponge-theory.dev) marketing autopilot for SaaS in Claude Code — product brief, Bullseye strategy, multi-channel content with its selling kit and media, native publishing or paste-ready Mode C kits, rendered videos and their storyboard workshop, AARRR metrics (167 tools, 9 commands including `/rayonne:rayonne-status`, `/rayonne:rayonne-content` and `/rayonne:rayonne-workspaces`). A key minted by an organisation admin drives every workspace of that organisation, and with the administration option it creates and deletes them. Requires the Business plan (API access). On enable, enter your `rk_…` API key (Réglages → Clés API, shown once). Needs [`uv`](https://docs.astral.sh/uv/) installed — the plugin starts its MCP server from its committed lock (`uv run --locked`, rayonne-mcp 0.10.0). |
+| **rayonne** | [Rayonne](https://rayonne.sponge-theory.dev) marketing autopilot for SaaS in Claude Code — product brief, Bullseye strategy, multi-channel content with its selling kit and media, native publishing or paste-ready Mode C kits, rendered videos and their storyboard workshop, AARRR metrics (168 tools, 11 commands including `/rayonne:rayonne-status`, `/rayonne:rayonne-content` and `/rayonne:rayonne-workspaces`). From a product's own repository, `/rayonne:rayonne-from-code` sets everything up end to end (finds or creates the workspace, writes the product dossier from the code, checks the brief and facts against it, wires the product events, strategy, GEO questions, first contents) and `/rayonne:rayonne-verify` checks everything Rayonne produced against the code, then improves it. A key minted by an organisation admin drives every workspace of that organisation, and with the administration option it creates and deletes them. Requires the Business plan (API access). On enable, enter your `rk_…` API key (Réglages → Clés API, shown once). Needs [`uv`](https://docs.astral.sh/uv/) installed — the plugin starts its MCP server from its committed lock (`uv run --locked`, rayonne-mcp 0.11.0). |
 
 ## Oriflux 0.2.0 — plugins et SDK
 
@@ -65,9 +65,11 @@ et vérifie les fichiers indexés avant publication ; il ne pousse rien lui-mêm
 ## Rayonne pour Codex
 
 L’adaptateur [`rayonne-codex`](plugins/rayonne-codex/README.md) est disponible
-dans la marketplace `sponge-theory-codex` : 129 outils marketing Rayonne, neuf
-parcours métier et configuration sécurisée dans le trousseau macOS. Il utilise
-le serveur publié `rayonne-mcp==0.10.0`.
+dans la marketplace `sponge-theory-codex` : 168 outils marketing Rayonne, onze
+parcours métier — dont `rayonne-from-code` (tout configurer depuis le code du
+produit) et `rayonne-verify` (vérifier contre le code ce que Rayonne a produit)
+— et configuration sécurisée dans le trousseau macOS. Il utilise le serveur
+publié `rayonne-mcp==0.11.0`.
 
 ## Codex Keychain update — 2026-10-01
 

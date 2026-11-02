@@ -1,7 +1,7 @@
 # Rayonne pour Codex
 
 Adaptateur Codex du plugin Claude Code Rayonne 0.9.0 : les **129 mêmes
-outils**, le même serveur PyPI `rayonne-mcp==0.10.0` et son guide métier.
+outils**, le même serveur PyPI `rayonne-mcp==0.11.0` et son guide métier.
 Aucun code serveur propriétaire n'est embarqué dans cet adaptateur.
 
 ## Installation et configuration
@@ -32,7 +32,7 @@ dédiée `ai.sponge-theory.rayonne.codex.v2`, sans modifier Claude. Une clé neu
 peut aussi être saisie dans le champ masqué. L'URL, la référence du credential et le
 choix lecture seule sont enregistrés dans `~/.rayonne/codex/connection.json`
 (mode 0600) ; ce fichier ne contient pas de clé. La vérification ne publie
-rien : elle initialise MCP, contrôle 167 outils et lit l'aperçu de l'espace.
+rien : elle initialise MCP, contrôle 168 outils et lit l'aperçu de l'espace.
 Ouvre ensuite un **nouveau fil Codex** pour charger skills et outils.
 
 Un déploiement sans trousseau peut fournir ensemble `RAYONNE_API_URL` et
@@ -43,8 +43,11 @@ bloque les écritures côté serveur. Ne stocke pas de clé dans `.mcp.json`.
 ## Parcours
 
 Les skills `rayonne-audit`, `rayonne-brief`, `rayonne-content`,
-`rayonne-media`, `rayonne-plan`, `rayonne-publish`, `rayonne-status`,
-`rayonne-video` et `rayonne-workspaces` reprennent les commandes Claude.
+`rayonne-from-code`, `rayonne-media`, `rayonne-plan`, `rayonne-publish`,
+`rayonne-status`, `rayonne-verify`, `rayonne-video` et `rayonne-workspaces`
+reprennent les commandes Claude. `rayonne-from-code` configure Rayonne
+depuis le dépôt du produit, `rayonne-verify` vérifie contre le code ce que
+Rayonne a produit.
 Le serveur fournit les descriptions et instructions métier canoniques.
 Les actions gardent leurs contraintes : workspace explicite, validation
 humaine des contenus, vidéo facturée, publication manuelle en `semi_auto`,
@@ -84,4 +87,4 @@ l’import initial. L’assistant natif partagé est installé à l’emplacemen
 fenêtre : si le trousseau est verrouillé, déverrouille-le puis relance la migration.
 Aucune clé Claude n’est modifiée ou supprimée. Les rotations de clé Claude ne
 sont plus reprises automatiquement dans la copie Codex. Le serveur PyPI reste
-`rayonne-mcp==0.10.0` : cette version corrige uniquement l’adaptateur Codex.
+`rayonne-mcp==0.11.0` : cette version corrige uniquement l’adaptateur Codex.

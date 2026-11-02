@@ -671,26 +671,26 @@ wheels = [
 
 [[package]]
 name = "rayonne-claude-code"
-version = "0.10.0"
+version = "0.11.0"
 source = { virtual = "." }
 dependencies = [
     { name = "rayonne-mcp" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "rayonne-mcp", specifier = "==0.10.0" }]
+requires-dist = [{ name = "rayonne-mcp", specifier = "==0.11.0" }]
 
 [[package]]
 name = "rayonne-mcp"
-version = "0.10.0"
+version = "0.11.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
     { name = "mcp" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/51/cb/a208ba064c1554717467a49e81495655cbeae5551b24e5a33264e2616b45/rayonne_mcp-0.10.0.tar.gz", hash = "sha256:213a79c5fe650652c524400ec78e09b7fb0f08b7abdf3d3a1fa21ede1ace7e5f", size = 570565 }
+sdist = { url = "https://files.pythonhosted.org/packages/40/d3/7199904fe505b500d0f8d7604b85fd8117ecd8ded068e8d18b9a396ee09a/rayonne_mcp-0.11.0.tar.gz", hash = "sha256:53d67ba4f08655296bc27662aca774a60a2d690e614e790826bbfcf3122f62c7", size = 582517 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ff/31/6525950da0614db57fabc7cca48049bde63c26e0ffa740c61fbd3b5fbf12/rayonne_mcp-0.10.0-py3-none-any.whl", hash = "sha256:6d1febdcb91ff6abbf2b5a9bbf48311100251baf0c3487918aa0e15c7cd0441d", size = 76241 },
+    { url = "https://files.pythonhosted.org/packages/85/24/019af3d473091f6f3c1e28e450d34c7f26f2b1b0ba8c6a8ec06b109fef08/rayonne_mcp-0.11.0-py3-none-any.whl", hash = "sha256:87d4e3a99977e0a9bea3ee9f4a4bf0ad5fb5b457de0d8239188421c045381c0e", size = 77841 },
 ]
 
 [[package]]

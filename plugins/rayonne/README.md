@@ -42,6 +42,9 @@ prennent ~0,2 s, hors ligne compris.
 - `/rayonne-brief` — ce que Rayonne a compris de ta page produit — et
   corrige-le.
 - `/rayonne-content` — génère, relis et approuve un contenu Rayonne.
+- `/rayonne-from-code` — configure Rayonne depuis le code de ton produit :
+  brief, faits, stratégie, mesure, premiers contenus, chaque élément vérifié
+  contre le code.
 - `/rayonne-media` — inspecte les médias d'un contenu Rayonne et
   corrige-les.
 - `/rayonne-plan` — la stratégie Bullseye de ton workspace — lis-la ou
@@ -50,13 +53,16 @@ prennent ~0,2 s, hors ligne compris.
   coller.
 - `/rayonne-status` — état du workspace Rayonne — contenus, soumissions,
   métriques.
+- `/rayonne-verify` — vérifie contre le code ce que Rayonne a produit
+  (faits, stratégie, contenus, scénarios vidéo, questions GEO) et
+  améliore-le.
 - `/rayonne-video` — lance une vidéo Rayonne et suis-la jusqu'au rendu.
 - `/rayonne-workspaces` — les espaces de ton organisation Rayonne —
   liste-les, cible-en un, agis.
 
 ## Outils
 
-167 outils — ceux du serveur publié qu'épingle le verrou (`rayonne-mcp==0.10.0`),
+168 outils — ceux du serveur publié qu'épingle le verrou (`rayonne-mcp==0.11.0`),
 un par verbe de l'API publique — table complète groupée par
 module (M1 brief, M2 stratégie, M3 contenu, M3 kit de vente et médias, M4
 soumission et pièces jointes du kit, M5 analytics, M9 vidéo et storyboard,
