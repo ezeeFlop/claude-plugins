@@ -81,7 +81,10 @@ chacun. Lis aussi `loop` : la décision, et les points restants des juges.
 
 **Corriger** :
 - une retouche locale : `rayonne_edit_content`, ou `rayonne_regenerate_text`
-  avec un autre `argument_index` pour changer d'argument ;
+  avec un autre `argument_index` pour changer d'argument. Après une
+  retouche, lance `rayonne_rerun_fact_check` : la vérification indépendante
+  relit le texte retouché et remplace ses anciens signalements, au lieu de
+  les laisser jusqu'à l'approbation ;
 - un défaut de fond : corrige le brief ou les faits, puis
   `rayonne_regenerate_content`. Ça consomme le quota : préviens.
 

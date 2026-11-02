@@ -117,7 +117,7 @@ et une passe sur « À valider » dans l'application chaque semaine.
 
 ## Outils
 
-168 outils — ceux du serveur publié qu'épingle le verrou (`rayonne-mcp==0.13.0`),
+168 outils — ceux du serveur publié qu'épingle le verrou (`rayonne-mcp==0.13.1`),
 un par verbe de l'API publique — table complète groupée par
 module (M1 brief, M2 stratégie, M3 contenu, M3 kit de vente et médias, M4
 soumission et pièces jointes du kit, M5 analytics, M9 vidéo et storyboard,
