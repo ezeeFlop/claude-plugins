@@ -4,7 +4,7 @@
       "command": "uv",
       "args": ["run", "--locked", "--quiet", "--directory", "${CLAUDE_PLUGIN_ROOT}", "rayonne-mcp"],
       "env": {
-        "RAYONNE_API_KEY": "${user_config.api_key}",
+        "RAYONNE_PLUGIN_API_KEY": "${user_config.api_key}",
         "RAYONNE_API_URL": "${user_config.api_url}",
         "RAYONNE_READ_ONLY": "${user_config.read_only}"
       }

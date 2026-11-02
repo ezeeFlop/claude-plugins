@@ -173,14 +173,14 @@
     {
       "name": "rayonne",
       "displayName": "Rayonne",
-      "description": "Rayonne — l'autopilote marketing des SaaS : piloter toute l'organisation, créer des espaces, briefs, stratégie, contenus et médias, vidéo, kits Mode C, métriques — et tout configurer depuis le code du produit, chaque élément vérifié contre le code (/rayonne-from-code, /rayonne-verify). 168 outils, 11 commandes.",
+      "description": "Rayonne — l'autopilote marketing des SaaS : piloter toute l'organisation, créer des espaces, briefs, stratégie, contenus et médias, vidéo, kits Mode C, métriques — et tout configurer depuis le code du produit, chaque élément vérifié contre le code (/rayonne-from-code, /rayonne-verify) ; clé API installée sans jamais la coller (/rayonne-setup, rayonne-mcp login). 168 outils, 12 commandes.",
       "author": {
         "name": "Sponge Theory",
         "email": "contact@sponge-theory.ai",
         "url": "https://rayonne.sponge-theory.dev"
       },
       "category": "productivity",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "keywords": [
         "marketing",
         "saas",

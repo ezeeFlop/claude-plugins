@@ -48,7 +48,10 @@ Le seul prérequis est la clé API du plugin : une clé d'organisation avec
 l'option d'administration (Réglages → Clés API, plan Business).
 1. `rayonne_workspace_access` : `org_wide` et `org_admin` doivent être vrais
    pour créer un espace et finir sa configuration. Si ce n'est pas le cas,
-   dis exactement quoi créer comme clé, puis arrête-toi.
+   ou si aucune clé n'est chargée, déroule `rayonne-setup` avec
+   l'utilisateur. Il crée la clé dans l'application et l'installe lui-même,
+   sans la coller dans la conversation ; `next_step` dit comment. Reprends
+   ensuite ici. Ne demande jamais la clé dans la conversation.
 2. `rayonne_list_workspaces` : cherche l'espace de CE produit, par l'hôte de
    son URL publique ou par son nom (celui du dépôt, du `package.json`, du
    README).

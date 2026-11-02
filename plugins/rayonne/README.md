@@ -12,8 +12,16 @@ vidéos, métriques AARRR.
 /plugin install rayonne
 ```
 
-Claude Code demande alors ta **clé API** (Rayonne → Réglages → Clés API,
-format `rk_…`, plan Business). Prérequis : [`uv`](https://docs.astral.sh/uv/).
+Le plugin s'installe pour l'utilisateur (portée « user », celle par défaut) :
+il vaut pour tous tes dépôts. Claude Code demande ta **clé API** (Rayonne →
+Réglages → « Clés d'API (extension, API, Claude) », format `rk_…`, plan
+Business). Tu peux laisser vide et l'installer ensuite sans la coller nulle
+part : copie-la, puis `! pbpaste | uvx rayonne-mcp login` et `/reload-plugins`
+(détail : `/rayonne-setup`). Elle va dans `~/.config/rayonne/credentials.json`
+(lisible par toi seul) et l'emporte sur celle saisie à l'installation. Pour
+créer et initialiser des espaces (`/rayonne-from-code`), coche « Piloter
+toute l'organisation » en la créant (propriétaire de l'organisation).
+Prérequis : [`uv`](https://docs.astral.sh/uv/).
 
 Le serveur démarre par `uv run --locked` sur le verrou livré avec le plugin
 (`uv.lock`) : rien n'est résolu sur PyPI au lancement. Le tout premier
@@ -51,6 +59,10 @@ prennent ~0,2 s, hors ligne compris.
   crées-en une.
 - `/rayonne-publish` — publie un contenu approuvé — ou rends le kit à
   coller.
+- `/rayonne-setup` — installe ou remplace la clé API sans jamais la coller
+  dans la conversation (`! pbpaste | uvx rayonne-mcp login`), pour
+  l'utilisateur et tous ses dépôts, puis vérifie qu'elle porte
+  l'administration.
 - `/rayonne-status` — état du workspace Rayonne — contenus, soumissions,
   métriques.
 - `/rayonne-verify` — vérifie contre le code ce que Rayonne a produit
@@ -62,7 +74,7 @@ prennent ~0,2 s, hors ligne compris.
 
 ## Outils
 
-168 outils — ceux du serveur publié qu'épingle le verrou (`rayonne-mcp==0.11.0`),
+168 outils — ceux du serveur publié qu'épingle le verrou (`rayonne-mcp==0.12.0`),
 un par verbe de l'API publique — table complète groupée par
 module (M1 brief, M2 stratégie, M3 contenu, M3 kit de vente et médias, M4
 soumission et pièces jointes du kit, M5 analytics, M9 vidéo et storyboard,

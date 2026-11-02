@@ -17,6 +17,18 @@ dans un champ masqué. Il vérifie l'espace en lecture avant d'enregistrer.
 Il propose aussi le mode lecture seule. Une clé se crée dans Rayonne →
 Réglages → Clés API (plan Business).
 
+Pour `rayonne-from-code` (créer ou initialiser un espace), la clé doit porter
+l'administration : Rayonne → Réglages → « Clés d'API (extension, API,
+Claude) », coche « Piloter toute l'organisation », puis « Générer une clé »
+(propriétaire de l'organisation, plan Business). Une clé existante ne se
+promeut pas : crées-en une nouvelle. `rayonne_workspace_access` doit
+ensuite répondre `org_admin: true` ; sinon son `next_step` dit quoi faire.
+
+Hors macOS, sans trousseau : `uvx rayonne-mcp login` dans un terminal
+(saisie masquée) enregistre la clé, vérifiée, dans
+`~/.config/rayonne/credentials.json` (0600) ; l'adaptateur la lit quand
+aucun profil n'est configuré.
+
 Ne demande jamais la clé dans la conversation, ne lis pas les secrets,
 n'affiche pas les variables d'environnement et ne lance pas les helpers
 Keychain isolément. Le script seul manipule le credential. Une clé Claude est importée une fois dans une entrée dédiée Codex ;

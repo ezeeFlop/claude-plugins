@@ -1,6 +1,6 @@
 {
   "name": "rayonne",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Rayonne — l'autopilote marketing des SaaS : audit marketing de ta page produit, analyse, contenus, vidéos, métriques AARRR, tous les espaces de l'organisation, depuis Claude Code.",
   "author": {
     "name": "Sponge Theory",
@@ -20,9 +20,9 @@
     "api_key": {
       "type": "string",
       "title": "Clé API Rayonne",
-      "description": "Générée dans Rayonne → Réglages → Clés API (format rk_…, plan Business requis).",
+      "description": "Générée dans Rayonne → Réglages → Clés d'API (format rk_…, plan Business). Tu peux laisser vide et l'installer plus tard sans la coller nulle part : copie-la, puis « ! pbpaste | uvx rayonne-mcp login » dans Claude Code (voir /rayonne-setup).",
       "sensitive": true,
-      "required": true
+      "required": false
     },
     "api_url": {
       "type": "string",
