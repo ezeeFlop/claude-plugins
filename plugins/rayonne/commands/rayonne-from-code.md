@@ -164,39 +164,57 @@ Deux faits qui se contredisent, ou un fait contraire au brief : tranche
 avec le fondateur. Sinon, les rédacteurs l'écartent en silence. Par exemple,
 « marche sur PC » à côté de « rien ne quitte ton Mac » n'est jamais repris.
 
-## 7. La galerie — écrans et clips du vrai produit
+## 7. La galerie — seulement ce qui manque
 
 Les vidéos et les posts piochent dans la galerie. Rayonne ne voit que les
 pages publiques ; l'intérieur de l'app, derrière la connexion, c'est toi qui
-le captures. Fais-le avant les premiers contenus.
+le captures. Mais **jamais avant d'avoir regardé ce qui existe déjà** :
+recapturer une vue déjà présente crée un doublon que les contenus
+choisiront au hasard.
 
-1. **Lance l'app en local** avec la commande du dépôt (serveur de dev,
-   build desktop, simulateur). Charge les données de démonstration du dépôt
-   (seed, fixtures) ou crée-en de crédibles. Jamais de vraie donnée client
-   ni personnelle à l'écran, jamais de clé ni de secret visible. Connecte-toi
-   avec un compte de test du dépôt, uniquement sur l'app locale.
-2. **Écrans, 4 à 8** : avec Playwright (ou l'outil de navigateur dont tu
-   disposes), en 1440×900. Prends ceux qui prouvent la promesse principale
-   et chaque fonctionnalité du dossier : le résultat obtenu plutôt qu'un
-   formulaire vide.
-3. **Clips, 2 à 4** : un parcours chacun, de 10 à 30 s. Par exemple, l'action
-   principale de bout en bout, ou un avant/après. Écris un script Playwright
-   avec `recordVideo`, en 1440×900, à un rythme humain : pauses de 0,5 à 1 s
-   entre les étapes, pour qu'on voie ce qui se passe. Une app de bureau :
-   enregistre l'écran avec l'outil du système, si l'utilisateur est d'accord.
-4. **Envoi** : `rayonne_upload_product_asset`, avec PNG/JPEG pour un écran et
-   MP4/WebM/MOV pour un clip. La légende est précise : ce qu'on voit et le
-   bénéfice que ça prouve. Sans légende, aucun scénario ne saura le choisir
-   (à défaut, `rayonne_suggest_asset_caption`). Relis
-   `rayonne_list_product_assets` jusqu'à ce que chaque clip soit prêt.
-5. **Si rien ne peut tourner en local**, demande à l'utilisateur ses
-   captures, ou de les déposer lui-même dans l'application (Galerie). Ne
+1. **L'inventaire, toujours en premier** : `rayonne_list_product_assets`.
+   Pour chaque écran et chaque clip, note sa légende, son genre et s'il est
+   prêt.
+2. **Ce dont le dossier a besoin** :
+   - la promesse principale en action ;
+   - un écran par fonctionnalité du dossier ;
+   - 2 à 4 parcours en clip, comme l'action principale de bout en bout ou
+     un avant/après.
+3. **Le rapprochement** : une preuve est couverte quand un écran ou un clip
+   existant la montre, d'après sa légende et, au besoin, son image.
+   - Un écran **périmé** ne compte pas : une fonctionnalité retirée, un
+     libellé ou un design changé depuis, d'après le code et le CHANGELOG.
+   - Une **légende vague** se corrige (`rayonne_update_product_asset`) : la
+     vue n'est pas à refaire.
+4. **Rien ne manque** : dis-le en une ligne, puis passe à l'étape 8 sans
+   rien capturer.
+5. **Il manque quelque chose** : montre à l'utilisateur la liste de ce qui
+   existe déjà et de ce qui manque. Avec son accord, capture seulement ce
+   qui manque.
+   - **Lance l'app en local** avec la commande du dépôt (serveur de dev,
+     build desktop, simulateur). Charge les données de démonstration du
+     dépôt (seed, fixtures), ou crée-en de crédibles. Jamais de vraie
+     donnée client ou personnelle à l'écran, jamais de clé ni de secret
+     visible. Connecte-toi avec un compte de test du dépôt, uniquement sur
+     l'app locale.
+   - **Écrans** : avec Playwright, ou l'outil de navigateur dont tu
+     disposes, en 1440×900. Montre le résultat obtenu plutôt qu'un
+     formulaire vide.
+   - **Clips** : un parcours chacun, de 10 à 30 s. Script Playwright avec
+     `recordVideo`, en 1440×900, à un rythme humain : pauses de 0,5 à 1 s
+     entre les étapes. Pour une app de bureau, utilise l'enregistreur du
+     système, si l'utilisateur est d'accord.
+   - **Envoi** : `rayonne_upload_product_asset`, en PNG/JPEG pour un écran,
+     en MP4/WebM/MOV pour un clip. La légende dit ce qu'on voit et le
+     bénéfice que ça prouve (à défaut, `rayonne_suggest_asset_caption`).
+     Relis `rayonne_list_product_assets` jusqu'à ce que chaque clip soit
+     prêt.
+6. **Un écran périmé** : envoie d'abord le neuf, puis retire l'ancien de la
+   rotation des posts (`rayonne_update_product_asset(auto_posts=false)`).
+   Jamais deux écrans de la même vue en circulation.
+7. **Si rien ne peut tourner en local**, demande à l'utilisateur ses
+   captures, ou qu'il les dépose lui-même dans l'application (Galerie). Ne
    fabrique jamais un faux écran.
-
-Sur un espace existant, lis d'abord `rayonne_list_product_assets` : ne
-recapture que ce qui manque ou ce qui est périmé. Quand l'interface change
-(nouvelle fonctionnalité, refonte), `/rayonne-verify` signale les captures
-périmées : refais-les.
 
 ## 8. Le contexte du fondateur
 

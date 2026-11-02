@@ -114,9 +114,11 @@ TikTok ou LinkedIn, sont publiées par une personne, dans l'application.
 `rayonne_list_product_assets` : chaque écran et chaque clip montrent-ils
 l'interface ACTUELLE ? Repère une fonctionnalité retirée, un libellé changé
 ou une refonte depuis la capture (compare avec le code et le CHANGELOG).
-Une capture périmée, retire-la de la rotation des posts
-(`rayonne_update_product_asset(auto_posts=false)`) et refais-la. Une
-légende vague, précise-la : ce qu'on voit, et le bénéfice que ça prouve.
+Une capture périmée : retire-la de la rotation des posts
+(`rayonne_update_product_asset(auto_posts=false)`), puis refais cette vue,
+et seulement elle. Une légende vague : précise-la (ce qu'on voit, et le
+bénéfice que ça prouve), sans recapturer. Une galerie à jour n'appelle
+aucune capture.
 
 ## Questions GEO
 
