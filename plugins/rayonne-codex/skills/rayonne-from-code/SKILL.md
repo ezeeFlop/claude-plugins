@@ -59,6 +59,23 @@ l'option d'administration (Réglages → Clés API, plan Business).
 3. Garde ce `workspace_id` sur TOUS les appels qui suivent.
 4. `rayonne_usage` : dis ce qui reste ce mois-ci.
 
+**Un espace qui existe déjà ne se supprime jamais.** Il porte l'historique
+des briefs, les comptes connectés, les contenus publiés, les mesures et
+l'historique GEO. Sur un espace existant, chaque étape commence par LIRE ce
+qui est là, puis le vérifie contre le code et le complète, au lieu de le
+recréer :
+- **le brief** : une nouvelle analyse crée une nouvelle version, les
+  précédentes restent, et les retouches à la main du fondateur sont
+  reportées ;
+- **les faits** : ceux que le fondateur a saisis ou retouchés ne sont jamais
+  archivés par une analyse ;
+- **la stratégie active** : elle se vérifie et se corrige sur place ;
+- **la galerie, les contenus et les comptes connectés** : ils restent ;
+- **le secret des événements produit** : jamais régénéré (voir l'étape 9).
+
+Résume à l'utilisateur ce que l'espace contient déjà (`rayonne_today`),
+puis dis ce que tu vas vérifier et compléter.
+
 ## 2. Lis le dépôt — la carte du produit
 
 Lis ce qui dit ce que le produit fait pour son utilisateur :
@@ -110,7 +127,9 @@ en premier. Intègre ses corrections, puis attends son accord explicite.
 `rayonne_analyze_source` avec le dossier en premier, puis les 3 à 10 fichiers
 les plus parlants (README, doc des fonctionnalités, tarifs, changelog).
 Passe `product_url` (la valeur fournie dans la demande ou l'URL que l'utilisateur donne) si le
-produit a une page publique : elle est lue aussi.
+produit a une page publique : elle est lue aussi. Sur un espace existant,
+omise, c'est l'URL de l'espace qui est reprise. Ne la retire pas : les faits
+tirés de la page seraient archivés comme « disparus du site ».
 Relis `rayonne_list_briefs` toutes les 20 secondes jusqu'à READY, 6 minutes
 au plus. Un échec : lis `error_message`, corrige la cause, relance une fois.
 
@@ -180,8 +199,10 @@ le captures. Fais-le avant les premiers contenus.
    captures, ou de les déposer lui-même dans l'application (Galerie). Ne
    fabrique jamais un faux écran.
 
-Quand l'interface change (nouvelle fonctionnalité, refonte),
-`rayonne-verify` signale les captures périmées : refais-les.
+Sur un espace existant, lis d'abord `rayonne_list_product_assets` : ne
+recapture que ce qui manque ou ce qui est périmé. Quand l'interface change
+(nouvelle fonctionnalité, refonte), `rayonne-verify` signale les captures
+périmées : refais-les.
 
 ## 8. Le contexte du fondateur
 
@@ -217,6 +238,11 @@ les événements.
    Il n'est jamais écrit dans le code et jamais demandé dans la
    conversation : le fondateur le crée dans Réglages → Mesure produit et le
    range dans son gestionnaire de secrets.
+   - Si `rayonne_measurement` dit `has_event_secret: true`, le produit en
+     a déjà un : cherche dans le code l'envoi existant et complète-le.
+   - Ne régénère JAMAIS le secret (`rayonne_rotate_event_secret`) :
+     l'ancien cesserait de signer sur-le-champ, et chaque événement du
+     produit en production serait refusé.
 4. Ajoute des tests dans la suite du produit, montre le diff, et commite
    selon les règles du dépôt, avec l'accord de l'utilisateur.
 
@@ -225,8 +251,12 @@ Pour les liens que le fondateur partagera lui-même, crée-les avec
 
 ## 10. La stratégie
 
-`rayonne_create_strategy`, avec `objectives` tirés de l'objectif à 90 jours.
-Relis `rayonne_current_strategy` jusqu'au plan. Vérifie :
+Une stratégie active existe déjà (`rayonne_current_strategy`) : vérifie-la
+et corrige-la sur place. N'en crée une nouvelle que si le fondateur le
+demande, par exemple si le brief a beaucoup changé. Elle reste un brouillon
+à côté de l'active jusqu'à ce qu'il l'active.
+Sinon, `rayonne_create_strategy`, avec `objectives` tirés de l'objectif à 90
+jours, puis relis `rayonne_current_strategy` jusqu'au plan. Vérifie :
 - **3 canaux au plus en focus** (anneau intérieur), cohérents avec le
   produit. Un outil pour développeurs va là où les développeurs lisent.
   Sans page publique, pas d'annuaires ni de SEO tant qu'elle n'existe pas.
