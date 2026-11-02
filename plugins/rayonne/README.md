@@ -5,72 +5,115 @@ Pilote un ou tous les espaces de ton organisation
 marketing de ta page produit, analyse produit, génération de contenus et de
 vidéos, métriques AARRR.
 
-## Installation
+## Manuel d'utilisation
 
+Le plugin laisse Claude piloter Rayonne à ta place. Il sert à deux choses :
+**configurer un produit depuis son code** (une fois par produit) et **le
+travail courant** (contenus, vidéos, publication, suivi).
+
+Dans Claude Code, chaque commande prend le préfixe du plugin :
+`/rayonne:rayonne-from-code`, `/rayonne:rayonne-status`…
+
+### 1. Installer — une seule fois, pour ton compte et tous tes dépôts
+
+1. **Le plugin** :
+   ```
+   /plugin marketplace add ezeeFlop/claude-plugins
+   /plugin install rayonne@sponge-theory
+   ```
+   Portée « user », celle par défaut. Prérequis :
+   [`uv`](https://docs.astral.sh/uv/). Claude Code propose de saisir la clé
+   tout de suite : tu peux laisser vide et passer par l'étape 3.
+2. **La clé** : Rayonne → Réglages → « Clés d'API (extension, API,
+   Claude) ».
+   - Coche **« Piloter toute l'organisation »**, clique « Générer une
+     clé », puis copie-la : elle ne s'affiche qu'une fois.
+   - Dans la liste, la portée doit indiquer « organisation +
+     administration ». Il faut être propriétaire de l'organisation, sur le
+     plan Business.
+   - Une clé existante ne se promeut pas : crée-en une nouvelle, puis
+     révoque l'ancienne.
+3. **L'installer**, sans jamais la coller dans une conversation :
+   ```
+   ! pbpaste | uvx rayonne-mcp login
+   /reload-plugins
+   ```
+   - La clé est vérifiée auprès de Rayonne, puis rangée dans
+     `~/.config/rayonne/credentials.json`, lisible par toi seul.
+   - Sous Linux, remplace `pbpaste` par `wl-paste`. Dans un terminal,
+     `uvx rayonne-mcp login` la demande en saisie masquée.
+   - `uvx rayonne-mcp logout` la retire.
+4. **Vérifier** : `/rayonne:rayonne-setup`. La commande contrôle que la clé
+   est chargée et qu'elle porte l'administration.
+
+**Mettre à jour** :
 ```
-/plugin marketplace add ezeeFlop/claude-plugins
-/plugin install rayonne
+/plugin marketplace update
+/plugin update rayonne
+/reload-plugins
 ```
 
-Le plugin s'installe pour l'utilisateur (portée « user », celle par défaut) :
-il vaut pour tous tes dépôts. Claude Code demande ta **clé API** (Rayonne →
-Réglages → « Clés d'API (extension, API, Claude) », format `rk_…`, plan
-Business). Tu peux laisser vide et l'installer ensuite sans la coller nulle
-part : copie-la, puis `! pbpaste | uvx rayonne-mcp login` et `/reload-plugins`
-(détail : `/rayonne-setup`). Elle va dans `~/.config/rayonne/credentials.json`
-(lisible par toi seul) et l'emporte sur celle saisie à l'installation. Pour
-créer et initialiser des espaces (`/rayonne-from-code`), coche « Piloter
-toute l'organisation » en la créant (propriétaire de l'organisation).
-Prérequis : [`uv`](https://docs.astral.sh/uv/).
+### 2. Configurer un produit — une fois par produit
 
-Le serveur démarre par `uv run --locked` sur le verrou livré avec le plugin
-(`uv.lock`) : rien n'est résolu sur PyPI au lancement. Le tout premier
-démarrage installe l'environnement (quelques secondes), les suivants
-prennent ~0,2 s, hors ligne compris.
-
-### Mettre à jour
-
+Ouvre Claude Code **dans le dépôt du produit**, puis tape :
 ```
-/plugin marketplace update sponge-theory
-/plugin update rayonne@sponge-theory
+/rayonne:rayonne-from-code https://url-du-produit
 ```
+L'URL est facultative si le produit n'a pas encore de page publique.
+L'agent fait le travail ; toi, tu valides aux moments clés :
+
+| L'agent | Toi |
+|---|---|
+| Trouve l'espace du produit, ou le crée (il ne supprime jamais rien, et reprend un espace existant tel quel) | — |
+| Lit le code et rédige un dossier produit, chaque ligne avec sa source | **relis le dossier et dis OK** |
+| Lance l'analyse, puis vérifie le brief et les faits contre le code | **acceptes ou refuses ses corrections** |
+| Fait l'inventaire de la galerie et ne capture que les écrans qui manquent | **dis OK** s'il faut capturer |
+| Te pose quelques questions : stade, heures par semaine, audience, budget, objectif à 90 jours | **réponds** |
+| Branche dans ton code les événements mesurés (inscription, activation, revenu) | **relis le diff** et mets le secret dans ta prod |
+| Propose la stratégie et la vérifie | **l'actives**, si elle te va |
+| Liste les comptes à connecter | **les connectes dans l'application** |
+| Génère les premiers contenus et les vérifie | **les approuves** |
+
+Il termine par un tableau : ce qu'il a vérifié, ce qu'il a corrigé, ce
+qui reste à ta charge.
+
+### 3. Au quotidien
+
+| Commande | Quand |
+|---|---|
+| `/rayonne:rayonne-status` | Où on en est : contenus, publications, chiffres. |
+| `/rayonne:rayonne-verify` | À chaque version de ton produit, ou avant d'approuver : revérifie contre le code les faits, la stratégie, les contenus, les scénarios vidéo, la galerie et les questions GEO, puis améliore ce qui peut l'être. |
+| `/rayonne:rayonne-content linkedin` | Générer, relire, approuver un contenu. |
+| `/rayonne:rayonne-video` | Lancer une vidéo et la suivre jusqu'au rendu. Elle est facturée : il demande avant. |
+| `/rayonne:rayonne-publish` | Publier un contenu approuvé, ou récupérer le kit à coller. |
+| `/rayonne:rayonne-plan` | Lire la stratégie, ou en créer une. |
+| `/rayonne:rayonne-brief` | Ce que Rayonne a compris du produit, et le corriger. |
+| `/rayonne:rayonne-audit` | Ce qui plafonne le message de ta page produit. |
+| `/rayonne:rayonne-media` | Les images ou la vidéo d'un contenu. |
+| `/rayonne:rayonne-workspaces` | Les espaces de l'organisation : en cibler un. |
+| `/rayonne:rayonne-setup` | Installer ou remplacer la clé. |
+
+Le rythme simple : `/rayonne:rayonne-verify` à chaque version du produit,
+et une passe sur « À valider » dans l'application chaque semaine.
+
+### Ce que le plugin ne fait jamais
+
+- Te demander ta clé dans la conversation.
+- Approuver, publier ou lancer une vidéo facturée sans ton accord.
+- Valider un post LinkedIn ou Hashnode, ni poster sur Reddit, Hacker News
+  ou Product Hunt : c'est toi, dans l'application ou avec le kit.
+- Supprimer un espace, ni régénérer le secret de mesure d'un produit déjà
+  branché.
 
 ### Le serveur ne démarre pas ?
 
-- `/mcp` → `rayonne` → **Reconnect** ;
-- un premier démarrage lent (réseau, antivirus) : allonge le délai de
-  démarrage des serveurs MCP dans `~/.claude/settings.json` —
-  `"env": {"MCP_TIMEOUT": "120000"}` — puis relance Claude Code ;
+- `/mcp` → `rayonne` → **Reconnect**.
+- Si le premier démarrage est lent (réseau, antivirus), allonge le délai
+  des serveurs MCP dans `~/.claude/settings.json`
+  (`"env": {"MCP_TIMEOUT": "120000"}`), puis relance Claude Code.
 - `uv --version` doit répondre : sans `uv`, le serveur ne peut pas partir.
-
-## Commandes
-
-- `/rayonne-audit` — audite le message de ta page produit et dit ce qui
-  plafonne tes contenus.
-- `/rayonne-brief` — ce que Rayonne a compris de ta page produit — et
-  corrige-le.
-- `/rayonne-content` — génère, relis et approuve un contenu Rayonne.
-- `/rayonne-from-code` — configure Rayonne depuis le code de ton produit :
-  brief, faits, stratégie, mesure, premiers contenus, chaque élément vérifié
-  contre le code.
-- `/rayonne-media` — inspecte les médias d'un contenu Rayonne et
-  corrige-les.
-- `/rayonne-plan` — la stratégie Bullseye de ton workspace — lis-la ou
-  crées-en une.
-- `/rayonne-publish` — publie un contenu approuvé — ou rends le kit à
-  coller.
-- `/rayonne-setup` — installe ou remplace la clé API sans jamais la coller
-  dans la conversation (`! pbpaste | uvx rayonne-mcp login`), pour
-  l'utilisateur et tous ses dépôts, puis vérifie qu'elle porte
-  l'administration.
-- `/rayonne-status` — état du workspace Rayonne — contenus, soumissions,
-  métriques.
-- `/rayonne-verify` — vérifie contre le code ce que Rayonne a produit
-  (faits, stratégie, contenus, scénarios vidéo, questions GEO) et
-  améliore-le.
-- `/rayonne-video` — lance une vidéo Rayonne et suis-la jusqu'au rendu.
-- `/rayonne-workspaces` — les espaces de ton organisation Rayonne —
-  liste-les, cible-en un, agis.
+- Le serveur démarre par `uv run --locked` sur le verrou livré avec le
+  plugin (`uv.lock`) : rien n'est résolu sur PyPI au lancement.
 
 ## Outils
 
