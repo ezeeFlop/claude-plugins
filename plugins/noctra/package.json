@@ -1,0 +1,31 @@
+{
+  "name": "noctra-mcp-distribution",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22"
+  },
+  "overrides": {
+    "tmp": "0.2.7"
+  },
+  "scripts": {
+    "build": "tsc",
+    "bundle": "node scripts/bundle.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "format:check": "prettier --check src scripts test 'codex/*.mjs' 'codex/*.json' package.json tsconfig.json"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/client": "2.4.0",
+    "@modelcontextprotocol/server": "2.4.0"
+  },
+  "devDependencies": {
+    "@anthropic-ai/mcpb": "2.1.2",
+    "@types/node": "22.20.5",
+    "esbuild": "0.28.2",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3"
+  }
+}

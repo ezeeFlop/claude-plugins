@@ -79,3 +79,7 @@ marketplace, reinstall the desired Codex plugins and run their setup with
 `--migrate` once. See [release details](CODEX_KEYCHAIN_RELEASE.md).
 The Claude plugins and their marketplace are unchanged. NeoKanban, NeoRAG,
 AudiGEO, Oriflux and SPT-AI do not use these Codex Python credential readers.
+
+## Noctra
+
+Les plugins Claude Code et Codex, les bundles Claude Desktop et les parcours de correction sont décrits dans [NOCTRA_RELEASE.md](NOCTRA_RELEASE.md). La bêta utilise `.dev` ; le service `.ai` n’est pas encore déployé.

@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "noctra": {
+      "command": "node",
+      "args": [
+        "scripts/launch.mjs"
+      ],
+      "cwd": ".",
+      "env_vars": [
+        "NOCTRA_API_KEY_6802BBE94C7E45B2589E9195"
+      ],
+      "startup_timeout_sec": 30,
+      "tool_timeout_sec": 120
+    }
+  }
+}

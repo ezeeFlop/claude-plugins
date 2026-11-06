@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "noctra": {
+      "command": "node",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/server/main.js"
+      ],
+      "env": {
+        "NOCTRA_MCP_API_KEY": "${user_config.api_key_6802bbe94c7e45b2589e9195}"
+      }
+    }
+  }
+}

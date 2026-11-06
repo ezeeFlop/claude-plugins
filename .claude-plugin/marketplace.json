@@ -191,6 +191,44 @@
       ],
       "source": "./plugins/rayonne",
       "homepage": "https://rayonne.sponge-theory.dev"
+    },
+    {
+      "name": "noctra-dev",
+      "displayName": "Noctra bêta",
+      "description": "Noctra bêta .dev : audits AppSec/IA autorisés et dossiers de correction pour agents de code.",
+      "version": "0.2.0",
+      "source": "./plugins/noctra-dev",
+      "homepage": "https://noctra.sponge-theory.dev",
+      "author": {
+        "name": "Sponge Theory"
+      },
+      "category": "development",
+      "keywords": [
+        "security",
+        "appsec",
+        "ai-security",
+        "remediation",
+        "noctra"
+      ]
+    },
+    {
+      "name": "noctra",
+      "displayName": "Noctra",
+      "description": "Noctra .ai : client du futur service public (pas encore déployé), audits et dossiers de correction.",
+      "version": "0.2.0",
+      "source": "./plugins/noctra",
+      "homepage": "https://noctra.sponge-theory.ai",
+      "author": {
+        "name": "Sponge Theory"
+      },
+      "category": "development",
+      "keywords": [
+        "security",
+        "appsec",
+        "ai-security",
+        "remediation",
+        "noctra"
+      ]
     }
   ]
 }

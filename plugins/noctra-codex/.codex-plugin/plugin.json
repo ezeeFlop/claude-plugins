@@ -1,0 +1,26 @@
+{
+  "name": "noctra-codex",
+  "version": "0.2.0",
+  "description": "Évaluations AppSec et IA autorisées, campagnes, constats et rapports depuis Noctra.",
+  "author": {
+    "name": "Sponge Theory"
+  },
+  "homepage": "https://noctra.sponge-theory.ai",
+  "license": "Sponge Theory Proprietary",
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Noctra pour Codex",
+    "shortDescription": "Audits autorisés et dossiers de correction Noctra.",
+    "developerName": "Sponge Theory",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Vérifie ma connexion Noctra.",
+      "Récupère le dossier de correction de mon dernier audit Noctra."
+    ]
+  }
+}

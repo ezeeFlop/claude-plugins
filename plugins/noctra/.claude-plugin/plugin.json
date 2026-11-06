@@ -1,0 +1,18 @@
+{
+  "name": "noctra",
+  "version": "0.2.0",
+  "description": "Évaluations AppSec et IA autorisées, campagnes, constats et rapports depuis Noctra.",
+  "author": {
+    "name": "Sponge Theory"
+  },
+  "homepage": "https://noctra.sponge-theory.ai",
+  "userConfig": {
+    "api_key_bb3435d803db6043f50a3d09": {
+      "type": "string",
+      "title": "Clé API Noctra",
+      "sensitive": true,
+      "required": true,
+      "description": "Clé limitée à votre organisation, créée dans Noctra → Clés API. Instance : https://noctra.sponge-theory.ai"
+    }
+  }
+}
