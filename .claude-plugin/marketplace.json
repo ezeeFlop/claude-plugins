@@ -229,6 +229,24 @@
         "remediation",
         "noctra"
       ]
+    },
+    {
+      "name": "codeur",
+      "displayName": "Codeur Automation",
+      "description": "Toutes les fonctions métier de Codeur : CRM, devis, factures, campagnes, imports et diagnostic, avec clé API révocable.",
+      "version": "0.1.0",
+      "source": "./plugins/codeur",
+      "homepage": "https://codeur.sponge-theory.dev",
+      "author": {
+        "name": "Sponge Theory"
+      },
+      "category": "productivity",
+      "keywords": [
+        "codeur",
+        "crm",
+        "facturation",
+        "mcp"
+      ]
     }
   ]
 }

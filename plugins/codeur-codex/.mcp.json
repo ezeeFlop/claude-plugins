@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "codeur-automation": {
+      "command": "node",
+      "args": [
+        "server.cjs"
+      ],
+      "cwd": ".",
+      "env": {
+        "CODEUR_CLIENT": "codex"
+      },
+      "env_vars": [
+        "CODEUR_URL",
+        "CODEUR_API_KEY",
+        "CODEUR_OUTPUT_DIR",
+        "CODEUR_READ_ONLY",
+        "CODEUR_CONFIG_PATH",
+        "CODEUR_TIMEOUT_SECONDS"
+      ],
+      "startup_timeout_sec": 20,
+      "tool_timeout_sec": 30
+    }
+  }
+}

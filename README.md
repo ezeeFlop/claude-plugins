@@ -83,3 +83,11 @@ AudiGEO, Oriflux and SPT-AI do not use these Codex Python credential readers.
 ## Noctra
 
 Les plugins Claude Code et Codex, les bundles Claude Desktop et les parcours de correction sont décrits dans [NOCTRA_RELEASE.md](NOCTRA_RELEASE.md). La bêta utilise `.dev` ; le service `.ai` n’est pas encore déployé.
+
+
+## Codeur Automation
+
+[Codeur MCP 0.1.0](CODEUR_RELEASE.md) : plugins Codex et Claude Code,
+[MCPB pour Claude Desktop](https://github.com/ezeeFlop/claude-plugins/releases/tag/codeur-mcp-v0.1.0),
+163 opérations métier et diagnostic. Authentification par clé API révocable ;
+saisie masquée dans Claude Desktop et stockage dédié au trousseau pour Codex sur macOS.

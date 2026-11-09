@@ -1,0 +1,24 @@
+{
+  "name": "codeur-codex",
+  "version": "0.1.0",
+  "description": "Pilotage métier de Codeur Automation pour Codex, Claude Code et Claude Desktop",
+  "author": {
+    "name": "Sponge Theory"
+  },
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Codeur Automation",
+    "shortDescription": "CRM, devis, factures et campagnes",
+    "developerName": "Sponge Theory",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Vérifie la connexion à Codeur.",
+      "Montre mon pipeline commercial."
+    ]
+  }
+}

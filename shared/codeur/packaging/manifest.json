@@ -1,0 +1,31 @@
+{
+  "manifest_version": "0.3",
+  "name": "codeur-automation",
+  "display_name": "Codeur Automation",
+  "version": "0.1.0",
+  "description": "Pilotez le CRM, les devis, factures, campagnes et réglages de Codeur Automation.",
+  "long_description": "Accès aux fonctions métier de votre instance Codeur Automation, avec imports de documents, exports, diagnostic de connexion et suivi des tâches longues. Le serveur local appelle votre API existante. Les données consultées sont transmises à Claude. Les identifiants ne sont pas inclus dans le bundle.",
+  "author": { "name": "Sponge Theory" },
+  "server": {
+    "type": "node",
+    "entry_point": "server.cjs",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server.cjs"],
+      "env": {
+        "CODEUR_URL": "${user_config.url}",
+        "CODEUR_API_KEY": "${user_config.api_key}",
+        "CODEUR_CLIENT": "desktop",
+        "CODEUR_OUTPUT_DIR": "${user_config.output_directory}",
+        "CODEUR_READ_ONLY": "${user_config.read_only}"
+      }
+    }
+  },
+  "compatibility": { "platforms": ["darwin", "win32"], "runtimes": { "node": ">=20" } },
+  "user_config": {
+    "url": { "type": "string", "title": "URL de Codeur", "description": "Adresse HTTPS de votre instance Codeur Automation.", "required": true, "default": "https://codeur.sponge-theory.dev" },
+    "api_key": { "type": "string", "title": "Clé API Codeur", "description": "Créez une clé dans Codeur → Paramètres → Accès MCP, puis collez ici la clé codeur_mcp_… affichée une seule fois. Ne la saisissez pas dans une conversation.", "sensitive": true, "required": true },
+    "output_directory": { "type": "directory", "title": "Dossier des téléchargements", "description": "Destination locale des PDF, CSV et pièces jointes. Les fichiers existants ne sont pas écrasés.", "required": true, "default": "${HOME}/Downloads/Codeur" },
+    "read_only": { "type": "boolean", "title": "Lecture seule", "description": "Désactive les écritures métier et les générations IA. Les exports locaux restent disponibles.", "default": false }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "codeur",
+  "version": "0.1.0",
+  "description": "Pilotage métier de Codeur Automation pour Codex, Claude Code et Claude Desktop",
+  "author": {
+    "name": "Sponge Theory"
+  },
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "userConfig": {
+    "api_key": {
+      "type": "string",
+      "title": "Clé API Codeur",
+      "description": "Clé codeur_mcp_… créée dans Codeur → Paramètres → Accès MCP. Laisser vide pour utiliser la configuration du trousseau dédiée à Claude Code.",
+      "sensitive": true,
+      "required": false
+    },
+    "url": {
+      "type": "string",
+      "title": "URL de Codeur",
+      "description": "URL HTTPS. Laisser vide pour utiliser la configuration locale ou https://codeur.sponge-theory.dev.",
+      "default": ""
+    }
+  }
+}
