@@ -22,7 +22,8 @@ Accompagne la publication d'un contenu approuvé.
    `rayonne_list_video_venues`, demande à l'utilisateur sur lesquels des
    réseaux `connected` la publier, puis `rayonne_publish_video` avec
    exactement ces `venues` — rien n'est publié par défaut, ne choisis
-   jamais à sa place. LinkedIn et TikTok : depuis l'application seulement.
+   jamais à sa place. LinkedIn, TikTok et Instagram : depuis l'application
+   seulement.
 4. En mode `semi_auto`, enchaîne sur `rayonne_submission_kit` et rends le
    deep-link, les blocs à coller et la checklist, prêts à l'emploi. Une fois
    posté, `rayonne_confirm_submission` avec l'URL publique — elle est exigée,

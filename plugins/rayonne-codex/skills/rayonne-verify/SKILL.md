@@ -121,7 +121,8 @@ avant la production. Quand `rayonne_get_video` est en relecture, vérifie :
 Corrige avec `rayonne_update_storyboard`, ou `rayonne_chat_storyboard` pour
 une consigne en mots. Puis, sur le « oui » de l'utilisateur, lance
 `rayonne_approve_storyboard`. Les vidéos du plan à 90 jours, et celles pour
-TikTok ou LinkedIn, sont publiées par une personne, dans l'application.
+TikTok, Instagram ou LinkedIn, sont publiées par une personne, dans
+l'application.
 
 ## Galerie
 

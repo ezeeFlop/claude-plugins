@@ -22,15 +22,17 @@ Génère une vidéo produit et rends compte du résultat.
 6. Pour la publier : fais approuver le contenu de la vidéo
    (`rayonne_approve_content`), regarde où elle peut partir
    (`rayonne_list_video_venues`, `rayonne_list_accounts` pour les comptes
-   connectés), puis `rayonne_publish_video` avec les venues nommées. TikTok
-   et LinkedIn, et toute vidéo du plan à 90 jours, se publient par une
-   personne dans l'application : LinkedIn revient sauté
-   (`founder_approval_required`), TikTok refusé (`tiktok_requires_app`), et
+   connectés), puis `rayonne_publish_video` avec les venues nommées. TikTok,
+   Instagram et LinkedIn, et toute vidéo du plan à 90 jours, se publient par
+   une personne dans l'application : LinkedIn revient sauté
+   (`founder_approval_required`), TikTok et Instagram refusés
+   (`tiktok_requires_app`, `instagram_requires_app` — sur Instagram, la
+   personne relit la légende avant chaque Reel), et
    la validation d'une vidéo du plan par clé répond `409
    plan_video_human_approval_required` — donne à l'utilisateur le
    `publish_url` que la réponse porte, ne tente jamais de contourner.
-7. Sur TikTok et YouTube Shorts, le lien n'est cliquable que dans la bio ou
-   sur la chaîne : lis `bio_link` dans `rayonne_list_accounts` et, une fois
+7. Sur TikTok, Instagram et YouTube Shorts, le lien n'est cliquable que dans
+   la bio ou sur la chaîne : lis `bio_link` dans `rayonne_list_accounts` et, une fois
    que l'utilisateur l'a posé, `rayonne_confirm_bio_link` (serveur 0.10.0 et
    plus). Une vidéo sans bandeau de première image peut en recevoir un :
    `rayonne_suggest_video_cover` puis `rayonne_set_video_cover` (0.10.0).
