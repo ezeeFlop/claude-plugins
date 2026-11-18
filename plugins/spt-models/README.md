@@ -37,7 +37,7 @@ dependencies are resolved on first launch by [`uv`](https://docs.astral.sh/uv/) 
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-`.mcp.json` launches it with `uv run --directory ${CLAUDE_PLUGIN_ROOT} server/main.py`.
+`.mcp.json` launches it with `uv run --directory ${CLAUDE_PLUGIN_ROOT} server/launcher.py`.
 
 ## Configure your key
 
@@ -55,7 +55,7 @@ The form feeds these environment variables into the MCP server:
 | `SPT_BASE_URL` | `https://models.sponge-theory.dev` | Your gateway base URL (no trailing path). |
 | `SPT_API_KEY` | — (required) | Bearer token for `/v1/*` inference endpoints. |
 | `SPT_ADMIN_TOKEN` | — (optional) | Enables `load_model` / `unload_model` / `refresh_prompting_guide`. |
-| `SPT_REQUEST_TIMEOUT` | `300` | HTTP timeout (seconds); raise for large diffusion models. |
+| `SPT_REQUEST_TIMEOUT` | `3900` | HTTP timeout (seconds), allowing for long generation jobs. |
 | `SPT_VERIFY_TLS` | `true` | Set `false` only for self-signed certs. |
 
 *To change values later:* run `/plugin`, open **Installed** → `spt-models`, then
@@ -161,3 +161,10 @@ diff them.
 ## License
 
 MIT.
+
+## TRELLIS image-to-3D — 1.17.0
+
+`generate_image` accepts `image_path` for a local PNG/JPG, or the existing
+raw base64 `extra.image`. Use `prompt=""` and `output_path` ending in `.glb`.
+Gateway failures, including failed async jobs, retain their error message.
+See the [release and complete example](../../SPT_MODELS_RELEASE.md).

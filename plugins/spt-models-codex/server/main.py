@@ -18,6 +18,8 @@ import time
 from pathlib import Path
 from typing import Any
 
+import httpx
+
 # Allow `python server/main.py` invocation by ensuring the bundle's own
 # server/ directory is on sys.path.
 _HERE = Path(__file__).resolve().parent
@@ -28,9 +30,11 @@ if str(_HERE) not in sys.path:
 # unchanged, so accept either major rather than pinning ourselves to 1.x.
 try:
     from mcp.server.mcpserver import MCPServer as _Server  # SDK >= 2
+    from mcp.server.mcpserver.exceptions import ToolError
 except ImportError:
     try:
         from mcp.server.fastmcp import FastMCP as _Server  # SDK 1.x
+        from mcp.server.fastmcp.exceptions import ToolError
     except ImportError as exc:
         print(
             "ERROR: no usable 'mcp' Python SDK found (looked for "
@@ -318,10 +322,21 @@ async def generate_image(
     extra: dict[str, Any] | None = None,
     output_path: str | None = None,
     overwrite: bool = False,
+    image_path: str | None = None,
 ) -> dict[str, Any]:
-    """Generate one or more images from a prompt.
+    """Generate images, or a 3D GLB from an input image with trellis-2-4b.
 
     The model auto-loads on first use — do NOT call `load_model` first.
+
+    Image input (models accepting `image`, including trellis-2-4b): pass
+    `image_path` for a local PNG/JPG on the machine running this MCP server
+    (absolute path recommended, `~` supported). The server reads and base64-
+    encodes it. Alternatively, `extra.image` accepts the raw base64-encoded
+    PNG/JPG bytes: NOT a path, URL or `data:image/...;base64,` URI. Use only
+    one of `image_path` and `extra.image`. URLs are not fetched.
+    For TRELLIS use `prompt=""`, `extra={"resolution": 512}` (or 1024/1536)
+    and `output_path="/absolute/path/object.glb"`. `prompt` is not an image
+    path or a text-to-3D instruction; `size` does not set TRELLIS resolution.
 
     Resolution: prefer `extra={"width": W, "height": H}` using a resolution from
     the model's prompting guide — that is the authoritative channel. `size`
@@ -348,6 +363,19 @@ async def generate_image(
     replaced unless `overwrite=True`.  All other response fields are kept.
     Images also report `width` / `height`.
     """
+    if image_path is not None:
+        if extra is not None and "image" in extra:
+            raise ToolError("Pass only one of image_path or extra.image")
+        try:
+            image_bytes = Path(image_path).expanduser().read_bytes()
+        except (OSError, ValueError):
+            raise ToolError(
+                "image_path must point to a readable local PNG/JPG file on the "
+                "MCP server machine; URLs are not supported"
+            ) from None
+        if not image_bytes.startswith((b"\x89PNG\r\n\x1a\n", b"\xff\xd8\xff")):
+            raise ToolError("image_path must contain a PNG or JPEG image")
+        extra = {**(extra or {}), "image": base64.b64encode(image_bytes).decode("ascii")}
     target = spt_outputs.prepare(output_path, overwrite, expected_count=n) if output_path else None
     payload: dict[str, Any] = {
         "model": model,
@@ -366,7 +394,12 @@ async def generate_image(
         payload["seed"] = seed
     if extra:
         payload.update(extra)
-    resp = await _get_client().run_generation_job("/v1/images/generations", payload)
+    try:
+        resp = await _get_client().run_generation_job("/v1/images/generations", payload)
+    except httpx.HTTPStatusError as exc:
+        # SPTClient carries the gateway's message, including async job failures.
+        # SDK 2 hides it unless this is an anticipated MCP tool error.
+        raise ToolError(str(exc)) from exc
     return _deliver(resp.json(), target, model)
 
 

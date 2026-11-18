@@ -1,8 +1,7 @@
 # SPT Models for Codex
 
-Codex adapter for the SPT Models GPU stack. Ships the MCP bundle 1.16.0
-(17 tools, with MCP annotations; generation tools write files with `output_path`), model prompting guides, and secure macOS setup. The Claude Code
-plugin is independent and unchanged.
+Codex adapter for the SPT Models GPU stack. Ships the MCP bundle 1.17.0
+(17 tools, with MCP annotations; generation tools write files with `output_path`), model prompting guides, and secure macOS setup. The Claude Code plugin carries the same server; its connection setup remains separate.
 
 ## Install
 
@@ -97,3 +96,10 @@ whole catalogue without prompts, add to `~/.codex/config.toml`:
 default_tools_approval_mode = "approve"
 ```
 
+
+## TRELLIS image-to-3D — 1.17.0
+
+`generate_image` accepts `image_path` for a local PNG/JPG, or the existing
+raw base64 `extra.image`. Use `prompt=""` and `output_path` ending in `.glb`.
+Gateway failures, including failed async jobs, retain their error message.
+See the [release and complete example](../../SPT_MODELS_RELEASE.md).

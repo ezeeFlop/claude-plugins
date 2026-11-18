@@ -201,6 +201,36 @@ The first call triggers the load (tens of seconds for big diffusion models);
 subsequent calls reuse the loaded model and are fast.  Without `extra` width/
 height you get 512×512 — too small/square for most real uses.
 
+### Worked example — image to 3D with TRELLIS.2
+
+TRELLIS takes an **image**, not a text prompt. With MCP bundle 1.17.0 or later:
+
+```
+get_model_info(slug="trellis-2-4b")
+generate_image(
+    model="trellis-2-4b",
+    prompt="",
+    image_path="/absolute/path/object.png",
+    seed=42,
+    extra={"resolution": 512, "texture_size": 2048, "decimation_target": 300000},
+    output_path="/absolute/path/object.glb",
+)
+```
+
+`image_path` is read on the **MCP server's machine**, not on a GPU worker.
+Use a PNG/JPG of one clearly visible object. The server encodes the file as
+raw base64 in the gateway's `image` field; it does not fetch URLs.
+`resolution` is 512, 1024 (the model default), or 1536; `size` does not set it.
+The returned `files` entry identifies the GLB mesh with PBR materials.
+
+On older bundles, or when image bytes are already available, pass
+`extra={"image": image_b64, "resolution": 512}` instead of `image_path`.
+`image_b64` must be the complete raw base64 encoding of the PNG/JPG bytes —
+**never a path, URL, data URI or truncated string**. `prompt=""` is still
+required. Do not pass both input forms. `fps` and `remesh*` are not exposed by
+this SPT loader; upstream Python examples using them are not MCP calls.
+Allow for cold loading and processing time; do not retry a still-running job.
+
 ### Worked example — transcription
 
 `transcribe` takes two optional knobs beyond `language`:

@@ -16,3 +16,9 @@ credential stores. The launcher alone resolves credentials into its process.
 Media responses contain base64: save/decode programmatically without printing
 large payloads. Large video responses may exceed host output limits; don't
 claim a file is complete without verifying it. Generation can take over 20 minutes.
+
+For TRELLIS image-to-3D, use `generate_image(model="trellis-2-4b", prompt="",
+image_path="/absolute/path/object.png", extra={"resolution": 512},
+output_path="/absolute/path/object.glb")`. The PNG/JPG is read on the MCP server
+machine. Alternatively use complete raw base64 in `extra.image`; never put
+a path, URL or data URI there. Use only one input form.

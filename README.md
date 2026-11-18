@@ -91,3 +91,9 @@ Les plugins Claude Code et Codex, les bundles Claude Desktop et les parcours de 
 [MCPB pour Claude Desktop](https://github.com/ezeeFlop/claude-plugins/releases/tag/codeur-mcp-v0.1.0),
 163 opérations métier et diagnostic. Authentification par clé API révocable ;
 saisie masquée dans Claude Desktop et stockage dédié au trousseau pour Codex sur macOS.
+
+## SPT Models 1.17.0 — TRELLIS image-to-3D
+
+Local PNG/JPG input via `image_path`, detailed gateway errors, and the same
+server for Claude Code, Codex and Claude Desktop. See the
+[update instructions, MCPB download and complete example](SPT_MODELS_RELEASE.md).
