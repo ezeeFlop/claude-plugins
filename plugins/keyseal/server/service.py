@@ -78,7 +78,10 @@ class Service:
     def call(self, method, path, data=None, *, public=False):
         if not path.startswith((API + "/", "/v1/")) or path.startswith("//"):
             raise Problem("Invalid service path.")
-        headers = {"Accept": "application/json", "User-Agent": "Keyseal-publisher/1.0.1"}
+        headers = {
+            "Accept": "application/json",
+            "User-Agent": "Keyseal-publisher/1.1.0",
+        }
         if not public:
             headers["Authorization"] = "Bearer " + self._key
         payload = None
@@ -153,6 +156,7 @@ def context(api):
                 "stripe",
             )
         }
+        | {field: row.get(field) for field in ("update_major", "usage_terms")}
         for row in plans
     ]
     return {
@@ -161,6 +165,7 @@ def context(api):
         "offers": offers,
         "products": [
             {k: row[k] for k in ("id", "name", "slug", "key_prefix", "ls_compat")}
+            | {k: row.get(k) for k in ("terms_url", "privacy_url")}
             for row in rows
         ],
     }
@@ -192,6 +197,8 @@ PRODUCT_FIELDS = {
     "key_prefix",
     "description",
     "website_url",
+    "terms_url",
+    "privacy_url",
     "image_url",
     "page_enabled",
     "offline_policy",
@@ -205,6 +212,8 @@ PLAN_FIELDS = {
     "seats",
     "features",
     "update_months",
+    "update_major",
+    "usage_terms",
     "public",
     "price",
     "free",
@@ -283,8 +292,9 @@ def product(api, **args):
         if not found:
             desired.setdefault("public", False)
             require(
-                all(k in desired for k in ("name", "kind", "seats")),
-                "New offers require name, kind and seats.",
+                all(k in desired for k in ("name", "kind"))
+                and ("seats" in desired or bool(desired.get("usage_terms"))),
+                "New offers require name, kind and either device seats or contractual use rights.",
             )
         delta = diff(found, desired, {"slug", "kind"}) if found else desired
         if flow == "new" and cur and found and delta:
@@ -456,7 +466,17 @@ def release(api, **args):
         "product": cur["slug"],
         "files": [meta for _, meta, _ in files],
     }
+    requested_major = args.get("update_major")
+    if requested_major is not None:
+        report["update_major"] = requested_major
     if existing:
+        if requested_major is not None and requested_major != existing.get(
+            "update_major"
+        ):
+            require(
+                existing["status"] == "draft",
+                "A published major classification cannot change.",
+            )
         require(
             existing["public"] is False,
             "This version has broader download coverage. Review its policy first.",
@@ -474,8 +494,30 @@ def release(api, **args):
         existing = api.call(
             "POST",
             base,
-            {"version": version, "notes": args.get("notes", ""), "public": False},
+            {
+                "version": version,
+                "notes": args.get("notes", ""),
+                "public": False,
+                **(
+                    {"update_major": requested_major}
+                    if requested_major is not None
+                    else {}
+                ),
+            },
         )
+    elif (
+        requested_major is not None and existing.get("update_major") != requested_major
+    ):
+        existing = api.call(
+            "PATCH",
+            f"{API}/releases/{existing['id']}",
+            {"update_major": requested_major},
+        )
+    expected_major = existing.get("update_major")
+    require(
+        requested_major is None or requested_major == expected_major,
+        "The release has a different major.",
+    )
     require(
         existing["public"] is False,
         "This version has broader download coverage. Review its policy first.",
@@ -510,6 +552,10 @@ def release(api, **args):
 
         def verify_manifest(row):
             require(
+                row.get("update_major") == expected_major,
+                "Release major changed. Review download coverage.",
+            )
+            require(
                 row["public"] is False, "Download coverage changed. Review the release."
             )
             keys = ("platform", "filename", "sha256", "size")
@@ -525,4 +571,9 @@ def release(api, **args):
         if final["status"] == "draft":
             final = api.call("POST", f"{API}/releases/{rid}/publish")
             verify_manifest(final)
-    return {**report, "id": rid, "status": final["status"]}
+    return {
+        **report,
+        "id": rid,
+        "status": final["status"],
+        "update_major": final.get("update_major"),
+    }

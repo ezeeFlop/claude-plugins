@@ -28,6 +28,10 @@ def obj(properties, required=()):
     }
 
 
+def nullable(schema):
+    return {**schema, "type": [schema["type"], "null"]}
+
+
 def array(items, limit, minimum=0):
     return {"type": "array", "items": items, "minItems": minimum, "maxItems": limit}
 
@@ -47,6 +51,9 @@ price = obj(
     },
     ["amount", "currency"],
 )
+major = number(0, 999999999)
+legal_url = nullable({**TEXT, "maxLength": 500, "pattern": r"https://[^\s]+"})
+translation = {**TEXT, "maxLength": 400}
 offer = obj(
     {
         "slug": SLUG,
@@ -54,6 +61,10 @@ offer = obj(
         "kind": enum("perpetual", "perpetual_with_updates", "renewal", "subscription"),
         "seats": number(1, 1000000),
         "update_months": number(1, 1200),
+        "update_major": nullable(major),
+        "usage_terms": nullable(
+            obj({"fr": translation, "en": translation}, ["fr", "en"])
+        ),
         "features": array(TEXT, 50),
         "free": FLAG,
         "public": FLAG,
@@ -68,6 +79,8 @@ product_spec = obj(
         "key_prefix": {**TEXT, "pattern": "^[A-Z]{3}$"},
         "description": {"type": "string", "maxLength": 5000},
         "website_url": TEXT,
+        "terms_url": legal_url,
+        "privacy_url": legal_url,
         "image_url": TEXT,
         "page_enabled": FLAG,
         "tax_code": TEXT,
@@ -115,6 +128,7 @@ TOOLS = {
                 "action": action,
                 "product_slug": SLUG,
                 "version": TEXT,
+                "update_major": major,
                 "notes": {"type": "string"},
                 "publish": FLAG,
                 "files": array(artifact, len(PLATFORMS), 1),
@@ -134,6 +148,10 @@ TOOLS = {
 
 def validate(value, schema):
     kind = schema["type"]
+    if isinstance(kind, list):
+        if value is None and "null" in kind:
+            return
+        kind = next(t for t in kind if t != "null")
     types = {
         "object": dict,
         "array": list,
@@ -206,7 +224,7 @@ def dispatch(message):
         result = {
             "protocolVersion": protocol if protocol in versions else versions[0],
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "keyseal-publisher", "version": "1.0.1"},
+            "serverInfo": {"name": "keyseal-publisher", "version": "1.1.0"},
         }
     elif method == "ping":
         result = {}
