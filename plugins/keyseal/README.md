@@ -40,8 +40,12 @@ Ask the agent to run `keyseal_context` and verify the publisher and environment 
 | `keyseal_image` | Store an official local raster image and assign the Keyseal-hosted visual to its product |
 | `keyseal_release` | Hash, upload and publish verified builds with the existing buyer coverage |
 
+When two publishers work on the same release version, finish editing its files before publishing. The plugin checks the file list, digests and download coverage immediately before and after publication. A concurrent change between those checks can be detected after the release becomes visible.
+
 The server never returns management credentials or storage upload tickets. Existing paid licences, historic installations and checkout links can be preserved independently of catalogue enrichment.
 
 ## En français
 
 Installez le plugin avec les commandes de votre client ci-dessus. Vérifiez l’organisation et Test ou Live avec `keyseal_context`. Dans le dépôt du produit, demandez par exemple « Prépare la fiche de cette application dans Keyseal Test avec son site et son visuel officiels. Montre-moi les offres avant publication. » Pour une application importée, indiquez son produit existant. Le plugin retrouve ses identifiants, publie les versions construites par le dépôt et restitue les clés publiques à embarquer. Les droits `catalog` et `files` suffisent pour ces opérations. [Guides de la plateforme](https://keyseal.io/fr/docs/).
+
+Si plusieurs personnes préparent la même version, terminez les modifications du brouillon avant sa publication. Le plugin compare les fichiers, les empreintes et les droits de téléchargement avant et après la publication. Une modification simultanée peut donc être signalée une fois la version visible.
