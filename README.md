@@ -97,3 +97,7 @@ saisie masquée dans Claude Desktop et stockage dédié au trousseau pour Codex 
 Local PNG/JPG input via `image_path`, detailed gateway errors, and the same
 server for Claude Code, Codex and Claude Desktop. See the
 [update instructions, MCPB download and complete example](SPT_MODELS_RELEASE.md).
+
+## Keyseal
+
+Configurer et illustrer un produit, reprendre une application importée de Lemon Squeezy et publier des versions pour les clients. [Installation pour Claude Code et Codex](plugins/keyseal/README.md).

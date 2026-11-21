@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "keyseal": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--no-project",
+        "--python",
+        "3.11",
+        "${CLAUDE_PLUGIN_ROOT}/server/publisher.py"
+      ]
+    }
+  }
+}

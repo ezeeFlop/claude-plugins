@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "keyseal": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--no-project",
+        "--python",
+        "3.11",
+        "server/publisher.py"
+      ],
+      "cwd": ".",
+      "startup_timeout_sec": 120,
+      "tool_timeout_sec": 1200,
+      "env_vars": [
+        "KEYSEAL_API_KEY",
+        "KEYSEAL_PROFILE",
+        "XDG_CONFIG_HOME"
+      ]
+    }
+  }
+}

@@ -247,6 +247,19 @@
         "facturation",
         "mcp"
       ]
+    },
+    {
+      "name": "keyseal",
+      "displayName": "Keyseal",
+      "description": "Configure products and offers from a project, migrate existing app integrations and publish verified builds to Keyseal.",
+      "author": {
+        "name": "Sponge Theory",
+        "url": "https://sponge-theory.io"
+      },
+      "category": "development",
+      "version": "1.0.0",
+      "source": "./plugins/keyseal",
+      "homepage": "https://keyseal.io"
     }
   ]
 }

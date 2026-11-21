@@ -1,0 +1,30 @@
+{
+  "name": "keyseal-codex",
+  "version": "1.0.0",
+  "description": "Configure products and offers from a project, migrate existing app integrations and publish verified builds to Keyseal.",
+  "author": {
+    "name": "Sponge Theory",
+    "url": "https://sponge-theory.io"
+  },
+  "homepage": "https://keyseal.io",
+  "repository": "https://github.com/ezeeFlop/claude-plugins",
+  "license": "MIT",
+  "skills": "./skills/",
+  "mcpServers": "./.codex-plugin/servers.json",
+  "interface": {
+    "displayName": "Keyseal",
+    "shortDescription": "Configure products, licences and releases",
+    "longDescription": "Configure products and offers from a project, migrate existing app integrations and publish verified builds to Keyseal.",
+    "developerName": "Sponge Theory",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Configure this project in Keyseal.",
+      "Prepare a release for the existing product."
+    ],
+    "logo": "./assets/icon.png"
+  }
+}

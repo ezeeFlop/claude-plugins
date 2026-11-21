@@ -1,0 +1,12 @@
+{
+  "name": "keyseal",
+  "version": "1.0.0",
+  "description": "Configure products and offers from a project, migrate existing app integrations and publish verified builds to Keyseal.",
+  "author": {
+    "name": "Sponge Theory",
+    "url": "https://sponge-theory.io"
+  },
+  "homepage": "https://keyseal.io",
+  "repository": "https://github.com/ezeeFlop/claude-plugins",
+  "license": "MIT"
+}
