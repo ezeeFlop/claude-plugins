@@ -257,7 +257,7 @@
         "url": "https://sponge-theory.io"
       },
       "category": "development",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "source": "./plugins/keyseal",
       "homepage": "https://keyseal.io"
     }

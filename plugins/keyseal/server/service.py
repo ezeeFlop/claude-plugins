@@ -78,7 +78,7 @@ class Service:
     def call(self, method, path, data=None, *, public=False):
         if not path.startswith((API + "/", "/v1/")) or path.startswith("//"):
             raise Problem("Invalid service path.")
-        headers = {"Accept": "application/json", "User-Agent": "Keyseal-publisher/1.0"}
+        headers = {"Accept": "application/json", "User-Agent": "Keyseal-publisher/1.0.1"}
         if not public:
             headers["Authorization"] = "Bearer " + self._key
         payload = None

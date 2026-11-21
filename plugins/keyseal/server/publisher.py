@@ -206,7 +206,7 @@ def dispatch(message):
         result = {
             "protocolVersion": protocol if protocol in versions else versions[0],
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "keyseal-publisher", "version": "1.0.0"},
+            "serverInfo": {"name": "keyseal-publisher", "version": "1.0.1"},
         }
     elif method == "ping":
         result = {}

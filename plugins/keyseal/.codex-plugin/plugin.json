@@ -1,6 +1,6 @@
 {
   "name": "keyseal-codex",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Configure products and offers from a project, migrate existing app integrations and publish verified builds to Keyseal.",
   "author": {
     "name": "Sponge Theory",
@@ -8,7 +8,6 @@
   },
   "homepage": "https://keyseal.io",
   "repository": "https://github.com/ezeeFlop/claude-plugins",
-  "license": "MIT",
   "skills": "./skills/",
   "mcpServers": "./.codex-plugin/servers.json",
   "interface": {
